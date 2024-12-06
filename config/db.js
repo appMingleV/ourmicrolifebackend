@@ -1,10 +1,10 @@
 import mysql from 'mysql'
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ourmicrolife'
+    host: 'srv1118.hstgr.io',
+    user: 'u637715618_ourmicrolife',
+    password: 'h+5JOJ7l6@UH',
+    database: 'u637715618_ourmicrolife'
 });
 
 pool.getConnection((err, connection) => {
