@@ -143,3 +143,34 @@ export const refferalCreate = async (req, res) => {
         });
     }
 };
+
+
+export const getRefferalUser=(req,res)=>
+    {
+        const {userId}=req.params;
+      try{
+        const queryGetRefferalUser = `SELECT * FROM refferal WHERE user_id=${userId} AND referral_status = 'active'`;
+        pool.query(queryGetRefferalUser, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    status: "failed",
+                    message: "Operation failed",
+                    error: err.message
+                });
+            }
+
+            return res.status(200).json({
+                status:"success",
+                message:"operation successful",
+                Data:result
+            })
+        
+        });
+      }catch(err){
+        return res.status(500).json({
+            status: "failed",
+            message: "Operation failed",
+            error: err.message
+        })
+      }
+    }

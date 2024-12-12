@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import coins from './coins.js';
-import {refferalCreate} from '../controllers/refferalController/refferController.js'
+import {refferalCreate,getRefferalUser} from '../controllers/refferalController/refferController.js'
 import {decryptRefferal} from '../middleware/index.js';
 
 const route=Router();
@@ -15,6 +15,7 @@ route.use('/coins',coins)
 
 //refferal routes-->
 route.post('/refferal/user/:userId',decryptRefferal(),refferalCreate);
+route.get('/refferal/user/:userId',getRefferalUser)
 route.post('/signup-user/:userId',decryptRefferal(),refferalCreate);
 
 
