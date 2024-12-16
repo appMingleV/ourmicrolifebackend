@@ -3,7 +3,7 @@ export const decryptRefferal = () => {
     return (req, res, next) => {
         console.log("Decrypt referral middleware is running...");
 
-        const { ref, vi } = req.query; // 'vi' for IV in the query parameters
+        const { ref, iv:vi } = req.query; // 'vi' for IV in the query parameters
         console.log("Received ref:", ref, " Received IV:", vi);
 
         try {
