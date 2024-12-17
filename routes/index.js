@@ -20,6 +20,6 @@ route.post('/refferal/user/:userId',decryptRefferal(),refferalCreate);
 route.get('/refferal/user/:userId',getRefferalUser)
 route.post('/signup-user/:userId',decryptRefferal(),refferalCreate);
 
-route.use('/admim',admin);
+route.use('/admin',admin);
 route.use('/vendor',vendor);
 export default route;
