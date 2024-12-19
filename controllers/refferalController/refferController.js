@@ -1,6 +1,7 @@
 import { customAlphabet } from 'nanoid';
 import crypto from 'crypto';
 import pool from '../../config/db.js';
+import { resolve } from 'path';
 
 // Define characters for generating referral code
 const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' + 'microlife';
@@ -36,75 +37,35 @@ export const refferalCreate = async (req, res) => {
     const refferalCode = req.decrypt; // Assuming decrypted referral code exists
 
     try {
-        // Handle referral logic
         if (refferalCode) {
-            const queryCheckRefferalCode = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
+            const referralDetails = await checkReferralCode(refferalCode);
 
-            pool.query(queryCheckRefferalCode, [refferalCode], (err, result) => {
-                if (err) {
-                    return res.status(500).json({
-                        status: "failed",
-                        message: "Error validating referral code",
-                        error: err.message
-                    });
-                }
-
-                if (!result.length || !result[0].user_id) {
-                    return res.status(404).json({
-                        status: "failed",
-                        message: "Invalid or inactive referral code"
-                    });
-                }
-
-                const referredUserId = result[0].user_id;
-                
-                // Add coins for the referred user
-                const queryInsertCoins = `INSERT INTO coins (user_id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = value + ?`;
-                const values = [userId, 50, 50];
-
-                pool.query(queryInsertCoins, values, (err) => {
-                    if (err) {
-                        return res.status(500).json({
-                            status: "failed",
-                            message: "Error adding coins",
-                            error: err.message
-                        });
-                    }
-
-                    // Update coins for the referral source user
-                    const queryUpdateCoins = `UPDATE coins SET value = value + ? WHERE user_id = ?`;
-                    pool.query(queryUpdateCoins, [50, referredUserId], (err) => {
-                        if (err) {
-                            return res.status(500).json({
-                                status: "failed",
-                                message: "Error updating referral coins",
-                                error: err.message
-                            });
-                        }
-
-                        return res.status(200).json({
-                            status: "success",
-                            message: "Referral successfully processed"
-                        });
-                    });
+            if (!referralDetails) {
+                return res.status(404).json({
+                    status: "failed",
+                    message: "Invalid or inactive referral code",
                 });
-            });
+            }
+
+            const referredUserId = referralDetails.user_id;
+            console.log(referredUserId)
+            const directReferral = await setDirectReferral(referredUserId, userId);
+
+            if (!directReferral) {
+                return res.status(400).json({
+                    status: "failed",
+                    message: "Error setting direct referral",
+                });
+            }
+            const Teams=await setTeam(referredUserId,userId)
+
+            await addCoins(userId, 50); // Add coins for the new user
+            await addCoins(referredUserId, 50); // Add coins for the referrer
         } else {
             // Add coins for a new user without referral
-            const queryInsertCoins = `INSERT INTO coins (user_id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = value + ?`;
-            const values = [userId, 50, 50];
+            await addCoins(userId, 50);
 
-            pool.query(queryInsertCoins, values, (err) => {
-                if (err) {
-                    return res.status(500).json({
-                        status: "failed",
-                        message: "Error adding coins",
-                        error: err.message
-                    });
-                }
-
-                console.log("Successfully added user without referral");
-            });
+            console.log("Successfully added user without referral");
         }
 
         // Generate referral code and link
@@ -112,33 +73,247 @@ export const refferalCreate = async (req, res) => {
         const { encryptedData, iv: ivHex } = encrypt(referralCode);
         const referralLink = `${req.protocol}://${req.headers.host}/signup-user?ref=${encryptedData}&iv=${ivHex}`;
 
-        const queryInsertReferral = `INSERT INTO refferal (referral_link, referral_code, referral_status, user_id) VALUES (?, ?, ?, ?)`;
-        const values = [referralLink, referralCode, 'active', userId];
+        const newReferral = await createReferral(referralLink, referralCode, userId);
 
-        pool.query(queryInsertReferral, values, (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    status: "failed",
-                    message: "Error creating referral",
-                    error: err.message
-                });
-            }
-
-            return res.status(200).json({
-                status: "success",
-                message: "Referral successfully created",
-                data: result.insertId
-            });
+        return res.status(200).json({
+            status: "success",
+            message: "Referral successfully created",
+            data: newReferral.insertId,
         });
     } catch (err) {
         return res.status(500).json({
             status: "failed",
             message: "Unexpected error occurred",
-            error: err.message
+            error: err.message,
         });
     }
 };
 
+// Check referral code validity
+const checkReferralCode = (referralCode) => {
+    const query = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
+    return new Promise((resolve, reject) => {
+        pool.query(query, [referralCode], (err, results) => {
+            if (err) return reject(err);
+            resolve(results.length > 0 ? results[0] : null);
+        });
+    });
+};
+
+// Set direct referral
+const setDirectReferral = (referralFrom, referralTo) => {
+    const query = `INSERT INTO direct_referrals (referral_from, referral_to, date, status, coin, coins_transfer) VALUES (?, ?, ?, ?, ?, ?)`;
+    const values = [referralFrom, referralTo, new Date(), "active", 50, true];
+
+    return new Promise((resolve, reject) => {
+        pool.query(query, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
+};
+
+// Add coins to user
+const addCoins = (userId, value) => {
+    const query = `SELECT value FROM coins WHERE user_id = ?`;
+    const values = [userId];
+    
+    return new Promise((resolve, reject) => {
+
+        pool.query(query, values, (err, result) => {
+            if (err) return reject(err);
+            if(result.length===0){
+                const insertQuery=`INSERT INTO coins (user_id, value) VALUES (?,?)`;
+                const insertValues=[userId,value];
+                pool.query(insertQuery,insertValues,(err,insertResult)=>{
+                    if(err) return reject(err);
+                    resolve(insertResult);
+                });
+            }else{
+                console.log()
+                const updateQuery=`UPDATE coins SET value=value+? WHERE userid_=?`;
+                const updateValues=[value+result[0].value,userId];
+                pool.query(updateQuery,updateValues,(err,updateResult)=>{
+                    if(err) return reject(err);
+                    resolve(updateResult);
+                });
+            }
+
+            resolve(result);
+        });
+    });
+};
+
+// Create referral entry
+const createReferral = (referralLink, referralCode, userId) => {
+    const query = `INSERT INTO refferal (referral_link, referral_code, referral_status, user_id) VALUES (?, ?, ?, ?)`;
+    const values = [referralLink, referralCode, "active", userId];
+
+    return new Promise((resolve, reject) => {
+        pool.query(query, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
+};
+const refferalTeam=[14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+const setTeam = async (referredUserId, userId) => {
+    try {
+        // Insert the new user's referral information
+        const querySetTeam = `INSERT INTO team_referral (user_id, status, coins, date, teams) VALUES (?, ?, ?, ?, ?)`;
+        const value = [referredUserId, "active", 50, new Date(), JSON.stringify([userId])];
+        const teamInsertResult = await queryPromise(querySetTeam, value);
+
+        // Retrieve parent team information
+        const queryParentRef = `SELECT team FROM tbl_users WHERE id = ?`;
+        const parentResult = await queryPromise(queryParentRef, [referredUserId]);
+
+        const parentTeams = parentResult[0]?.team ? JSON.parse(parentResult[0].team) : [];
+
+        if (parentTeams.length === 0) {
+            // Parent has no team yet, initialize with the current user's team
+            const queryPutTeam = `UPDATE tbl_users SET team = ? WHERE id = ?`;
+            await queryPromise(queryPutTeam, [JSON.stringify([teamInsertResult.insertId]), userId]);
+            return teamInsertResult;
+        }
+
+        // Update parent teams and propagate changes
+        const updatedTeams = [ teamInsertResult.insertId,...parentTeams];
+
+        // Update the parent user's team with new entries
+        const queryUpdateNewUserParent = `UPDATE tbl_users SET team = ? WHERE id = ?`;
+        await queryPromise(queryUpdateNewUserParent, [JSON.stringify(updatedTeams), userId]);
+
+        // Add new user to all parent teams in the hierarchy
+        for (const parentId of parentTeams) {
+            const queryTeamSearch = `SELECT teams FROM team_referral WHERE id= ?`;
+            const teamSearchResult = await queryPromise(queryTeamSearch, [parentId]);
+
+            const currentTeams = teamSearchResult[0]?.teams ? JSON.parse(teamSearchResult[0].teams) : [];
+            if (!currentTeams.includes(userId)) {
+                currentTeams.push(userId);
+
+                const queryPutTeamUnique = `UPDATE team_referral SET teams = ? WHERE id= ?`;
+                await queryPromise(queryPutTeamUnique, [JSON.stringify(currentTeams), parentId]);
+            }
+        }
+
+        return teamInsertResult;
+    } catch (err) {
+        console.error("Error in setTeam:", err);
+        throw err;
+    }
+};
+
+
+export const getRefferalUsers=async(req,res)=>{
+    try{
+        const {userId,query}=req.params;
+       console.log("get refferal")
+    
+        if(query=='all'){
+       //all typeRefferal get-->
+     
+        }else if(query=='directReferral'){
+            const directRefferalUsers = await getDirectRefferalUsers(userId);
+            console.log("direct refferal  given user id",directRefferalUsers);
+     
+            const  {objTeamData,objUserTeam,objDirectRefferal} = await getUserProfileRefferalUsers(directRefferalUsers);
+           
+     
+             const successData=[];
+             for(let i=0;i<objTeamData.length;i++){
+             
+                const userName=objUserTeam[i][0].first_name+" "+objUserTeam[i][0]?.last_name;
+                const level=objUserTeam[i][0]?.level;
+                const status=objUserTeam[i][0]?.status;
+                const teams=objTeamData[i].length;
+                let totalMembers=0;
+                for(let teamMember of objTeamData[i]){
+                      totalMembers+=JSON.parse(teamMember.teams).length;
+                }
+                const totalUser=totalMembers;
+                const directRefMembers=objDirectRefferal[i].length;
+                successData.push({
+                 userName,
+                 level,
+                 status,
+                 teams,
+                 totalUser,
+                 directRefMembers
+                })
+     
+             }
+              return res.status(200).json({
+                 status: "success",
+                 message: "All direct referral users fetched",
+                 data: successData
+              })
+        }else{
+            // const teamQuery=`SELECT `
+        }
+
+    }catch(err){
+        return res.status(500).json({
+            status: "failed",
+            message: "Operation failed",
+            error: err.message
+        })
+    }
+}
+
+
+function getDirectRefferalUsers(userId){
+    const queryDirectReferral=`SELECT referral_to FROM direct_referrals WHERE referral_from=?`;
+    const value=[userId];
+    return new Promise((resolve, reject) =>{
+        pool.query(queryDirectReferral,value,(err,result)=>{
+            if(err) return reject(err);
+            resolve(result);
+        })
+    })
+    
+}
+
+
+ function getUserProfileRefferalUsers(directRefferalUsers){
+    return new Promise(async (resolve,reject)=>{
+        const objTeamData=[];
+        const objUserTeam=[];
+        const objDirectRefferal=[];
+        for(let directRef of directRefferalUsers){
+            //directRef--> { referral_to: 27 }
+            //direct RefferalUser Profile--->
+            const queryUserPorfile=`SELECT first_name, last_name,level,status FROM  tbl_users WHERE id=?`;
+            const value=[directRef.referral_to];
+            const profileData= await queryPromise(queryUserPorfile,value);
+            // direct refferal user Profile Team--->
+            const queryUserTeam=`SELECT teams FROM team_referral  WHERE user_id=?`;
+          
+            const teamData=await queryPromise(queryUserTeam,value);
+            // console.log("team data ",teamData,"profile data ",profileData);
+
+            //direct refferal users -->
+            const queryDirectReferralUser=`SELECT referral_to FROM direct_referrals WHERE referral_from=?`;
+            const queryDirectReferal=await queryPromise(queryDirectReferralUser,value);
+            objUserTeam.push(profileData);
+            objTeamData.push(teamData);
+            objDirectRefferal.push(queryDirectReferal);
+        }
+        // console.log("get all details Team ",objTeamData, " get all details profile ",objUserTeam, " get all details refferal ",objDirectRefferal);
+        resolve({objTeamData,objUserTeam,objDirectRefferal});
+    })
+   
+}
+// Utility function to promisify pool.query
+const queryPromise = (query, values = []) => {
+    return new Promise((resolve, reject) => {
+        pool.query(query, values, (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+};
 
 export const getRefferalUser=(req,res)=>
     {
@@ -169,3 +344,28 @@ export const getRefferalUser=(req,res)=>
         })
       }
     }
+
+
+
+
+
+
+        //    refferal direct user [
+    //     [
+    //       RowDataPacket {
+    //         first_name: 'anki',
+    //         last_name: 'sha',
+    //         level: null,
+    //         status: 1
+    //       }
+    //     ],
+    //     [
+    //       RowDataPacket {
+    //         first_name: 'ankit',
+    //         last_name: 'askjbd',
+    //         level: null,
+    //         status: 1
+    //       }
+    //     ]
+    //   ]
+    //   refferal direct direct [ [ RowDataPacket { referral_to: 28 } ], [] ]
