@@ -206,6 +206,24 @@ const setTeam = async (referredUserId, userId) => {
     }
 };
 
+export const  getCheckRefferalCode=(req,res)=>{
+     try{
+        const decryptedRefferalCode = req.decrypt;
+  
+        return res.status(200).json({
+            status: "success",
+            message: "Referral code is valid",
+            data: decryptedRefferalCode,
+        })
+        
+     }catch(err){
+        return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message,
+        })
+     }
+}
 
 export const getRefferalUsers=async(req,res)=>{
     try{

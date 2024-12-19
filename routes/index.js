@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import coins from './coins.js';
-import {refferalCreate,getRefferalUser,getRefferalUsers} from '../controllers/refferalController/refferController.js'
+import {refferalCreate,getRefferalUser,getRefferalUsers,getCheckRefferalCode} from '../controllers/refferalController/refferController.js'
 import {decryptRefferal} from '../middleware/index.js';
 import admin from './admin.js'
 import vendor from './vendor.js'
@@ -20,7 +20,7 @@ route.post('/refferal/user/:userId',decryptRefferal(),refferalCreate);
 route.get('/refferal/user/:userId',getRefferalUser)
 route.post('/signup-user/:userId',decryptRefferal(),refferalCreate);
 route.get('/refferal/user/:userId/:query',getRefferalUsers);
-
+route.get('/refferal-code/has-ref/:ref/iv/:iv',decryptRefferal(),getCheckRefferalCode)
 route.use('/admin',admin);
 route.use('/vendor',vendor);
 export default route;
