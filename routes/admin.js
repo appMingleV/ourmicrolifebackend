@@ -3,7 +3,9 @@ import { Router } from "express";
 import {addCategory,editCategory,deleteCategory,singleCategory,getAllCategories} from '../controllers/adminController/categoryContoller.js'
 import {vedorList,singleVendor,vedorChangeStatus} from '../controllers/adminController/adminController.js'
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
+import {directReferralAddCoins,getDirectReferal} from '../controllers/adminController/referralManagment.js';
 import multer from "multer";
+
 
 const routes=Router();
 const storage = multer.diskStorage({
@@ -54,5 +56,8 @@ routes.get('/vendorSingle/:vendorId',singleVendor)
 routes.put('/vendorStatus/:vendorId',vedorChangeStatus)
 
 
+
+routes.post('/direct-referral/coin',directReferralAddCoins)
+routes.get('/direct-referral/coin',getDirectReferal)
 
 export default routes;
