@@ -4,6 +4,7 @@ import {addCategory,editCategory,deleteCategory,singleCategory,getAllCategories}
 import {vedorList,singleVendor,vedorChangeStatus} from '../controllers/adminController/adminController.js'
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
 import {directReferralAddCoins,getDirectReferal} from '../controllers/adminController/referralManagment.js';
+import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
 import multer from "multer";
 
 
@@ -59,5 +60,25 @@ routes.put('/vendorStatus/:vendorId',vedorChangeStatus)
 
 routes.post('/direct-referral/coin',directReferralAddCoins)
 routes.get('/direct-referral/coin',getDirectReferal)
+
+
+
+// campaign CRUD-->
+const storage2=multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/campaign/'); // Folder for storing uploaded files
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix ='campaign' +Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+})
+
+const upload2=multer({ storage:storage2 });
+const campaignImage=upload2.single('image');
+routes.post('/campaign/page/:page/location/:location',campaignImage,compaignAdd)
+routes.put('/campaign/:campaignId',campaignImage,updateCampaign)
+routes.delete('/campaign/:campaignId',deleteCampaign)
+routes.get('/campaign/page/:page/location/:location',getCampaign)
 
 export default routes;

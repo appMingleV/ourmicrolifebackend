@@ -72,7 +72,7 @@ export const refferalCreate = async (req, res) => {
         // Generate referral code and link
         const referralCode = generateReferralCode();
         const { encryptedData, iv: ivHex } = encrypt(referralCode);
-        const referralLink = `${req.protocol}://${req.headers.host}/signup-user?ref=${encryptedData}&iv=${ivHex}`;
+        const referralLink = `https://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
 
         const newReferral = await createReferral(referralLink, referralCode, userId);
 
