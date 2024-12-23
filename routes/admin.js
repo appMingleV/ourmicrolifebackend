@@ -5,6 +5,7 @@ import {vedorList,singleVendor,vedorChangeStatus} from '../controllers/adminCont
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
 import {directReferralAddCoins,getDirectReferal} from '../controllers/adminController/referralManagment.js';
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
+import {addSlider,allSlider,deleteSlider} from '../controllers/adminController/sliderController.js'
 import multer from "multer";
 
 
@@ -80,5 +81,21 @@ routes.post('/campaign/page/:page/location/:location',campaignImage,compaignAdd)
 routes.put('/campaign/:campaignId',campaignImage,updateCampaign)
 routes.delete('/campaign/:campaignId',deleteCampaign)
 routes.get('/campaign/page/:page/location/:location',getCampaign)
+
+//slider -->
+const storage3=multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/sliders/'); // Folder for storing uploaded files
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix ='slider' +Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+})
+const upload3=multer({storage:storage3});
+const singleImage3=upload3.single('image');
+routes.post('/sliders',singleImage3,addSlider);
+routes.get('/sliders',allSlider);
+routes.delete('/sliders/:sliderId',deleteSlider);
 
 export default routes;
