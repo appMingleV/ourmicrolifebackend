@@ -94,8 +94,10 @@ const storage3=multer.diskStorage({
 })
 const upload3=multer({storage:storage3});
 const singleImage3=upload3.single('image');
-routes.post('/sliders',singleImage3,addSlider);
-routes.get('/sliders',allSlider);
+routes.post('/sliders/:query',singleImage3,addSlider);
+routes.get('/sliders/:query',allSlider);
 routes.delete('/sliders/:sliderId',deleteSlider);
+
+
 
 export default routes;

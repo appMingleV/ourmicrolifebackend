@@ -2,7 +2,9 @@ import { Router } from "express";
 import multer from "multer";
 
 import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login } from '../controllers/vendorAuth/vendorAuthController.js'
+
 import {dimensionsProduct,getDimensionProduct} from '../controllers/vendorAuth/product.js'
+import store from './store.js'
 const routes=Router();
 
 const storage = multer.diskStorage({
@@ -45,7 +47,19 @@ routes.get('/:vendorId',vendorDetails)
 
 //dimenesion of product added--->
 routes.post('/dimension/product/:productId',dimensionsProduct)
+routes.get('/dimension/product/:product',getDimensionProduct)
+
+
+routes.use('/stores',store);
+//shop details-->
+
 
 //vendor login
 routes.post('/login',login)
+
+
+
+
+
+
 export default routes;

@@ -5,10 +5,11 @@ import pool from "../../config/db.js";
 
 export const addSlider = async (req, res) => {
     try {
+        const {query}=req.params;
         const { link } = req.body;
 
-        const queryAddSlider = `INSERT INTO sliders (image,link) VALUES (?,?)`;
-        const values = [req.file.filename, link];
+        const queryAddSlider = `INSERT INTO sliders (image,link,location) VALUES (?,?,?)`;
+        const values = [req.file.filename, link,query];
         const addedSlider = await queryPromis(queryAddSlider, values);
 
         if (!addedSlider) return res.status(400).json({
@@ -35,8 +36,9 @@ export const addSlider = async (req, res) => {
 //get all slider-->
 export const allSlider = async (req, res) => {
     try {
-        const queryAllSlider = `SELECT * FROM sliders`;
-        const allSlider = await queryPromis(queryAllSlider);
+        const {query}=req.params;
+        const queryAllSlider = `SELECT * FROM sliders WHERE location=?`;
+        const allSlider = await queryPromis(queryAllSlider,[query]);
 
         if (allSlider.length === 0) return res.status(400).json({
             status: "failed",
