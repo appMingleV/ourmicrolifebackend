@@ -3,11 +3,11 @@
 import pool from "../../config/db.js";
 
 
-export const directReferralAddCoins=(req,res)=>{
+export const directReferralAddCoins=async(req,res)=>{
     try{
      const {coin}=req.body;
      const queryCheckCoin=`SELECT * FROM direct_referral_coins`
-     pool.query(queryCheckCoin,(err,result)=>{
+     pool.query(queryCheckCoin,async(err,result)=>{
         if(err){
             return res.status(500).json({
                 status:"error",
@@ -15,21 +15,31 @@ export const directReferralAddCoins=(req,res)=>{
                 error:err.message
             })
         }
+
+       
+        
         if(result.length==0){
             const qeuryPutDIRRefCoin=`INSERT INTO direct_referral_coins (coin,date) VALUES (?,?)`;
             const values=[coin,new Date()];
-            pool.query(qeuryPutDIRRefCoin,values,(err,result)=>{
+       
+            pool.query(qeuryPutDIRRefCoin,values,async(err,result)=>{
                 if(err)return res.status(500).json({
                     status:"failed",
                     message:"An error occurred while trying to add coins to the user",
                     error:err.message
                 })
+                const queryAddLevle=`INSERT INTO team_referral_coin (level1) VALUES (?)`
+                const value=[coin];
+                const addCoinAtLevel1=await queryPromise(queryAddLevle,value);
                 res.status(200).json({
                     status:"success",
                     message:"Coins added successfully to the Direct Referral coin",
                 })
             });
          }else{
+            const queryAddLevle=`UPDATE team_referral_coin SET level1=? WHERE id=2`
+            const value=[coin];
+            const addCoinAtLevel1=await queryPromise(queryAddLevle,value);
             const queryUpdateDirecRef=`UPDATE direct_referral_coins SET coin=? WHERE id=1`;
             const values=[coin];
             pool.query(queryUpdateDirecRef,values,(err,result)=>{
@@ -88,12 +98,20 @@ export const getDirectReferal=(req,res)=>{
 export const teamReferralManagement=async(req,res)=>{
       try{
         console.log(req.body)
+        const queryDirectReferral=`SELECT * FROM direct_referral_coins`;
+        const directReferralData=await queryPromise(queryDirectReferral);
+        if(directReferralData.length==0){
+            return res.status(400).json({
+                status:"error",
+                message:"you should be add coin in  direct referral",
+            })
+        }
         const queryCheckData=`SELECT * FROM team_referral_coin `;
         const DataTeamReferral=await queryPromise(queryCheckData);
         if(DataTeamReferral.length==0){
-        const {level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14}=req.body;
+        const {level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14}=req.body;
         const queryGetTeamRef=`INSERT INTO team_referral_coin (level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
-        const values=[level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14];
+        const values=[directReferralData[0].coin,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14];
         
         const addTeamRefferals=await queryPromise(queryGetTeamRef,values);
         console.log(addTeamRefferals)
@@ -110,9 +128,9 @@ export const teamReferralManagement=async(req,res)=>{
             data:addTeamRefferals
         })
     }else{
-        const {level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14}=req.body;
+        const {level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14}=req.body;
         const queryUpdateTeamRef=`UPDATE team_referral_coin SET level1=?,level2=?,level3=?,level4=?,level5=?,level6=?,level7=?,level8=?,level9=?,level10=?,level11=?,level12=?,level13=?,level14=? WHERE id=2`;
-        const values=[level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14];
+        const values=[directReferralData[0].coin,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14];
         const updateValue=await queryPromise(queryUpdateTeamRef,values);
         if(updateValue.affectedRows==0){
             return res.status(400).json({
@@ -160,6 +178,30 @@ export const geTeamReferralCoin=async(req,res)=>{
             error:err.message
         })
     }
+}
+
+
+
+
+export const addDirectPurchased=async(req,res)=>{
+   try{
+        const {directPercentage}=req.body;
+        const queryGetDirRef=`SELECT * FROM direct_purchase`;
+        const directReferralData=await queryPromise(queryGetDirRef); 
+        if(directReferralData.length==0){
+            return res.status(400).json({
+                status:"error",
+                message:"you should be add coin in  direct purchase",
+            })
+        }
+
+   }catch(err){
+    return res.status(500).json({
+        status:"failed",
+        message:"An error occurred while trying to add direct purchased coins",
+        error:err.message
+    })
+   }
 }
 
 const queryPromise=(query,values=[])=>{
