@@ -186,14 +186,59 @@ export const geTeamReferralCoin=async(req,res)=>{
 export const addDirectPurchased=async(req,res)=>{
    try{
         const {directPercentage}=req.body;
+
+    
+        
+        if(!directPercentage)return res.status(400).json({
+            status:"error",
+            message:"direct percentage is required",
+        })
         const queryGetDirRef=`SELECT * FROM direct_purchase`;
         const directReferralData=await queryPromise(queryGetDirRef); 
         if(directReferralData.length==0){
-            return res.status(400).json({
-                status:"error",
-                message:"you should be add coin in  direct purchase",
+            console.log("check  this")
+            const queryPutDirRefPurchased=`INSERT INTO direct_purchase (direct_precentage,date) VALUES (?)`;
+            const values=[directPercentage,new Date()];
+            const addDirectPurchased=await queryPromise(queryPutDirRefPurchased,values);
+            if(addDirectPurchased.affectedRows==0){
+                return res.status(400).json({
+                    status:"error",
+                    message:"direct purchased coins are not added",
+                })
+            }
+
+            const queryTeamPurchased=`INSERT INTO direct_purchase_team (level1) VALUES (?)`;
+            const valuesTeam=[directPercentage];
+            const addTeamPurchased=await queryPromise(queryTeamPurchased,valuesTeam);
+
+            return res.status(200).json({
+                status:"success",
+                message:"direct purchased coins are added successfully",
+                data:addDirectPurchased
+            })
+            
+        }else{
+            const queryUpdateDirRefPurchased=`UPDATE direct_purchase SET direct_precentage=?, date=? WHERE id=1`;
+            const values=[directPercentage,new Date()];
+            const updateDirectPurchased=await queryPromise(queryUpdateDirRefPurchased,values);
+        
+            const queryTeamPurchased=`UPDATE direct_purchase_team SET level1=? WHERE id=1 `;
+            const valuesTeam=[directPercentage,new Date()];
+            const addTeamPurchased=await queryPromise(queryTeamPurchased,valuesTeam);
+            
+            if(updateDirectPurchased.affectedRows==0){
+                return res.status(400).json({
+                    status:"error",
+                    message:"direct purchased coins are not updated",
+                })
+            }
+            return res.status(200).json({
+                status:"success",
+                message:"direct purchased coins are updated successfully",
+                data:updateDirectPurchased
             })
         }
+
 
 
    }catch(err){
@@ -205,6 +250,102 @@ export const addDirectPurchased=async(req,res)=>{
    }
 }
 
+export const getDirectPurchased=async(req,res)=>{
+    try{
+       const queryGetDirRef=`SELECT * FROM direct_purchase`
+       const getQueryData=await queryPromise(queryGetDirRef);
+       if(getQueryData.length==0){
+        return res.status(200).json({
+            status:"success",
+            message:"No direct purchased coins found",
+        })
+       }
+       return res.status(200).json({
+        status:"success",
+        message:"Direct purchased coins fetched successfully",
+        data:getQueryData[0]
+       })
+    }catch(err){
+        return res.status(500).json({
+            status:"failed",
+            message:"An error occurred while trying to fetch direct referral coins",
+            error:err.message
+        })
+    }
+}
+
+export const addTeamPurchased=async(req,res)=>{
+    try{
+        const {level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14}=req.body;
+        const queryGetDirRef=`SELECT * FROM direct_purchase_team`;
+        const directTeamReferralData=await queryPromise(queryGetDirRef);
+        const queryDirectPurchasedData=`SELECT * FROM direct_purchase`
+        const directReferralData=await queryPromise(queryDirectPurchasedData);
+
+        if(directTeamReferralData.length==0){
+            const queryPutDirRefPurchased=`INSERT INTO direct_purchase_team (level1,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+            const values=[directReferralData[0].direct_precentage,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14];
+            const addDirectPurchased=await queryPromise(queryPutDirRefPurchased,values);
+            if(addDirectPurchased.affectedRows==0){
+                return res.status(400).json({
+                    status:"error",
+                    message:"team purchased coins are not added",
+                })
+            }
+           return res.status(200).json({
+                status:"success",
+                message:"team purchased coins are added successfully",
+                data:addDirectPurchased
+            })
+        }else{
+            const queryUpdateDirRefPurchased=`UPDATE direct_purchase_team SET level1=?, level2=?,level3=?,level4=?,level5=?,level6=?,level7=?,level8=?,level9=?,level10=?,level11=?,level12=?,level13=?,level14=? WHERE id=1`;
+            const values=[directReferralData[0].direct_precentage,level2,level3,level4,level5,level6,level7,level8,level9,level10,level11,level12,level13,level14];
+            const updateDirectPurchased=await queryPromise(queryUpdateDirRefPurchased,values);
+            if(updateDirectPurchased.affectedRows==0){
+                return res.status(400).json({
+                    status:"error",
+                    message:"team purchased coins are not updated",
+                })
+            }
+            return res.status(200).json({
+                status:"success",
+                message:"team purchased coins are updated successfully",
+                data:updateDirectPurchased
+            })
+        }
+
+    }catch(err){
+        return res.status(500).json({
+            status:"failed",
+            message:"An error occurred while trying to add team purchased coins",
+            error:err.message
+        })
+    }
+}
+
+export const getTeamPurchased=async(req,res)=>{
+    try{
+      const queryGetDirRef=`SELECT * FROM direct_purchase_team`
+      const getQueryData=await queryPromise(queryGetDirRef);
+      if(getQueryData.length==0){
+        return res.status(200).json({
+            status:"success",
+            message:"No team purchased coins found",
+        })
+      }
+      return res.status(200).json({
+        status:"success",
+        message:"Team purchased coins fetched successfully",
+        data:getQueryData[0]
+      })
+    }catch(err){
+        return res.status(500).json({
+            status:"failed",
+            message:"An error occurred while trying to fetch team purchased coins",
+            error:err.message
+        })
+    }
+}
 const queryPromise=(query,values=[])=>{
     return new Promise((resolve,reject)=>{
         pool.query(query,values,(err,result)=>{
