@@ -214,3 +214,71 @@ export const vedorChangeStatus = (req, res) => {
         })
     }
 }
+
+
+
+
+export const vendorOrderList = async (req, res) => {
+    try {
+        console.log("vendor is order list")
+        const { vendorId } = req.params;
+        const queryVendorOrder = `SELECT * FROM  order_items WHERE vendor_id=?`;
+        const values = [vendorId];
+        const orderItems = await queryPromises(queryVendorOrder, values)
+        if (orderItems.length == 0) {
+            return res.status(400).json({
+                status: "failed",
+                message: "No vendor order found"
+            })
+        }
+  
+     
+        let orderDetails=[]
+        for (let i = 0; i < orderItems.length; i++) {
+            const productId = orderItems[i].product_id;
+            const orderId=orderItems[i].order_id;
+            const queryProductDetail = `SELECT name,featured_image FROM products WHERE id=?`
+            const value1 = [productId];
+            const getProductData=await queryPromises(queryProductDetail,value1);
+            const queryStatus=`SELECT payment_status,payment_type FROM orders_cart WHERE id=?`;
+            const value2=[orderId];
+            const orderStatus=await queryPromises(queryStatus,value2);
+            const order={
+                orderId:orderId,
+                productName:getProductData[0]?.name||"not available",
+                productImage:getProductData[0]?.featured_image||"not available",
+                totalAmount:orderItems[i]?.total_price,
+                size:orderItems[i]?.size||"not available",
+                color:orderItems[i]?.color||"not available",
+                status:orderStatus[0]?.payment_status||"not available",
+                paymentType:orderStatus[0]?.payment_type||"not available"
+            }
+            orderDetails.push(order)
+        }
+
+        return res.json({
+            status: "success",
+            message: "Vendor order list fetched successfully",
+            data: orderDetails
+        })
+
+    } catch (err) {
+        return res.status(500).json({
+            status: "error",
+            message: "Something went wrong while trying to fetch vendor order list",
+            error: err.message
+        })
+    }
+}
+
+const queryPromises = (query, value = []) => {
+    return new Promise((resolve, reject) => {
+        pool.query(query, value, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        })
+    })
+}

@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {addCategory,editCategory,deleteCategory,singleCategory,getAllCategories} from '../controllers/adminController/categoryContoller.js'
-import {vedorList,singleVendor,vedorChangeStatus} from '../controllers/adminController/adminController.js'
+import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList} from '../controllers/adminController/adminController.js'
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
 
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
@@ -57,7 +57,7 @@ routes.get('/subategory/category/:categoryId',subCategeriesByCategories);
 routes.get('/vendor/:query',vedorList)
 routes.get('/vendorSingle/:vendorId',singleVendor)
 routes.put('/vendorStatus/:vendorId',vedorChangeStatus)
-
+routes.get('/vendor/:vendorId/order',vendorOrderList)
 
 
 
@@ -99,5 +99,6 @@ routes.get('/sliders/:query',allSlider);
 routes.delete('/sliders/:sliderId',deleteSlider);
 
 routes.use('/referral',referral)
+
 
 export default routes;
