@@ -1,8 +1,6 @@
 import { customAlphabet } from 'nanoid';
 import crypto from 'crypto';
 import pool from '../../config/db.js';
-import { resolve } from 'path';
-import { ContentInstance } from 'twilio/lib/rest/content/v1/content.js';
 
 // Define characters for generating referral code
 const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' + 'microlife';
@@ -40,7 +38,6 @@ export const refferalCreate = async (req, res) => {
     try {
         if (refferalCode) {
             const referralDetails = await checkReferralCode(refferalCode);
-
             if (!referralDetails) {
                 return res.status(404).json({
                     status: "failed",
@@ -59,9 +56,10 @@ export const refferalCreate = async (req, res) => {
                 });
             }
             const Teams = await setTeam(referredUserId, userId)
-
+            
             await addCoins(userId, 50); // Add coins for the new user
             await addCoins(referredUserId, 50); // Add coins for the referrer
+        
         } else {
             // Add coins for a new user without referral
             await addCoins(userId, 50);
@@ -118,24 +116,33 @@ const setDirectReferral = (referralFrom, referralTo) => {
 const addCoins = (userId, value) => {
     const query = `SELECT value FROM coins WHERE user_id = ?`;
     const values = [userId];
-
+ 
     return new Promise((resolve, reject) => {
-
+              
         pool.query(query, values, (err, result) => {
+           
             if (err) return reject(err);
             if (result.length === 0) {
+                console.log("user id ",userId);
                 const insertQuery = `INSERT INTO coins (user_id, value) VALUES (?,?)`;
                 const insertValues = [userId, value];
                 pool.query(insertQuery, insertValues, (err, insertResult) => {
+                 
                     if (err) return reject(err);
+                   
                     resolve(insertResult);
                 });
             } else {
-
-                const updateQuery = `UPDATE coins SET value=value+? WHERE userid_=?`;
-                const updateValues = [value + result[0].value, userId];
+                console.log("referral is working. userId is ",userId,"referral is result ",result)
+                const updateQuery = `UPDATE coins SET value=? WHERE user_id=?`;
+                let ga=+result[0].value;
+                ga+=value;
+                console.log(ga,"user id ",userId);
+                const updateValues = [`${ga}`, userId];
                 pool.query(updateQuery, updateValues, (err, updateResult) => {
+                    console.log("now add coin referral ",err);
                     if (err) return reject(err);
+                    console.log("now add coin referral ",err);
                     resolve(updateResult);
                 });
             }

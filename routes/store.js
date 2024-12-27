@@ -18,9 +18,13 @@ const multipleupload1 = upload1.fields([{ name: 'logo',maxCount: 1  }, { name: '
 
 
 routes.get('/Details/:storeId',shopDetails);
+
 routes.put('/Details/:vendorId',multipleupload1,editShopDetails)
+
 routes.get('/allStores',allStores);
+
 routes.get('/products/:vendorId',showProductsDetails)
+
 routes.get('/products/cate/:categId/subcate/:subCateId',getProductCategoriesSubCate)
 
 

@@ -110,7 +110,7 @@ export const editShopDetails = async(req, res) => {
 
 export const getProductCategoriesSubCate=async(req,res)=>{
     try{
-        console.log("getAll Stores")
+        console.log("getAll Stores product")
      const {categId,subCateId}=req.params;
      const queryProductDetails=`SELECT id,name,featured_image,description FROM products WHERE category_id=? AND sub_category_id=?`;
      const value=[categId,subCateId];
@@ -133,9 +133,8 @@ export const getProductCategoriesSubCate=async(req,res)=>{
  }
  
 
-export const showProductsDetails = async (req, res) => {
+ export const showProductsDetails = async (req, res) => {
     try {
-        console.log("getAll Stores")
         const { vendorId } = req.params;
         const queryProductDetails = `SELECT id,name,featured_image,description FROM products WHERE vendor_id=?`;
         const value = [vendorId];
@@ -160,11 +159,25 @@ export const showProductsDetails = async (req, res) => {
     }
 }
 const queryPromis = (query, value = [])=>{
-    console.log("getAll Stores")
     return new Promise((resolve, reject) => {
         pool.query(query, value, (err, result) => {
             if (err) reject(err);
             resolve(result)
         })
+    })
+}
+
+
+
+const getMinConfig=(productData)=>{
+    return new Promise(async(resolve,reject)=>{
+        for (let key of productData) {
+            const queryProductDetails = `SELECT * FROM product_configurations WHERE sale_price = (SELECT MIN(sale_price) FROM product_configurations WHERE products=?); `
+            const value=[key.id];
+            const productConfig = await queryPromis(queryProductDetails, value);
+             key.old_price=productConfig[0]?.old_price;
+             key.sale_price=productConfig[0]?.sale_price;
+        }
+        resolve(productData);
     })
 }
