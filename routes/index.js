@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import coins from './coins.js';
 import {refferalCreate,getRefferalUser,getRefferalUsers,getCheckRefferalCode,signupWithReferralCode} from '../controllers/refferalController/refferController.js'
+import user from './user.js'
 import {decryptRefferal} from '../middleware/index.js';
 import admin from './admin.js'
 import vendor from './vendor.js'
@@ -32,4 +33,5 @@ route.get('/refferal-code/has-ref/:ref/iv/:iv',decryptRefferal(),getCheckReffera
 
 route.use('/admin',admin);
 route.use('/vendor',vendor);
+route.use('/user',user)
 export default route;

@@ -7,6 +7,7 @@ import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAl
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
 import {addSlider,allSlider,deleteSlider} from '../controllers/adminController/sliderController.js'
 import referral from './referral.js'
+import coupons from './coupons.js'
 import multer from "multer";
 
 
@@ -99,6 +100,6 @@ routes.get('/sliders/:query',allSlider);
 routes.delete('/sliders/:sliderId',deleteSlider);
 
 routes.use('/referral',referral)
-
+routes.use('/coupon',coupons)
 
 export default routes;
