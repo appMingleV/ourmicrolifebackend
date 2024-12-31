@@ -3,6 +3,10 @@ import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoup
 const routes=Router();
 
 
+//user otp system-->
+routes.post('')
+
+
 //total amount of routes-->
 routes.get('/totalAmount/allCoupons',getALLTotalCouponsTotalAmount)
 routes.post('/totalAmount/applyCoupons',applyCouponsTotalAmount)
