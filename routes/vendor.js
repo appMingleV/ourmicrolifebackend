@@ -36,6 +36,7 @@ routes.post('/otp/vendor/email', emailOTP)
 ///api/vendor/signup/verifyOTP
 //verify the OTP-->
 routes.post('/verifyOTP', verifyOtpNumber);
+
 routes.post('/signup/verifyOTP', verifyOtpSignup);
 
 
@@ -48,6 +49,10 @@ routes.get('/:vendorId',vendorDetails)
 //dimenesion of product added--->
 routes.post('/dimension/product/:productId',dimensionsProduct)
 routes.get('/dimension/product/:product',getDimensionProduct)
+
+
+//product edit --->
+routes.put('/product')
 
 
 routes.use('/stores',store);

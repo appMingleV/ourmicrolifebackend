@@ -56,6 +56,21 @@ export const dimensionsProduct= async (req,res)=>{
     }
 }
 
+
+export const editProduct=(req,res)=>{
+    try{
+        const {productId}=req.params;
+      
+
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:"Something went wrong while trying to edit product",
+            error:err.message
+        })
+    }
+}
+
 //promis for all query of sql-->
 const queryPromis=(query,value=[])=>{
     return new Promise((resolve,reject)=>{

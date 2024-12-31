@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 import pool from '../../config/db.js';
 // import { response } from 'express';
 import jwt from 'jsonwebtoken';
+import { otpImplementation } from '../../service/OTPSub/otp.js';
 
 const otpStore = [];
 const SCERET = process.env.JWT_SECRET
@@ -84,22 +85,27 @@ export const otpSend = async (req, res) => {
         const mobileNumber = "+91" + mobile_number;
 
         // Twilio credentials from environment variables
-        const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
-        const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-        const twilioAccountSID = process.env.TWILIO_ACCOUNT_SID;
+      
 
-        const client = twilio(twilioAccountSID, twilioAuthToken);
 
+        
         // Generate and store the OTP
         const otp = generateOtp();
+        const otpData=await otpImplementation(otp,mobile_number)
+      
+         if(otpData.Status!=='OK'){
+          return res.status(400).json(otpData);
+         }
+
+        
         otpStore[mobileNumber] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // OTP expires in 5 minutes
 
         // Send OTP via Twilio
-        const message = await client.messages.create({
-            body: `Your OTP is ${otp}`,
-            from: twilioNumber,
-            to: mobileNumber,
-        });
+        // const message = await client.messages.create({
+        //     body: `Your OTP is ${otp}`,
+        //     from: twilioNumber,
+        //     to: mobileNumber,
+        // });
 
         return res.json({
             status: "success",

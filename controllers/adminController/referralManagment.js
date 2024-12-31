@@ -254,6 +254,7 @@ export const getDirectPurchased = async (req, res) => {
     try {
         const queryGetDirRef = `SELECT * FROM direct_purchase`
         const getQueryData = await queryPromise(queryGetDirRef);
+           
         if (getQueryData.length == 0) {
             return res.status(200).json({
                 status: "success",
