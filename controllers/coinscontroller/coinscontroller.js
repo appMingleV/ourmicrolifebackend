@@ -1,16 +1,17 @@
 import pool from '../../config/db.js';
 import {dateDetails} from '../../service/common/common.js'
-
+import {getTeamPurchased} from  '../../service/refferralSystem/refferral.js' 
 export const getCoins=(req,res)=>{
     const {userId}=req.params;
     try{
       const queryCoin=`Select value from coins where user_id=${userId}`;
+    
       pool.query(queryCoin,(err,result)=>{
         if(err)return res.status(500).json({
             status:"failed",
             message:"operation failed"
         })
-
+        console.log(result);
         return res.status(200).json({
             status:"success",
             message:"operation successful",
@@ -23,7 +24,7 @@ export const getCoins=(req,res)=>{
     }catch(err){
       return  res.status(500).json({
         status:"failed",
-        message:"operation failed"
+        message:err.message
       })
     }
 }
@@ -40,6 +41,8 @@ export const addCoinsOnProductBuy=async(req,res)=>{
           status:"failed",
           message:"User does not exist"
         })
+        console.log(userDetails);
+        if(userDetails[0].team!=null)putCoinsTeam(JSON.parse(userDetails[0].team));
         const queryAddCoins=`UPDATE coins SET value=value+? WHERE user_id=?`;
         const value=[coins,userId];
         const addCoins=await queryPromise(queryAddCoins,value);
@@ -78,6 +81,13 @@ export const addCoinsOnProductBuy=async(req,res)=>{
       }
 }
 
+
+const putCoinsTeam=async(teams)=>{
+    const teamData=await getTeamPurchased();
+     for(let key in teams){
+    
+     }
+}
 
 export const getCoinHistory=async(req,res)=>{
   try{

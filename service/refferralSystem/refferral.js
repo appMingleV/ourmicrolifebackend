@@ -20,3 +20,12 @@ export const teamReferralCoin= async()=>{
         return err;
     }
 }
+
+export const getTeamPurchased=async()=>{
+    try{
+      const response =await axios.get(`https://api.ourmicrolife.com/api/admin/referral/teamPurchased`);
+      return response.data;
+    }catch(err){
+        return err;
+    }
+}
