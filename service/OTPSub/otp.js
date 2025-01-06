@@ -3,7 +3,7 @@ import axios from "axios"
 
 export const otpImplementation=async(otp,mobile)=>{
     try{
-          const templateId=process.env.TEMPLATEID
+        const templateId=process.env.TEMPLATEID
         const entityId = process.env.ENITYID;
         const  senderId = process.env.SENDERID;
         const  userNib= process.env.USERNIMBUS;
