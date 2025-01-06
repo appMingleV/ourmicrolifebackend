@@ -29,3 +29,13 @@ export const getTeamPurchased=async()=>{
         return err;
     }
 }
+
+
+export const currencyValues=async()=>{
+    try{
+      const response =await axios.get('http://127.0.0.1:8000/api/coins/currencyValueNow');
+      return response.data.data.coin_value;
+    }catch(err){
+        return err;
+    }
+}
