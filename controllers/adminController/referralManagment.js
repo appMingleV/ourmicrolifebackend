@@ -187,8 +187,6 @@ export const addDirectPurchased = async (req, res) => {
     try {
         const { directPercentage } = req.body;
 
-
-
         if (!directPercentage) return res.status(400).json({
             status: "error",
             message: "direct percentage is required",

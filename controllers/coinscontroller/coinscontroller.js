@@ -1,5 +1,6 @@
 import pool from '../../config/db.js';
 import {dateDetails} from '../../service/common/common.js'
+
 export const getCoins=(req,res)=>{
     const {userId}=req.params;
     try{
@@ -49,6 +50,7 @@ export const addCoinsOnProductBuy=async(req,res)=>{
           })
         }
         const date=dateDetails();
+    
         for(let row in products){
         
           const {heading,coin}=products[row];
@@ -102,6 +104,68 @@ export const getCoinHistory=async(req,res)=>{
   }
 }
 
+//coins into rupees-->
+export const coinsToCurrency=async(req,res)=>{
+  try{
+    const {coinsValue}=req.body;
+    const queryCheckCoinValue=`SELECT * FROM coins_value`;
+    const coinValue=await queryPromise(queryCheckCoinValue);
+    if(coinValue.length===0){
+
+    const queryAddCoinValue=`INSERT INTO coins_value (coin_value) VALUES (?)`;
+    const value=[coinsValue];
+    const addCoinValue=await queryPromise(queryAddCoinValue,value);
+    
+    if(addCoinValue.affectedRows==0)return res.status(400).json({
+      status:"error",
+      message:"Coins value is not added",
+    })
+  }else{
+    const queryUpdateCoinValue=`UPDATE coins_value SET coin_value=? WHERE id=1`;
+    const value=[coinsValue];
+    const updateCoinValue=await queryPromise(queryUpdateCoinValue,value);
+    if(updateCoinValue.affectedRows===0)return res.status(400).json({
+      status:"error",
+      message:"Coins value is not updated",
+    })
+  }
+    return res.status(200).json({
+      status:"success",
+      message:"Coins value added successfully",
+    })
+  
+    
+  }catch(err){
+    return  res.status(500).json({
+      status:"failed",
+      message:err.message
+    })
+  }
+}
+
+
+export const getCoinsCurrencyValue=async(req,res)=>{
+  try{
+     const queryCurrencyValue =`SELECT * FROM coins_value`;
+     const currencyValue=await queryPromise(queryCurrencyValue);
+    
+     if(currencyValue.length==0)return res.status(200).json({
+       status:"failed",
+       message:"No coins value found"
+     })
+
+     return res.status(200).json({
+       status:"success",
+       message:"Coins value fetched successfully",
+       data:currencyValue[0]
+     })
+  }catch(err){
+    return  res.status(500).json({
+      status:"failed",
+      message:err.message
+    })
+  }
+}
 const queryPromise=(query,value=[])=>{
     return new Promise((resolve,reject)=>{
       pool.query(query,value,(err,result)=>{
