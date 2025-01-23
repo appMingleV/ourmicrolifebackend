@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
+import {searchResult} from '../controllers/vendorAuth/product.js'
 const routes=Router();
 
 
@@ -19,6 +20,5 @@ routes.post('/applyCoupons/category/:categoryId',applyCategoryCoupon);
 routes.get('/all/coupons/category/:categoryId/subcategory/:subCategoryId',getALLSubCategoryCoupons);
 routes.post('/applyCoupons/category/:categoryId/subcategory/:subCategoryId',applySubCategoryCoupon);
 
-
-
+routes.get('/search',searchResult);
 export default routes;
