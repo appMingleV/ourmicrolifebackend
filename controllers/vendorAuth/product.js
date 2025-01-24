@@ -98,23 +98,33 @@ export const dimensionsProduct= async (req,res)=>{
 }
 
 
-const queryPromise = (query, value = []) => {
-    return new Promise((resolve, reject) => {
-        pool.query(query, value, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
-        })
-    })
-}
 
-export const editProduct=(req,res)=>{
+
+export const editProduct=async(req,res)=>{
     try{
+        console.log("prices is ")
         const {productId}=req.params;
-      
-
+        const {productName,description,quantity,thumnailImage,coin,status,categoryId,subCategoryId,brandName,prices}=req.body; 
+        
+        const updateProduct=`UPDATE products SET name=?,description=?,quantity=?,status=?,featured_image=?,category_id=?,sub_category_id=?,brand_name=?,coin=? WHERE id=?`
+        const value=[productName,description,quantity,status,thumnailImage,categoryId,subCategoryId,brandName,coin,productId];
+        const updateDataProduct=await queryPromis(updateProduct,value);
+        console.log(prices,productName)
+        if(!updateDataProduct){
+            return res.status(400).json({
+                status:"error",
+                message:"Product is not updated",
+            })
+        }
+        for(let key of prices){
+            
+        updatePriceAndConfig(key);
+        }
+        return res.status(200).json({
+            status:"success",
+            message:"Product is updated successfully",
+            data:updateDataProduct
+        })
     }catch(err){
         return res.status(500).json({
             status:"error",
@@ -124,6 +134,43 @@ export const editProduct=(req,res)=>{
     }
 }
 
+async function updatePriceAndConfig(prices){
+      const priceId=prices.pricesId
+      const color=prices?.color;
+      const updatePrice=`UPDATE product_prices SET color_name=? WHERE id=?`
+      const value=[color,priceId];
+      const updatedData=await queryPromis(updatePrice,value);
+      if(!updatedData){
+        return res.status(400).json({
+            status:"error",
+            message:"Price is not updated",
+        })
+      }
+      const config=prices.configuration;
+      for(let key of config){
+        updateConfigurations(key);
+      }
+      
+    }
+
+   async function updateConfigurations(config){
+            const configId=config.configurationId;
+            const size=config.size;
+            const mrp=config.mrp;
+            const sellPrice=config.sellPrice;
+            const quantity=config.quantity;
+            const updateConfig=`UPDATE product_configurations SET size=?, old_price=?,sale_price=?, stock=? WHERE id=?`
+            const value=[size,mrp,sellPrice,quantity,configId]
+
+            const dataUpateConfig=await queryPromis(updateConfig,value);
+            if(!dataUpateConfig){
+                return res.status(400).json({
+                    status:"error",
+                    message:"Configuration is not updated",
+                })
+            }
+            return dataUpateConfig;
+    }
 //promis for all query of sql-->
 const queryPromis=(query,value=[])=>{
     return new Promise((resolve,reject)=>{
