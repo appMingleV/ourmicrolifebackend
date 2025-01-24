@@ -193,7 +193,7 @@ const setTeam = async (referredUserId, userId,coinsTeam) => {
         const value = [referredUserId, "active", 50, new Date(), JSON.stringify([userId])];
         const teamInsertResult = await queryPromise(querySetTeam, value);
 
-        // Retrieve parent team information
+        // Retrieve parent team information-
         const queryParentRef = `SELECT team FROM tbl_users WHERE id = ?`;
         const parentResult = await queryPromise(queryParentRef, [referredUserId]);
 
