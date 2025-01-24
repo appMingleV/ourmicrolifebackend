@@ -50,7 +50,27 @@ routes.get('/:vendorId',vendorDetails)
 routes.post('/dimension/product/:productId',dimensionsProduct)
 routes.get('/dimension/product/:product',getDimensionProduct)
 
-routes.put('/product/:productId',editProduct);
+const thumbnailStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/thumbnails/"); // Directory for thumbnail
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname); // Unique name for thumbnail
+    },
+  });
+  
+  const pricesImageStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/prices-images/"); // Directory for prices-specific images
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname); // Unique name for images
+    },
+  });
+
+  const uploadThumbnail = multer({ storage: thumbnailStorage });
+const uploadPricesImages = multer({ storage: pricesImageStorage });
+routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPricesImages.array('pricesImages',10),editProduct);
 
 
 //product edit --->
