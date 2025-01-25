@@ -76,7 +76,7 @@ export const dimensionsProduct= async (req,res)=>{
 
  
         
-        const searchData = await queryPromise(searchQuery,[searchTerm,searchTerm,searchTerm]);
+        const searchData = await queryPromis(searchQuery,[searchTerm,searchTerm,searchTerm]);
        
         if (searchData.length == 0) return res.status(400).json({
             status: "failed",
@@ -115,14 +115,11 @@ export const editProduct=async(req,res)=>{
           prices,
         } = req.body;
   
-        const thumbnail = req.file ? req.file.path : null; // Thumbnail file
-        const pricesImages = req.files ? req.files.map((file) => file.path) : []; // Prices-specific images
   
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
-          SET name = ?, description = ?, quantity = ?, status = ?, 
-              featured_image = ?, category_id = ?, sub_category_id = ?, 
+          SET name = ?, description = ?, quantity = ?, status = ?,  category_id = ?, sub_category_id = ?, 
               brand_name = ?, coin = ? 
           WHERE id = ?
         `;
@@ -131,7 +128,7 @@ export const editProduct=async(req,res)=>{
           description,
           quantity,
           status,
-          thumbnail, // Set the thumbnail
+
           categoryId,
           subCategoryId,
           brandName,
@@ -139,7 +136,7 @@ export const editProduct=async(req,res)=>{
           productId,
         ];
         const updateProductResult = await queryPromis(updateProductQuery, updateProductValues);
-  
+        console.log("sajdgck",updateProductResult)
         if (!updateProductResult) {
           return res.status(400).json({
             status: "error",
@@ -148,9 +145,10 @@ export const editProduct=async(req,res)=>{
         }
   
         // Update prices and configurations
-        const parsedPrices = JSON.parse(prices);
-        for (const price of parsedPrices) {
-          await updatePriceAndImages(price, pricesImages);
+        
+        for (const price of prices) {
+          console.log(price)
+          await updatePriceAndImages(price);
         }
   
         return res.status(200).json({
@@ -168,7 +166,7 @@ export const editProduct=async(req,res)=>{
     
 }
 
-const updatePriceAndImages = async (price, images) => {
+const updatePriceAndImages = async (price) => {
     const priceId = price.pricesId;
     const color = price.color;
   
@@ -182,10 +180,7 @@ const updatePriceAndImages = async (price, images) => {
     }
   
     // Insert images for this priceId
-    for (const image of images) {
-      const insertImageQuery = `UPDATE  product_price_images image_url=? WHERE product_price_id=?`;
-      await queryPromis(insertImageQuery, [ image,priceId]);
-    }
+
   
     // Update configurations for this price
     for (const config of price.configuration) {

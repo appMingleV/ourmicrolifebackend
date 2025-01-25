@@ -387,6 +387,7 @@ export const getRefferalUsers = async (req, res) => {
                 data: referralData
             })
         } else {
+            console.log("team is  ")
             const teamData = await getTeams(userId);
             return res.status(200).json({
                 status: "success",
@@ -433,8 +434,9 @@ function directReferrals(userId) {
             const userName = objUserTeam[i][0].first_name + " " + objUserTeam[i][0]?.last_name;
             const level = objUserTeam[i][0]?.level;
             const status = objUserTeam[i][0]?.status;
-            const teams = objTeamData[i].length;
-            const date = directRefferalUsers[i].date
+            const image= objUserTeam[i][0]?.profile_picture
+            const teams = objTeamData[i]?.length;
+            const date = directRefferalUsers[i]?.date
             let totalMembers = 0;
             for (let teamMember of objTeamData[i]) {
                 totalMembers += JSON.parse(teamMember.teams).length;
@@ -462,11 +464,16 @@ function getTeams(userId) {
     return new Promise(async (resolve, reject) => {
         const teamQuery = `SELECT teams,coins,date FROM team_referral WHERE user_id =?`
         const value = [userId]
+        console.log("user Id is ",userId);
         const teamData = await queryPromise(teamQuery, value);
         const objRef = [];
+        console.log(teamData);
+        if(teamData.length===0){
+            return 
+        }
 
         for (let key of teamData) {
-
+                    
             const obj = {
                 teamName: userId + key.coins + Math.floor(Math.random() * 100),
                 coins: key.coins,
@@ -486,7 +493,7 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
         for (let directRef of directRefferalUsers) {
             //directRef--> { referral_to: 27 }
             //direct RefferalUser Profile--->
-            const queryUserPorfile = `SELECT first_name, last_name,level,status FROM  tbl_users WHERE id=?`;
+            const queryUserPorfile = `SELECT first_name, last_name,level,status,profile_picture FROM  tbl_users WHERE id=?`;
             const value = [directRef.referral_to];
             const profileData = await queryPromise(queryUserPorfile, value);
             // direct refferal user Profile Team--->
