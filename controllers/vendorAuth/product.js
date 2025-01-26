@@ -128,7 +128,6 @@ export const editProduct=async(req,res)=>{
           description,
           quantity,
           status,
-
           categoryId,
           subCategoryId,
           brandName,
@@ -136,7 +135,7 @@ export const editProduct=async(req,res)=>{
           productId,
         ];
         const updateProductResult = await queryPromis(updateProductQuery, updateProductValues);
-        console.log("sajdgck",updateProductResult)
+       
         if (!updateProductResult) {
           return res.status(400).json({
             status: "error",
@@ -150,7 +149,7 @@ export const editProduct=async(req,res)=>{
           console.log(price)
           await updatePriceAndImages(price);
         }
-  
+         
         return res.status(200).json({
           status: "success",
           message: "Product is updated successfully",
@@ -167,34 +166,37 @@ export const editProduct=async(req,res)=>{
 }
 
 const updatePriceAndImages = async (price) => {
-    const priceId = price.pricesId;
-    const color = price.color;
   
-    // Update price details
+    const priceId = price.id;
+    const color = price.color_name;
+   
+     // Update price details
     const updatePriceQuery = `UPDATE product_prices SET color_name = ? WHERE id = ?`;
     const updatePriceValues = [color, priceId];
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
-  
+   
     if (!updatedPrice) {
       throw new Error("Price update failed");
     }
+  
   
     // Insert images for this priceId
 
   
     // Update configurations for this price
-    for (const config of price.configuration) {
-      await updateConfigurations(config);
+    for (const config of price.configurations) {
+     const updatedDataConfig= await updateConfigurations(config);
+  
     }
   };
   
   // Update Configurations
   const updateConfigurations = async (config) => {
-    const configId = config.configurationId;
+    const configId = config.id;
     const size = config.size;
-    const mrp = config.mrp;
-    const sellPrice = config.sellPrice;
-    const quantity = config.quantity;
+    const mrp = config.old_price;
+    const sellPrice =config.sale_price;
+    const quantity = config.stock;
   
     const updateConfigQuery = `
       UPDATE product_configurations 
@@ -208,6 +210,7 @@ const updatePriceAndImages = async (price) => {
     if (!updatedConfig) {
       throw new Error("Configuration update failed");
     }
+    
   
     return updatedConfig;
   };
