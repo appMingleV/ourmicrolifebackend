@@ -115,7 +115,7 @@ export const editProduct=async(req,res)=>{
           prices,
         } = req.body;
   
-  
+        console.log("files are  ",req.files);
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
@@ -146,7 +146,7 @@ export const editProduct=async(req,res)=>{
         // Update prices and configurations
         
         for (const price of prices) {
-          console.log(price)
+    
           await updatePriceAndImages(price);
         }
          

@@ -260,7 +260,7 @@ export const subCategeriesByCategories=(req,res)=>{
                     error:err.message
                 })
             }
-            if(result.length===0)return  res.status(400).json({
+            if(result.length===0)return  res.status(200).json({
                 status:"failed",
                 message:"No sub categories found for this category"
  

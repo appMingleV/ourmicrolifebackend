@@ -449,6 +449,7 @@ function directReferrals(userId) {
                 status,
                 teams,
                 totalUser,
+                image,
                 date,
                 directRefMembers
             })
@@ -493,10 +494,12 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
         for (let directRef of directRefferalUsers) {
             //directRef--> { referral_to: 27 }
             //direct RefferalUser Profile--->
-            const queryUserPorfile = `SELECT first_name, last_name,level,status,profile_picture FROM  tbl_users WHERE id=?`;
-            const value = [directRef.referral_to];
+            
+            const queryUserPorfile = `SELECT first_name,last_name,level,status,profile_picture FROM  tbl_users WHERE id=?`;
+            const value = [directRef?.referral_to];
             const profileData = await queryPromise(queryUserPorfile, value);
             // direct refferal user Profile Team--->
+            console.log("direct referral ---> ",directRef.referral_to)
             const queryUserTeam = `SELECT teams FROM team_referral  WHERE user_id=?`;
 
             const teamData = await queryPromise(queryUserTeam, value);
