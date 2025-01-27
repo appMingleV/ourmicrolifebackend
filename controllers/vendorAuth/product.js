@@ -82,6 +82,13 @@ export const dimensionsProduct= async (req,res)=>{
             status: "failed",
             message: "No products found matching the search term",
         })
+        for(let key of searchData) {
+          const queryConfig=`SELECT * FROM product_configurations WHERE products=?`
+        
+           const dataConfig=await queryPromis(queryConfig,[key.id]);
+           console.log(dataConfig);
+           key.config=dataConfig;
+        }
         return res.status(200).json({
             status: "success",
             message: "Products fetched successfully",
@@ -115,7 +122,7 @@ export const editProduct=async(req,res)=>{
           prices,
         } = req.body;
   
-        console.log("files are  ",req.files);
+        console.log("files are  ",req.body.featured_image);
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
