@@ -3,15 +3,16 @@ import pool from "../../config/db.js"
 
 export const buyOrders=async(req,res)=>{
     try{
-        const {coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,user_id}=req.body
-        if(!req?.file && !coin && !product_configuration_id && !color && !products && !product_name && !old_price && !price && !user_id){
+        const {coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,user_id,image_url}=req.body
+        if(!req?.file && !coin && !product_configuration_id && !color && !products && !product_name && !old_price && !price && !user_id && !image_url){
             return res.status(400).json({
                 status:"error",
                 message:"Missing required fields"
             })
         }
+        console.log(image_url)
         const queryBuyOrder=`INSERT INTO buyorder (user_id,coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,image_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
-        const values=[user_id,coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,req?.file?.filename]
+        const values=[user_id,coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,image_url]
         
         const dataBuyOrder=await queryPromis(queryBuyOrder,values);
         if(!dataBuyOrder) return res.status(400).json({
