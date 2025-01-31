@@ -221,6 +221,34 @@ const updatePriceAndImages = async (price) => {
   
     return updatedConfig;
   };
+
+  export const deleteProduct=async (req,res)=>{
+           try{
+                const {productId}=req.params;
+                const queryDeleteProduct=`DELETE FROM products WHERE id=?`;
+                const value=[productId];
+                const deleteProductSet=await queryPromis(queryDeleteProduct,value);      
+                if(!deleteProductSet){
+                    return res.status(404).json({
+                        status:"error",
+                        message:"Product is not found",
+                    })
+                }
+                return res.status(200).json({
+                    status:"success",
+                    message:"Product is deleted successfully",
+                    data:deleteProductSet
+                })
+  
+           }catch(err){
+            return res.status(500).json({
+                status:"error",
+                message:"Something went wrong while trying to delete product",
+                error:err.message
+            })
+ 
+           }
+  }
 //promis for all query of sql-->
 const queryPromis=(query,value=[])=>{
     return new Promise((resolve,reject)=>{

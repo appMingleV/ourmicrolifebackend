@@ -3,7 +3,7 @@ import multer from "multer";
 
 import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login } from '../controllers/vendorAuth/vendorAuthController.js'
 
-import {dimensionsProduct,getDimensionProduct,editProduct} from '../controllers/vendorAuth/product.js'
+import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct} from '../controllers/vendorAuth/product.js'
 import store from './store.js'
 const routes=Router();
 
@@ -75,6 +75,7 @@ routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPrice
 
 //product edit --->
 routes.put('/product')
+.delete('/product/:productId',deleteProduct)
 
 
 routes.use('/stores',store);

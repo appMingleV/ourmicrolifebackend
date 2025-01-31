@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult} from '../controllers/vendorAuth/product.js'
 import {userProfileUpdate,getProfile} from '../controllers/userController/userController.js'
+import order from './order.js'
 import multer from 'multer';
 const routes=Router();
 
@@ -39,5 +40,6 @@ const upload=multer({ storage: storage });
 
 routes.put('/profile/:userId',upload.single('profile_picture'),userProfileUpdate)
 routes.get('/profile/:userId',getProfile)
+.use('/order',order);
 
 export default routes;
