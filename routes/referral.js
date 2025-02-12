@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {teamReferralManagement,geTeamReferralCoin,directReferralAddCoins,getDirectReferal,addDirectPurchased,getDirectPurchased,addTeamPurchased,getTeamPurchased} from '../controllers/adminController/referralManagment.js';
+import {getPositionRewards} from '../controllers/refferalController/refferController.js'
 
 const routes=Router();
 
@@ -16,6 +17,11 @@ routes.get('/directPurchased',getDirectPurchased)
 
 //purchased team purchased-->
 routes.post('/teamPurchased',addTeamPurchased);
-routes.get('/teamPurchased',getTeamPurchased);
+routes.get('/teamPurchased',getTeamPurchased)
+
+//get position and award--->
+.get('/mlmPosition',getPositionRewards)
+
+
 
 export default routes;

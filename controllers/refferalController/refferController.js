@@ -38,10 +38,11 @@ const encrypt = (text) => {
 
 // Referral creation logic
 export const refferalCreate = async (req, res) => {
+    console.log("here function is runing")
     const { userId } = req.params; // Assuming `userId` comes from request params
     const refferalCode = req.decrypt; // Assuming decrypted referral code exists
     
-
+ 
 
     try {
         //get direct referal coin
@@ -104,6 +105,30 @@ export const refferalCreate = async (req, res) => {
     }
 };
 
+
+export const getPositionRewards=async (req,res)=>{
+    try{
+      const   queryGetPositionMLM=`SELECT * FROM phases`;
+      const dataGetMLM=await queryPromise(queryGetPositionMLM);
+      if(dataGetMLM.length==0){
+        return res.status(200).json({
+            status: "success",
+            message: "No position rewards found",
+        })
+      }
+      return res.status(200).json({
+        status: "success",
+        message: "Position rewards fetched successfully",
+        data: dataGetMLM,
+      });
+    }catch(err){
+        return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message,
+        });
+    }
+}
 // Check referral code validity
 const checkReferralCode = (referralCode) => {
     const query = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
@@ -359,6 +384,7 @@ export const signupWithReferralCode = async (req, res) => {
         })
     }
 }
+
 
 
 

@@ -14,7 +14,7 @@ export const decryptRefferal = () => {
                 return next();
             }
 
-            // Validate the IV
+            // Validate the IV -->
             const ivBuffer = Buffer.from(vi, 'hex');
             if (ivBuffer.length !== 16) {
                 console.error("Invalid IV length. Expected 16 bytes.");

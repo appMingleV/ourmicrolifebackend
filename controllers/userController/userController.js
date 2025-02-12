@@ -1,4 +1,6 @@
 import pool from '../../config/db.js';
+import {getMLM} from '../../service/refferralSystem/refferral.js'
+import {updatePosition} from '../../service/refferralSystem/refferral.js'
 export const userProfileUpdate=(req,res)=>{
     try{
        const {userId}=req.params;
@@ -36,26 +38,102 @@ export const userProfileUpdate=(req,res)=>{
     }
 }
 
+export const checkReferralActive=async(req,res)=>{
+       try{
+            const {userId}=req.params;
+            const queryCheckAmount=`SELECT * FROM  Transition WHERE user_id=?`
+            const value=[userId];
+            const dataQuery=await queryPromise(queryCheckAmount,value);
+            if(dataQuery.length==0){
+                 return res.status(200).json({
+                    status: "success",
+                    message: "No transition found",
+                    data: dataQuery,
+                })
+            }
+           
+            const amount=dataQuery[0]?.TransitionAm
+            if(!amount){
+                return res.status(200).json({
+                    status: "success",
+                    message: "No transition found",
+                })
+            }
+            if(amount<500){
+                return res.status(200).json({
+                    status: "success",
+                    message: "Referral not active",
+                    refferalStatus:false,
+                })
+            }
+            return res.status(200).json({
+                status: "success",
+                message: "referral is active",
+                refferalStatus:true,
+            })
+       }catch(err){
+        return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message,
+        })
+       }
+}
 
-export const getProfile=(req,res)=>{
+export const payMLMAmount=async(req,res)=>{
+    try{
+       const {userId}=req.params;
+       const {price}=req.body;
+       const queryAddMLMAmount=`INSERT INTO Transition (user_id,TransitionAm,MLMStatus) VALUE (?,?,?)`
+       const value=[userId,price,true];
+       const dataQuery=await queryPromise(queryAddMLMAmount,value);
+       if(!dataQuery){
+        return res.status(404).json({
+            status:"error",
+            message:"server error",
+        })
+       }
+       const queryUpdateLevel=`UPDATE tbl_users SET  LEVEl="Sahyogi" WHERE id=?`
+       const valueData=[userId]
+       const updateData=await queryPromise(queryUpdateLevel,valueData);
+        if(!updateData)return res.status(500).json({
+            status:"error",
+            message:"server error",
+        })    
+
+        return res.status(200).json({
+                status: "success",
+                message: "MLM  added successfully",
+                data: dataQuery[0], 
+            })
+    }catch(err){
+        return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message,
+        })
+    }
+}
+
+export const getProfile=async(req,res)=>{
     try{
        const {userId}=req.params;
        const queryGetProfile=`SELECT * FROM tbl_users WHERE id=?`;
        const value=[userId]
+       const dataQuery=await queryPromise(queryGetProfile,value);
+       if(dataQuery.length==0){
+        return res.status(404).json({
+            status:"error",
+            message:"User not found",
+        })
+       }
 
-       pool.query(queryGetProfile,value,(err,result)=>{
-        if(err){
-                return res.status(500).json({
-                    status:"error",
-                    message:"Something went wrong while trying to fetch user profile",
-                    error:err.message
-                })
-             }
-             return res.status(200).json({
-                 status:"success",
-                 message:"User profile fetched successfully",
-                 user:result[0]
-             })
+       await updatePosition(userId);
+
+       return res.status(200).json({
+           status:"success",
+           message:"User profile fetched successfully",
+           data:dataQuery[0],
        })
     }catch(err){
         return res.status(500).json({
@@ -64,4 +142,17 @@ export const getProfile=(req,res)=>{
             error:err.message
         })
     }
+}
+
+
+
+const queryPromise=async(query,value=[])=>{
+    return new Promise((resolve,reject)=>{
+           pool.query(query,value,(err,result)=>{
+            if(err){
+                reject(err);
+            }
+            resolve(result);
+           })
+    })
 }

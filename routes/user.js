@@ -1,14 +1,14 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult} from '../controllers/vendorAuth/product.js'
-import {userProfileUpdate,getProfile} from '../controllers/userController/userController.js'
+import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount} from '../controllers/userController/userController.js'
+import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
 import multer from 'multer';
 const routes=Router();
 
 
-//user otp system-->
-routes.post('')
+
 
 
 //total amount of routes-->
@@ -40,6 +40,8 @@ const upload=multer({ storage: storage });
 
 routes.put('/profile/:userId',upload.single('profile_picture'),userProfileUpdate)
 routes.get('/profile/:userId',getProfile)
+.get('/referralActive/:userId',checkReferralActive)
+.post('/mlmMembers/:userId',payMLMAmount,refferalCreate)
 .use('/order',order);
 
 export default routes;
