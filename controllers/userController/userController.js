@@ -48,7 +48,7 @@ export const checkReferralActive=async(req,res)=>{
                  return res.status(200).json({
                     status: "success",
                     message: "No transition found",
-                    data: dataQuery,
+                    refferalStatus:false,
                 })
             }
            
@@ -57,6 +57,7 @@ export const checkReferralActive=async(req,res)=>{
                 return res.status(200).json({
                     status: "success",
                     message: "No transition found",
+                    refferalStatus:false,
                 })
             }
             if(amount<500){
