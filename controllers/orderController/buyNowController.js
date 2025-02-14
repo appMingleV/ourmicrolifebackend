@@ -10,7 +10,7 @@ export const buyOrders=async(req,res)=>{
                 message:"Missing required fields"
             })
         }
-        console.log(image_url)
+    
         const queryBuyOrder=`INSERT INTO buyorder (user_id,coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,image_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
         const values=[user_id,coin,color,products,size,product_configuration_id,old_price,price,quantity,product_name,image_url]
         
@@ -19,6 +19,7 @@ export const buyOrders=async(req,res)=>{
             status:"error",
             message:"Failed to add buy order"
         })
+    
     return  res.status(200).json({
         status:"success",
         message:"Fetched buy orders successfully",

@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult} from '../controllers/vendorAuth/product.js'
-import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount} from '../controllers/userController/userController.js'
+import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP} from '../controllers/userController/userController.js'
 import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
 import multer from 'multer';
@@ -14,6 +14,8 @@ const routes=Router();
 //total amount of routes-->
 routes.get('/totalAmount/allCoupons',getALLTotalCouponsTotalAmount)
 routes.post('/totalAmount/applyCoupons',applyCouponsTotalAmount)
+
+
 
 //category coupon routes--->
 routes.get('/all/coupons/category/:categoryId',getALLCategoryCoupons);
@@ -37,6 +39,8 @@ const storage=multer.diskStorage({
 
 const upload=multer({ storage: storage });
 
+routes.post('/signup',signupController)
+routes.post('/signup/verifyOTP',verifyOTP);
 
 routes.put('/profile/:userId',upload.single('profile_picture'),userProfileUpdate)
 routes.get('/profile/:userId',getProfile)
