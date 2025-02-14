@@ -83,6 +83,7 @@ export const verifyOTP =async (req, res) => {
         console.log(userSet)
         delete otpStorage[mobile_number]; // Remove OTP after successful verification
         return res.status(200).json({ message: "OTP verified successfully!",token,id:userSet.insertId });
+
     }
     
     res.status(400).json({ message: "Invalid OTP or OTP expired" });
@@ -139,7 +140,7 @@ export const payMLMAmount=async(req,res)=>{
     try{
        const {userId}=req.params;
     //    const {price}=req.body;
-       const queryAddMLMAmount=`INSERT INTO Transition (user_id,TransitionAm,MLMStatus) VALUE (?,?,?-)`
+       const queryAddMLMAmount=`INSERT INTO Transition (user_id,TransitionAm,MLMStatus) VALUE (?,?,?)`
        const value=[userId,500,true];
        const dataQuery=await queryPromise(queryAddMLMAmount,value);
        if(!dataQuery){
