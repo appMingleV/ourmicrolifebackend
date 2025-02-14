@@ -48,7 +48,7 @@ export const signupController=async (req,res)=>{
         return res.status(400).json({ message: "All fields except referral code are required." });
     }
 
-    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
+    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets :false });
     otpStorage[mobileNumber] = {firstName,lastName,email,otp}; // Store OTP temporarily
 
     // Send OTP via email (use an actual email service in production)
