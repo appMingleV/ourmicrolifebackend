@@ -42,33 +42,33 @@ export const userProfileUpdate=(req,res)=>{
 }
 
 export const signupController=async (req,res)=>{
-    const { firstName, lastName, email, mobileNumber, referralCode } = req.body;
+    const { first_name, last_name, email, mobile_number, referralCode } = req.body;
 
-    if (!firstName || !lastName || !email || !mobileNumber) {
+    if (!first_name || !last_name || !email || !mobile_number) {
         return res.status(400).json({ message: "All fields except referral code are required." });
     }
 
     const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets :false });
-    otpStorage[mobileNumber] = {firstName,lastName,email,otp}; // Store OTP temporarily
+    otpStorage[mobile_number] = {first_name,last_name,email,otp}; // Store OTP temporarily
 
     // Send OTP via email (use an actual email service in production)
     
 
     try {
         
-        res.status(200).json({ message: "OTP sent successfully!",otp,mobileNumber });
+        res.status(200).json({ message: "OTP sent successfully!",otp,mobile_number });
     } catch (error) {
         res.status(500).json({ message: "Error sending OTP", error });
     }
 }
 
 export const verifyOTP =async (req, res) => {
-    const { mobileNumber, otp } = req.body;
+    const { mobile_number, otp } = req.body;
     try{
-    if (otpStorage[mobileNumber] && otpStorage[mobileNumber].otp === otp) {
-        const token=jwt.sign({mobileNumber},process.env.JWT_SECRET)
+    if (otpStorage[mobile_number] && otpStorage[mobile_number].otp === otp) {
+        const token=jwt.sign({mobile_number},process.env.JWT_SECRET)
         const querySignup=`INSERT INTO tbl_users (first_name, last_name, email,mobile_number,api_token) VALUES (?,?,?,?,?)`
-        const value=[otpStorage[mobileNumber].firstName,otpStorage[mobileNumber].lastName,otpStorage[mobileNumber].email,mobileNumber,token];
+        const value=[otpStorage[mobile_number].first_name,otpStorage[mobile_number].last_name,otpStorage[mobile_number].email,mobile_number,token];
         const userSet=await queryPromise(querySignup,value);
         if(!userSet){
             return res.status(400).json({
@@ -79,7 +79,7 @@ export const verifyOTP =async (req, res) => {
       
         console.log(token);
         console.log(userSet)
-        delete otpStorage[mobileNumber]; // Remove OTP after successful verification
+        delete otpStorage[mobile_number]; // Remove OTP after successful verification
         return res.status(200).json({ message: "OTP verified successfully!",token });
     }
     
