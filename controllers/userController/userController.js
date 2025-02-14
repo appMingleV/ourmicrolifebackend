@@ -70,17 +70,19 @@ export const verifyOTP =async (req, res) => {
         const querySignup=`INSERT INTO tbl_users (first_name, last_name, email,mobile_number,api_token) VALUES (?,?,?,?,?)`
         const value=[otpStorage[mobile_number].first_name,otpStorage[mobile_number].last_name,otpStorage[mobile_number].email,mobile_number,token];
         const userSet=await queryPromise(querySignup,value);
+    
         if(!userSet){
             return res.status(400).json({
                 status:"error",
                 message:"server error",
+                
             })
         }
       
         console.log(token);
         console.log(userSet)
         delete otpStorage[mobile_number]; // Remove OTP after successful verification
-        return res.status(200).json({ message: "OTP verified successfully!",token });
+        return res.status(200).json({ message: "OTP verified successfully!",token,id:userSet.insertId });
     }
     
     res.status(400).json({ message: "Invalid OTP or OTP expired" });
