@@ -215,9 +215,74 @@ export const vedorChangeStatus = (req, res) => {
     }
 }
 
+export const getMLMUser=async(req,res)=>{
+     try{
+       console.log("get mlm user")
+       const queryMLMUser = `SELECT * FROM Transition`;
+       const MLMUsers = await queryPromises(queryMLMUser)
+       if (MLMUsers.length == 0) {
+            return res.status(400).json({
+                status: "failed",
+                message: "No MLM user found"
+            })
+        }
+        console.log(MLMUsers)
+        for(let i=0;i<MLMUsers.length;i++){
+            const userId=MLMUsers[i]?.user_Id;
+        
+            const queryUserDetail = `SELECT first_name,last_name,mobile_number FROM tbl_users WHERE id=?`
+            const value1 = [userId];
+            const getUserData=await queryPromises(queryUserDetail,value1);
+            console.log(getUserData)
+            MLMUsers[i].name=getUserData[0]?.first_name+getUserData[0]?.last_name;
+            MLMUsers[i].mobile=getUserData[0].mobile_number;
+        }
+        
+       return res.status(200).json({
+            status: "success",
+            message: "MLM User list successfully retrieved",
+            data: MLMUsers
+        })
+     }catch(err){
+            return res.status(500).json({
+                status: "error",
+                message: "Something went wrong while trying to fetch MLM User",
+                error: err.message
+            })
+     }
+}
 
+export const upateMLMMemberStatus=async(req,res)=>{
+    try{ 
+        const {userId}=req.params;
+        const { status } = req.body;
+        if(!userId || !status)return res.status(404).json({
+            status: "failed",
+            message: "Missing required field"
+        })
+        const quueryUpdateStatus=`UPDATE Transition SET  MLMStatus=? WHERE user_id=?`
+        const values=[status,userId];
+        const updateUser=await queryPromises(quueryUpdateStatus,values);
+        if (!updateUser){
+            return res.status(400).json({
+                status: "failed",
+                message: "No MLM Member found with this id"
+            })
+        }
+        return res.status(200).json({
+            status: "success",
+            message: "MLM Member status updated successfully",
+            user:updateUser
+        })
 
-
+    }catch(err){
+        return res.status(500).json({
+            status: "error",
+            message: "Something went wrong while trying to update MLM Member Status",
+            error: err.message
+        })
+    }
+}
 export const vendorOrderList = async (req, res) => {
     try {
         console.log("vendor is order list")

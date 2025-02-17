@@ -107,21 +107,15 @@ export const checkReferralActive=async(req,res)=>{
                 })
             }
            
-            const amount=dataQuery[0]?.TransitionAm
-            if(!amount){
+            const MLMStatus=dataQuery[0]?.MLMStatus
+            if(!MLMStatus){
                 return res.status(200).json({
                     status: "success",
-                    message: "No transition found",
+                    message: "admin has not been approved",
                     refferalStatus:false,
                 })
             }
-            if(amount<500){
-                return res.status(200).json({
-                    status: "success",
-                    message: "Referral not active",
-                    refferalStatus:false,
-                })
-            }
+            
             return res.status(200).json({
                 status: "success",
                 message: "referral is active",
@@ -136,12 +130,33 @@ export const checkReferralActive=async(req,res)=>{
        }
 }
 
+
+// const queryUpdateLevel=`UPDATE tbl_users SET  LEVEl="Sahyogi" WHERE id=?`
+//        const valueData=[userId]
+//        const updateData=await queryPromise(queryUpdateLevel,valueData);
+//         if(!updateData)return res.status(500).json({
+//             status:"error",
+//             message:"server error",
+//         })    
+//         const startDate=new Date();
+//         const endDate = new Date(new Date().setDate(startDate.getDate() + 30));
+//         console.log(endDate);
+//         const queryStartMlm=`INSERT INTO mlm_duration (startDate,endDate,coinValue,payOut,userId) VALUE (?,?,?,?,?)`;
+//         const valueStartMlm=[startDate,endDate,0,0,userId];
+//         await queryPromise(queryStartMlm,valueStartMlm,userId);
+//         return res.status(200).json({
+//                 status: "success",
+//                 message: "MLM  added successfully",
+//                 data: dataQuery[0], 
+//             })
+
 export const payMLMAmount=async(req,res)=>{
     try{
        const {userId}=req.params;
-    //    const {price}=req.body;
-       const queryAddMLMAmount=`INSERT INTO Transition (user_id,TransitionAm,MLMStatus) VALUE (?,?,?)`
-       const value=[userId,500,true];
+       const {price,transitionId,dateTransaction}=req.body;
+      
+       const queryAddMLMAmount=`INSERT INTO Transition (user_id,TransitionAm,MLMStatus,date_transaction,transition_id,image) VALUE (?,?,?,?,?,?)`
+       const value=[userId,price,"pending",dateTransaction,transitionId,req.file.filename];
        const dataQuery=await queryPromise(queryAddMLMAmount,value);
        if(!dataQuery){
         return res.status(404).json({
@@ -149,19 +164,13 @@ export const payMLMAmount=async(req,res)=>{
             message:"server error",
         })
        }
-       const queryUpdateLevel=`UPDATE tbl_users SET  LEVEl="Sahyogi" WHERE id=?`
-       const valueData=[userId]
-       const updateData=await queryPromise(queryUpdateLevel,valueData);
-        if(!updateData)return res.status(500).json({
-            status:"error",
-            message:"server error",
-        })    
-
-        return res.status(200).json({
+       return  res.status(200).json({
                 status: "success",
-                message: "MLM  added successfully",
+                message: "MLM amount added successfully",
                 data: dataQuery[0], 
-            })
+     
+       })
+       
     }catch(err){
         return res.status(500).json({
             status: "failed",
@@ -198,6 +207,67 @@ export const getProfile=async(req,res)=>{
             error:err.message
         })
     }
+}
+
+export const getWalletTransactions=async(req,res)=>{
+        try{
+            const {userId}=req.params;
+            const queryGetTransactions=`SELECT * FROM coins_history WHERE user_id=?`;
+            const value=[userId];
+            const dataQuery=await queryPromise(queryGetTransactions,value);
+           if(dataQuery.length==0){
+            return res.status(404).json({
+                status:"error",
+                message:"No transactions found",
+                
+            })
+           }
+           const querymlmduration=`SELECT * FROM mlm_duration WHERE userId=?`;
+           const mlmValue=[userId];
+           const mlmDataQuery=await queryPromise(querymlmduration,mlmValue);
+             if(mlmDataQuery.length==0){
+                return res.status(200).json({
+                    status:"success",
+                    message:"this user is not part of mlm"
+                })
+             }
+            const endDate=mlmDataQuery[0].endDate;
+            const currentDate=new Date();
+            if(endDate<currentDate){
+               return res.status(200).json({
+                status:"success",
+                message:"MLM duration expired"
+               })
+            }
+            const queryCoinUser=`SELECT * FROM  coins WHERE user_id=?`;
+            const getUserCoin=await queryPromise(queryCoinUser,[userId]);
+            const coinValue=+getUserCoin[0].value;
+             if(coinValue<200)return res.status(200).json({
+                status:"success",
+                message:"Insufficient balance",
+                balance:coinValue
+             })
+            
+             console.log(mlmDataQuery);
+             
+             console.log(endDate);
+             
+          return  res.status(200).json({
+            status:"success",
+            message:"Wallet transactions fetched successfully",
+            data:dataQuery,
+            mlmData:mlmDataQuery[0]
+ 
+          })
+
+           
+        }catch(err){
+            return res.status(500).json({
+                status:"error",
+                message:"Something went wrong while trying to fetch wallet transactions",
+                error:err.message
+            })
+        }
 }
 
 
