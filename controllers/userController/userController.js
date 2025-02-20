@@ -1,7 +1,7 @@
 import pool from '../../config/db.js';
 import {getMLM} from '../../service/refferralSystem/refferral.js'
 import otpGenerator from 'otp-generator'
-import {updatePosition,getAllPositonAmount} from '../../service/refferralSystem/refferral.js'
+import {updatePosition,getAllPositonAmount,getTentativeCoin} from '../../service/refferralSystem/refferral.js'
 import jwt from 'jsonwebtoken'
 const otpStorage = {};
 export const userProfileUpdate=(req,res)=>{
@@ -252,7 +252,7 @@ export const getWalletTransactions=async(req,res)=>{
             const positionPaid=dataUser[0].paid_status_;
             const position=dataUser[0].level;
             console.log(dataUser);
-            if(coins>200 && currentDate>endDate ){
+            if(coins>200 ){
             
                 if(!positionPaid){
                  const queryCheckUser=`UPDATE tbl_users SET paid_status_=? WHERE id=?`
@@ -263,7 +263,8 @@ export const getWalletTransactions=async(req,res)=>{
                  })
                  coins-=200;
                  const dataPositionPaid=await getAllPositonAmount(position);
-                 
+                 const dataTentativeCoins=await getTentativeCoin(position);
+                 console.log("hello is tentative Coins--> ",dataTentativeCoins);
                  let income=dataPositionPaid?.income
                  console.log()
                  
@@ -273,7 +274,6 @@ export const getWalletTransactions=async(req,res)=>{
                  totalPayout+=income
                
                  if(income!=0){
-                   
                     const queryAddPayout=`INSERT INTO payout (user_id,amount) VALUES (?,?)`;
                     const dataAddPayout=await queryPromise(queryAddPayout,[userId,income]);
                     console.log(dataAddPayout);

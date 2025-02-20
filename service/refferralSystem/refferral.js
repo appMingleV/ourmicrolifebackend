@@ -118,7 +118,15 @@ export const getAllPositonAmount=async (position)=>{
     }
 }
 
-
+export const getTentativeCoin=async(position)=>{
+    try{
+      const queryDataCoins=`SELECT * FROM Tentative_coins WHERE award=?`;
+      const dataCoins=await queryPromise(queryDataCoins,[position]);
+      return dataCoins[0];
+    }catch(err){
+        return err;
+    }
+}
 
 
 const queryPromise=async(query,value=[])=>{

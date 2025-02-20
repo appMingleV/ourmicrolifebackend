@@ -342,16 +342,26 @@ export const getnewMLMUser=async(req,res)=>{
         })
         const queryMLMUser=`SELECT * FROM Transition WHERE user_id=?`;
         const dataMLMUser=await queryPromises(queryMLMUser,[userId]);
-        if (!dataMLMUser){
+        if (dataMLMUser.length==0){
             return res.status(400).json({
                 status: "failed",
                 message: "No MLM User found with this id"
             })
         }
+        const queryUserData=`SELECT * FROM tbl_users WHERE id=?`
+        const dataUserData=await queryPromises(queryUserData,[userId]);
+        if (dataUserData.length==0){
+            return res.status(400).json({
+                status: "failed",
+                message: "No MLM User found with this id"
+            })
+        }
+        dataMLMUser[0].userDetail=dataUserData[0];
         return res.status(200).json({
             status: "success",
             message: "MLM User fetched successfully",
-            data: dataMLMUser
+            data: dataMLMUser,
+       
         })
  
     }catch(err){
