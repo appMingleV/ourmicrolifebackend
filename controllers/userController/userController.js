@@ -2,6 +2,7 @@ import pool from '../../config/db.js';
 import {getMLM} from '../../service/refferralSystem/refferral.js'
 import otpGenerator from 'otp-generator'
 import {updatePosition,getAllPositonAmount,getTentativeCoin} from '../../service/refferralSystem/refferral.js'
+import {sendMailForOTP,sendMailWelcomeSignup} from '../../service/common/common.js';
 import jwt from 'jsonwebtoken'
 const otpStorage = {};
 export const userProfileUpdate=(req,res)=>{
@@ -81,7 +82,9 @@ export const verifyOTP =async (req, res) => {
       
         console.log(token);
         console.log(userSet)
-        delete otpStorage[mobile_number]; // Remove OTP after successful verification
+        await sendMailWelcomeSignup(otpStorage[mobile_number]?.email,otpStorage[mobile_number]?.first_name);
+        delete otpStorage[mobile_number];
+         // Remove OTP after successful verification
         return res.status(200).json({ message: "OTP verified successfully!",token,id:userSet.insertId });
 
     }
@@ -128,6 +131,31 @@ export const checkReferralActive=async(req,res)=>{
             error: err.message,
         })
        }
+}
+const otpStore={}
+function generateOtp() {
+    return Math.floor(1000 + Math.random() * 9000);
+}
+export const userLogin=async(req,res)=>{
+    try{
+      console.log("user login ")
+     const {email}=req.body;
+     const otp = generateOtp();
+     otpStore[email]=otp;
+     await sendMailForOTP(email,otp);
+     return res.status(200).json({
+        status: "success",
+        message: "OTP sent successfully!",
+        otp,
+        email,
+     })
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:"Unexpected error occurred",
+            error:err.message,
+        })
+    }
 }
 
 
@@ -184,6 +212,7 @@ export const payMLMAmount=async(req,res)=>{
         })
     }
 }
+
 
 export const getProfile=async(req,res)=>{
     try{

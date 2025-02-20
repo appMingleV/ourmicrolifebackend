@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            background: linear-gradient(135deg, #8E44AD, #3498DB);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            padding: 15px;
+            border-radius: 10px; 
+        }
+        .content {
+            padding: 20px;
+            font-size: 16px;
+            color: #fff;
+            text-align: left; 
+        }
+        .display {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .display input {
+            border: 0;
+            outline: 0;
+            font-size: 20px;
+            padding-left: 10px;
+            border-radius: 5px;
+            width: 100%;
+            height: 30px;
+        }
+        .display img {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            cursor: pointer;
+        }
+        @media (max-width: 480px) {
+            .header {
+                font-size: 20px;
+            }
+            .content {
+                font-size: 14px;
+            }
+            .display input {
+                font-size: 18px;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Welcome to OurMicroLife</div>
+        <div class="content">
+            <p><strong>Dear User,</strong></p>
+            <p>We're thrilled to have you join OurMicroLife! To complete your login/signup, 
+                use the following One-Time Password (OTP): <strong>{{OTP}}</strong></p>
+            <div class="display">
+                <input type="text" id="password" placeholder="Password" value="" disabled>
+                <script>
+                    document.getElementById("password").value= `{{OTP}}`;
+                </script>
+                <img src="image/copy.png" alt="Copy" onclick="copyPassword()">
+            </div>
+            <p>This OTP is valid for a limited time. Please do not share it with anyone.</p>
+            <p>Enjoy exclusive collections, unbeatable prices, and top-quality products designed just for you.</p>
+            <p>Your new lifestyle starts here!</p>
+            <p><strong>The OurMicroLife Team</strong></p>
+        </div>
+    </div>
+    <script>
+        function copyPassword() {
+            var passwordInput = document.getElementById("password");
+            passwordInput.value = "647323";
+            passwordInput.select();
+            passwordInput.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+        }
+        
+    </script>
+</body>
+</html>
