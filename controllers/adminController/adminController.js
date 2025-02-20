@@ -269,12 +269,17 @@ export const upateMLMMemberStatus=async(req,res)=>{
                 message: "No MLM Member found with this id"
             })
         }
+        if(status=="accepted"){
+        const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=? WHERE id=?`
+        const values1=[true,userId];
+        const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
+        }
         return res.status(200).json({
             status: "success",
             message: "MLM Member status updated successfully",
             user:updateUser
         })
-
+   
     }catch(err){
         return res.status(500).json({
             status: "error",

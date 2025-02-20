@@ -253,7 +253,7 @@ export const getWalletTransactions=async(req,res)=>{
             const position=dataUser[0].level;
             console.log(dataUser);
             if(coins>200 ){
-            
+              let income=0;
                 if(!positionPaid){
                  const queryCheckUser=`UPDATE tbl_users SET paid_status_=? WHERE id=?`
                  const dataCheckUser=await queryPromise(queryCheckUser,[true,userId]);
@@ -263,27 +263,45 @@ export const getWalletTransactions=async(req,res)=>{
                  })
                  coins-=200;
                  const dataPositionPaid=await getAllPositonAmount(position);
-                 const dataTentativeCoins=await getTentativeCoin(position);
-                 console.log("hello is tentative Coins--> ",dataTentativeCoins);
-                 let income=dataPositionPaid?.income
-                 console.log()
-                 
-                 let amount=(((coins>=200?coins:0)*(5))*80)/100;
-                 coins-=amount;
-                 income+=amount;
+                 income=dataPositionPaid?.income
                  totalPayout+=income
-               
                  if(income!=0){
                     const queryAddPayout=`INSERT INTO payout (user_id,amount) VALUES (?,?)`;
                     const dataAddPayout=await queryPromise(queryAddPayout,[userId,income]);
                     console.log(dataAddPayout);
                     }
                 }
+                if(coins>=200){
+                const dataTentativeCoins=await getTentativeCoin(position);
+                console.log("hello is tentative Coins--> ",dataTentativeCoins);
+                const tentativeCoins=dataTentativeCoins.coinValue
+                 let totalIncome=(coins*tentativeCoins)
+                 let amount=((totalIncome)*80)/100;
+                 let pfamount=totalIncome-amount;
+                 coins=0;
+                 
+                 totalPayout+=amount
+                 
+                 if(income!=0){
+                    const queryAddPayout=`INSERT INTO payout (user_id,amount) VALUES (?,?)`;
+                    const dataAddPayout=await queryPromise(queryAddPayout,[userId,amount]);
+                   
+                    }
+                    if(pfamount!=0){
+                          const queryAddPfAmount=`INSERT INTO pf_amoZunt  (pfAmount,user_id,withdraw_status) VALUES (?,?,?)`;
+                          const dataAddPfAmount=await queryPromise(queryAddPfAmount,[pfamount,userId,true]);
+                         
+                    }
+                }
+               
                 const QueryUpdateMLMPay=`UPDATE mlm_duration SET coinValue=?,payOut=?,startDate=?,endDate=? WHERE userId=?`
                 endDate=currentDate+30;
                 await queryPromise(QueryUpdateMLMPay,[coins,totalPayout,currentDate,endDate,userId]);
             }
-         
+             
+            await queryPromise(`UPDATE coins SET value=? WHERE user_id=?`,[coins,userId]);
+            
+       
             
           return  res.status(200).json({
             status:"success",
@@ -304,7 +322,9 @@ export const getWalletTransactions=async(req,res)=>{
         }
 }
 
-
+// function TransitionWallet(){
+    
+// }
 
 const queryPromise=async(query,value=[])=>{
     return new Promise((resolve,reject)=>{
