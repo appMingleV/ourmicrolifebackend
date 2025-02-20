@@ -296,8 +296,6 @@ export const vendorOrderList = async (req, res) => {
                 message: "No vendor order found"
             })
         }
-  
-     
         let orderDetails=[]
         for (let i = 0; i < orderItems.length; i++) {
             const productId = orderItems[i].product_id;
@@ -320,7 +318,6 @@ export const vendorOrderList = async (req, res) => {
             }
             orderDetails.push(order)
         }
-
         return res.json({
             status: "success",
             message: "Vendor order list fetched successfully",
@@ -331,6 +328,36 @@ export const vendorOrderList = async (req, res) => {
         return res.status(500).json({
             status: "error",
             message: "Something went wrong while trying to fetch vendor order list",
+            error: err.message
+        })
+    }
+}
+
+export const getnewMLMUser=async(req,res)=>{
+    try{
+        const {userId}=req.params;
+        if(!userId)return res.status(404).json({
+            status: "failed",
+            message: "Missing required field"
+        })
+        const queryMLMUser=`SELECT * FROM Transition WHERE user_id=?`;
+        const dataMLMUser=await queryPromises(queryMLMUser,[userId]);
+        if (!dataMLMUser){
+            return res.status(400).json({
+                status: "failed",
+                message: "No MLM User found with this id"
+            })
+        }
+        return res.status(200).json({
+            status: "success",
+            message: "MLM User fetched successfully",
+            data: dataMLMUser
+        })
+ 
+    }catch(err){
+          return res.status(500).json({
+            status: "error",
+            message: "Something went wrong while trying to fetch MLM User",
             error: err.message
         })
     }

@@ -105,6 +105,21 @@ const updateUserLevel= async (position,userId)=>{
 
 }
 
+export const getAllPositonAmount=async (position)=>{
+    try{
+        let level=position || null;
+        const queryGetPositionAmount=`SELECT * FROM payment_position WHERE award=?`;
+        const data=await queryPromise(queryGetPositionAmount,[level]);
+        console.log("hello  ",data);
+        return data[0];
+    }catch(err){
+        console.log(err);
+        return;
+    }
+}
+
+
+
 
 const queryPromise=async(query,value=[])=>{
     return new Promise((resolve,reject)=>{
