@@ -136,6 +136,57 @@ const otpStore={}
 function generateOtp() {
     return Math.floor(1000 + Math.random() * 9000);
 }
+export const singleOrder=async(req,res)=>{
+    try{
+        const {orderId}=req.params;
+        console.log(orderId);
+        if(orderId==undefined || orderId==null)return res.status(404).json({
+            status:"error",
+            message:"Invalid order id",
+        })
+
+        const queryOrderItems=`SELECT * FROM order_items WHERE id=?`
+        const valueItems=[orderId];
+        const dataOrderItems=await queryPromise(queryOrderItems,valueItems);
+        if(dataOrderItems.length==0){
+            return res.status(400).json({
+                status:"error",
+                message:"No order items found",
+            })
+        }
+ 
+
+        const queryOrder=`SELECT * FROM  orders_cart WHERE id=?`
+        const value=[dataOrderItems[0]?.order_id];
+        const dataOrder=await queryPromise(queryOrder,value);
+        if(dataOrder.length==0){
+            return res.status(404).json({
+                status:"error",
+                message:"Invalid order id",
+            })
+        }
+        
+        const queryUser=`SELECT * FROM  shipping_addresses WHERE id=?`
+        const valueUser=[dataOrder[0]?.shipping_address_id];
+        const dataUserAddress=await queryPromise(queryUser,valueUser);
+       
+        
+      
+        return res.status(200).json({
+            status: "success",
+            message: "Order details fetched successfully",
+            userAddress:dataUserAddress[0]|| "not found",
+            orderItems:dataOrderItems,
+        })
+
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:"Unexpected error occurred",
+            error:err.message,
+        })
+    }
+}
 export const userLogin=async(req,res)=>{
     try{
       console.log("user login ")
