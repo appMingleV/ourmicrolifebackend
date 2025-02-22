@@ -6,6 +6,7 @@ import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAl
 
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
 import {addSlider,allSlider,deleteSlider} from '../controllers/adminController/sliderController.js'
+import {decryptRefferal} from '../middleware/index.js'
 import referral from './referral.js'
 import coupons from './coupons.js'
 import multer from "multer";
@@ -99,7 +100,7 @@ routes.post('/sliders/:query',singleImage3,addSlider);
 routes.get('/sliders/:query',allSlider);
 routes.delete('/sliders/:sliderId',deleteSlider);
 routes.get('/newMLMUser',getMLMUser)
-.put('/statusMLM/:userId',upateMLMMemberStatus)
+.put('/statusMLM/:userId',decryptRefferal(),upateMLMMemberStatus)
 .get('/mlmuser/:userId',getnewMLMUser)
 routes.use('/referral',referral)
 routes.use('/coupon',coupons)

@@ -37,13 +37,7 @@ const encrypt = (text) => {
 };
 
 // Referral creation logic
-export const refferalCreate = async (req, res) => {
-    console.log("here function is runing")
-    const { userId } = req.params; // Assuming `userId` comes from request params
-    const refferalCode = req.decrypt; // Assuming decrypted referral code exists
-    
- 
-
+export const refferalCreate = async (refferalCode) => {
     try {
         //get direct referal coin
         const directRefCoin = await directReferralCoin();
@@ -51,10 +45,7 @@ export const refferalCreate = async (req, res) => {
         if (refferalCode) {
             const referralDetails = await checkReferralCode(refferalCode);
             if (!referralDetails) {
-                return res.status(400).json({
-                    status: "failed",
-                    message: "Invalid or inactive referral code",
-                });
+                return false
             }
 
             const referredUserId = referralDetails.user_id;
@@ -62,10 +53,7 @@ export const refferalCreate = async (req, res) => {
             const directReferral = await setDirectReferral(referredUserId, userId,coin);
 
             if (!directReferral) {
-                return res.status(400).json({
-                    status: "failed",
-                    message: "user already register with referral code",
-                });
+                return false
             }
             //team fetch coins--->
             const getCoins =await teamReferralCoin();
@@ -91,17 +79,9 @@ export const refferalCreate = async (req, res) => {
 
         const newReferral = await createReferral(referralLink, referralCode, userId);
 
-        return res.status(200).json({
-            status: "success",
-            message: "Referral successfully created",
-            data: newReferral.insertId,
-        });
+        return false
     } catch (err) {
-        return res.status(500).json({
-            status: "failed",
-            message: "Unexpected error occurred",
-            error: err.message,
-        });
+        return false
     }
 };
 

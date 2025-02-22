@@ -47,7 +47,7 @@ routes.post('/verifyOTP',verifyOtpNumber);
 routes.put('/profile/:userId',upload.single('profile_picture'),userProfileUpdate)
 routes.get('/profile/:userId',getProfile)
 .get('/referralActive/:userId',checkReferralActive)
-.post('/mlmMembers/:userId',upload.single('transaction_image'),payMLMAmount,refferalCreate)
+.post('/mlmMembers/:userId',upload.single('transaction_image'),payMLMAmount)
 .get('/walletTransactions/:userId',getWalletTransactions)
 .get('/order/:orderId',singleOrder)
 .use('/order',order);

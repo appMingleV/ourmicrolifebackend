@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import pool from '../../config/db.js'
+import {refferalCreate} from '../../controllers/refferalController/refferController.js'
 export const vedorList = (req, res) => {
     try {
         const { query } = req.params;
@@ -256,6 +257,7 @@ export const upateMLMMemberStatus=async(req,res)=>{
     try{ 
         const {userId}=req.params;
         const { status } = req.body;
+        const refferalCode = req.decrypt; 
         if(!userId || !status)return res.status(404).json({
             status: "failed",
             message: "Missing required field"
@@ -273,6 +275,7 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=? WHERE id=?`
         const values1=[true,userId];
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
+        await refferalCreate(refferalCode)
         }
         return res.status(200).json({
             status: "success",
