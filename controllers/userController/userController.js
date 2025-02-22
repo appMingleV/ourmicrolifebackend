@@ -154,8 +154,10 @@ export const singleOrder=async(req,res)=>{
                 message:"No order items found",
             })
         }
- 
-
+          console.log(dataOrderItems)
+         const queryProduct=`SELECT * FROM products WHERE id=?`;
+         const valueProduct=[dataOrderItems[0]?.product_id];
+         const dataProduct=await queryPromise(queryProduct,valueProduct);
         const queryOrder=`SELECT * FROM  orders_cart WHERE id=?`
         const value=[dataOrderItems[0]?.order_id];
         const dataOrder=await queryPromise(queryOrder,value);
@@ -177,6 +179,7 @@ export const singleOrder=async(req,res)=>{
             message: "Order details fetched successfully",
             userAddress:dataUserAddress[0]|| "not found",
             orderItems:dataOrderItems,
+            products:dataProduct
         })
 
     }catch(err){
