@@ -66,6 +66,39 @@ export const getBuyOrder = async (req, res) => {
         })
     }
 }
+
+
+export const cancelOrder = async (req, res) => {
+    try{
+        const {orderId}=req.params;
+        if(!orderId){
+            return res.status(200).json({
+                status:"error",
+                message:"Missing required fields"
+            })
+        }
+        const queryCancelOrder=`UPDATE order_items  SET status='canceled' WHERE id=?`;
+        const value=[orderId];
+        const cancelOrder=await queryPromis(queryCancelOrder,value);
+        if(!cancelOrder){
+            return res.status(404).json({
+                status:"error",
+                message:"No order found"
+            })
+        }
+        return res.status(200).json({
+            status:"success",
+            message:"Order is canceled successfully",
+            data:cancelOrder
+        })
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:"Operation failed",
+            error:err.message
+        })
+    }
+}
 // coin
 // : 
 // 4
