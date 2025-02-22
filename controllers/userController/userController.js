@@ -223,11 +223,15 @@ export const verifyOtpNumber =async (req, res) => {
             const queryStoreToken = `UPDATE tbl_users SET  api_token=? WHERE email=?`;
             const values1 = [token, email]
             const userData=await queryPromise(queryStoreToken, values1);
+            const queryGetUserId=`SELECT id FROM tbl_users WHERE email=?`;
+            const values2 = [email]
+            const userId=await queryPromise(queryGetUserId, values2);
             return res.json({
                 status: "success",
                 message: "OTP verified successfully",
                 userData,
                 token,
+                userId: userId[0].id
             });
         } else {
             // OTP is invalid or expired
@@ -250,9 +254,14 @@ export const verifyOtpNumber =async (req, res) => {
             const queryStoreToken = `UPDATE tbl_users SET  api_token=? WHERE mobile=?`;
             const values1 = [token, mobile];
             const userData=await queryPromise(queryStoreToken,values1);
+            const queryGetUserId=`SELECT id FROM tbl_users WHERE mobile=?`;
+            const values2 = [mobile]
+            const userId=await queryPromise(queryGetUserId, values2);
             return res.status(200).json({
                     status: "success",
                     message: "OTP verified successfully",
+                    userId: userId[0].id,
+                    token
             })
         } else {
             // OTP is invalid or expired
