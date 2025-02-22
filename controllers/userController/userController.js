@@ -104,7 +104,7 @@ export const login = async (req, res) => {
             ? { email: req.body.email }
             : { mobile: req.body.mobile_number };
 
-
+       
         if ('email' in authData) {
             const { email } = authData;
 
@@ -147,7 +147,8 @@ export const login = async (req, res) => {
         } else {
 
             const { mobile } = authData;
-            const queryCheckMobile = `SELECT * FROM tbl_user WHERE mobile=?`;
+            console.log("mobile is ",authData)
+            const queryCheckMobile = `SELECT * FROM tbl_users WHERE mobile_number=?`;
             const Value = [mobile];
             pool.query(queryCheckMobile, Value, async (err, result) => {
                 if (err) {
