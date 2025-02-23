@@ -37,7 +37,7 @@ const encrypt = (text) => {
 };
 
 // Referral creation logic
-export const refferalCreate = async (refferalCode) => {
+export const refferalCreate = async (refferalCode,userId) => {
     try {
         //get direct referal coin
         const directRefCoin = await directReferralCoin();

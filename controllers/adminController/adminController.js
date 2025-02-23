@@ -275,7 +275,7 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=? WHERE id=?`
         const values1=[true,userId];
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
-        await refferalCreate(refferalCode)
+        await refferalCreate(refferalCode,userId)
         }
         return res.status(200).json({
             status: "success",
