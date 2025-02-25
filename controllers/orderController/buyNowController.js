@@ -183,6 +183,7 @@ export const orderItems = async (req, res) => {
                     message: "Failed to add coins history"
                 })
             }
+   
             const queryAddCoinsUser = `UPDATE coins SET value=value+? WHERE user_id=?`;
             const valueAddcoin=[total_coins,user_id]
             await queryPromis(queryAddCoinsUser,valueAddcoin);

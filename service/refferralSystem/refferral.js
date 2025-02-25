@@ -99,8 +99,8 @@ export const updatePosition=async(userId)=>{
 }
 
 const updateUserLevel= async (position,userId)=>{
-    const queryUpdateUser=`UPDATE tbl_users SET level=? WHERE id=?`
-    const value=[position,userId];
+    const queryUpdateUser=`UPDATE tbl_users SET level=?,paid_status_=? WHERE id=?`
+    const value=[position,false,userId];
     const updateProfile=await queryPromise(queryUpdateUser,value);
 
 }

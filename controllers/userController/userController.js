@@ -507,7 +507,7 @@ export const getWalletTransactions = async (req, res) => {
                     console.log(dataAddPayout);
                 }
             }
-            if (coins >= 200) {
+            if (coins >= 200 && endDate<currentDate) {
                 const dataTentativeCoins = await getTentativeCoin(position);
                 let teamPurchasedPercent = await getTeamPurchased();
 
