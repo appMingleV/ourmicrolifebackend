@@ -55,7 +55,7 @@ export const signupController = async (req, res) => {
     otpStorage[mobile_number] = { first_name, last_name, email, otp }; // Store OTP temporarily
 
     // Send OTP via email (use an actual email service in production)
-
+    const otpData = await otpImplementation(otp, mobile_number)
 
     try {
 
@@ -136,8 +136,6 @@ export const login = async (req, res) => {
                 otpStorage[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // OTP valid for 5 minutes
 
                 await sendMailForOTP(email, otp);
-
-
                 return res.status(200).json({
                     status: "success",
                     message: "OTP sent to email successfully",

@@ -234,9 +234,9 @@ export const getMLMUser=async(req,res)=>{
             const queryUserDetail = `SELECT first_name,last_name,mobile_number FROM tbl_users WHERE id=?`
             const value1 = [userId];
             const getUserData=await queryPromises(queryUserDetail,value1);
-            console.log(getUserData)
+       
             MLMUsers[i].name=getUserData[0]?.first_name+getUserData[0]?.last_name;
-            MLMUsers[i].mobile=getUserData[0].mobile_number;
+            MLMUsers[i].mobile=getUserData[0]?.mobile_number;
         }
         
        return res.status(200).json({
