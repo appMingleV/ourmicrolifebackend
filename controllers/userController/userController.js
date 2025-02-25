@@ -473,12 +473,7 @@ export const getWalletTransactions = async (req, res) => {
         let totalPayout = mlmDataQuery[0].payOut;
         let coins = 0;
         const dataQuery = await queryPromise(queryGetTransactions, value);
-        if (dataQuery.length == 0) {
-            return res.status(404).json({
-                status: "error",
-                message: "No transactions found",
-            })
-        }
+       
 
 
         const queryCoinUser = `SELECT * FROM  coins WHERE user_id=?`;
