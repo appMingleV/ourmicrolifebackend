@@ -50,7 +50,7 @@ export const refferalCreate = async (refferalCode,userId) => {
 
             const referredUserId = referralDetails.user_id;
 
-            const directReferral = await setDirectReferral(referredUserId, userId,coin);
+            const directReferral = await setDirectReferral(referredUserId, userId,0);
 
             if (!directReferral) {
                 return false
@@ -62,8 +62,7 @@ export const refferalCreate = async (refferalCode,userId) => {
            
             const Teams = await setTeam(referredUserId, userId, coinsTeam)
            
-            await addCoins(userId, coin); // Add coins for the new user
-            await addCoins(referredUserId, coin); // Add coins for the referrer
+
 
         } else {
             // Add coins for a new user without referral
@@ -262,11 +261,11 @@ const putCoins = async (coinsTeam, teamId) => {
             const valueUser=coins[i+1]+(Number(dataCoin[0]?.value)||0);
             console.log("in value get ",valueUser);
             const queryPutCoins = `UPDATE coins SET value=value+? WHERE user_id=?`;
-            const values = [coins[i+1], dataUserId[0].user_id];
+            const values = [0, dataUserId[0].user_id];
             await queryPromise(queryPutCoins, values);
             
             const queryAddCoins = `UPDATE team_referral SET coins=? WHERE id=?`;
-            await queryPromise(queryAddCoins, [coins[i+1], teamId[i]]);
+            await queryPromise(queryAddCoins, [0, teamId[i]]);
           } else {
             console.error(`No user found for team ID: ${teamId[i]}`);
           }
@@ -280,11 +279,11 @@ const putCoins = async (coinsTeam, teamId) => {
   
           if (dataUserId.length > 0) {
             const queryPutCoins = `UPDATE coins SET value=value+? WHERE user_id=?`;
-            const values = [coins[count], dataUserId[0].user_id];
+            const values = [0, dataUserId[0].user_id];
             await queryPromise(queryPutCoins, values);
   
             const queryAddCoins = `UPDATE team_referral SET coins=coins+? WHERE id=?`;
-            await queryPromise(queryAddCoins, [coins[count], teamId[i]]);
+            await queryPromise(queryAddCoins, [0, teamId[i]]);
             count--;
           } else {
             console.error(`No user found for team ID: ${teamId[i]}`);
