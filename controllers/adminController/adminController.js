@@ -274,8 +274,10 @@ export const upateMLMMemberStatus=async(req,res)=>{
         if(status=="accepted"){
         const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=?,level="Sahyogi" WHERE id=?`
         const values1=[true,userId];
-        const startDate=new Date();
-        const endDate=(startDate+30)
+        const startDate = new Date();
+        const endDate = new Date(startDate); // Create a new Date object to avoid modifying startDate
+        
+        endDate.setDate(startDate.getDate() + 30);
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
         const queryAddMLMDuration=`INSERT INTO mlm_duration (startDate,endDate,coinValue,payOut,userId) VALUES (?,?,?,?,?)`
         const values2=[startDate,endDate,0,0,userId];

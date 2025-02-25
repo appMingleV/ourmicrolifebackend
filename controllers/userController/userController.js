@@ -488,7 +488,7 @@ export const getWalletTransactions = async (req, res) => {
         const positionPaid = dataUser[0].paid_status_;
         const position = dataUser[0].level;
         console.log(dataUser);
-        if (coins > 200) {
+        if (coins > 200 && currentDate>=endDate) {
             let income = 0;
             if (!positionPaid) {
                 const queryCheckUser = `UPDATE tbl_users SET paid_status_=? WHERE id=?`
@@ -540,7 +540,7 @@ export const getWalletTransactions = async (req, res) => {
             }
 
             const QueryUpdateMLMPay = `UPDATE mlm_duration SET coinValue=?,payOut=payOut+?,startDate=?,endDate=? WHERE userId=?`
-            endDate = currentDate + 30;
+            endDate = (currentDate + 30);
             await queryPromise(QueryUpdateMLMPay, [coins, totalPayout, currentDate, endDate, userId]);
         }
 
