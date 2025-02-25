@@ -272,7 +272,7 @@ export const upateMLMMemberStatus=async(req,res)=>{
             })
         }
         if(status=="accepted"){
-        const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=? WHERE id=?`
+        const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=?,level="Sahyogi" WHERE id=?`
         const values1=[true,userId];
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
         await refferalCreate(refferalCode,userId)

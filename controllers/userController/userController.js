@@ -3,6 +3,7 @@ import { getMLM } from '../../service/refferralSystem/refferral.js'
 import otpGenerator from 'otp-generator'
 import { updatePosition, getAllPositonAmount, getTentativeCoin } from '../../service/refferralSystem/refferral.js'
 import { sendMailForOTP, sendMailWelcomeSignup } from '../../service/common/common.js';
+import { getTeamPurchased } from '../../service/refferralSystem/refferral.js'
 import { otpImplementation } from '../../service/OTPSub/otp.js';
 import jwt from 'jsonwebtoken'
 const otpStorage = {};
@@ -104,7 +105,7 @@ export const login = async (req, res) => {
             ? { email: req.body.email }
             : { mobile: req.body.mobile_number };
 
-       
+
         if ('email' in authData) {
             const { email } = authData;
 
@@ -147,7 +148,7 @@ export const login = async (req, res) => {
         } else {
 
             const { mobile } = authData;
-            console.log("mobile is ",authData)
+            console.log("mobile is ", authData)
             const queryCheckMobile = `SELECT * FROM tbl_users WHERE mobile_number=?`;
             const Value = [mobile];
             pool.query(queryCheckMobile, Value, async (err, result) => {
@@ -180,13 +181,13 @@ export const login = async (req, res) => {
                 otpStorage[mobileNumber] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // OTP expires in 5 minutes
 
 
-               
-             
-                    return res.status(200).json({
-                        status: "success",
-                        message: "OTP sent to mobile number successfully",
-                    });
-        
+
+
+                return res.status(200).json({
+                    status: "success",
+                    message: "OTP sent to mobile number successfully",
+                });
+
             })
 
 
@@ -201,7 +202,7 @@ export const login = async (req, res) => {
     }
 };
 
-export const verifyOtpNumber =async (req, res) => {
+export const verifyOtpNumber = async (req, res) => {
     const authData = req.body.email
         ? { email: req.body.email }
         : { mobile: "+91" + req.body.mobile_number };
@@ -222,10 +223,10 @@ export const verifyOtpNumber =async (req, res) => {
 
             const queryStoreToken = `UPDATE tbl_users SET  api_token=? WHERE email=?`;
             const values1 = [token, email]
-            const userData=await queryPromise(queryStoreToken, values1);
-            const queryGetUserId=`SELECT id FROM tbl_users WHERE email=?`;
+            const userData = await queryPromise(queryStoreToken, values1);
+            const queryGetUserId = `SELECT id FROM tbl_users WHERE email=?`;
             const values2 = [email]
-            const userId=await queryPromise(queryGetUserId, values2);
+            const userId = await queryPromise(queryGetUserId, values2);
             return res.json({
                 status: "success",
                 message: "OTP verified successfully",
@@ -253,15 +254,15 @@ export const verifyOtpNumber =async (req, res) => {
             const token = jwt.sign({ mobile }, process.env.JWT_SECRET);
             const queryStoreToken = `UPDATE tbl_users SET  api_token=? WHERE mobile=?`;
             const values1 = [token, mobile];
-            const userData=await queryPromise(queryStoreToken,values1);
-            const queryGetUserId=`SELECT id FROM tbl_users WHERE mobile=?`;
+            const userData = await queryPromise(queryStoreToken, values1);
+            const queryGetUserId = `SELECT id FROM tbl_users WHERE mobile=?`;
             const values2 = [mobile]
-            const userId=await queryPromise(queryGetUserId, values2);
+            const userId = await queryPromise(queryGetUserId, values2);
             return res.status(200).json({
-                    status: "success",
-                    message: "OTP verified successfully",
-                    userId: userId[0].id,
-                    token
+                status: "success",
+                message: "OTP verified successfully",
+                userId: userId[0].id,
+                token
             })
         } else {
             // OTP is invalid or expired
@@ -515,14 +516,24 @@ export const getWalletTransactions = async (req, res) => {
             }
             if (coins >= 200) {
                 const dataTentativeCoins = await getTentativeCoin(position);
-                console.log("hello is tentative Coins--> ", dataTentativeCoins);
+                let teamPurchasedPercent = await getTeamPurchased();
+
                 const tentativeCoins = dataTentativeCoins.coinValue
                 let totalIncome = (coins * tentativeCoins)
                 let amount = ((totalIncome) * 80) / 100;
                 let pfamount = totalIncome - amount;
+                let teamAmount = 5 * coins;
+                const teamPurchaesArray = [];
+                for (let key in teamPurchasedPercent.data) {
+
+                    teamPurchaesArray.push(teamPurchasedPercent.data[key]);
+
+                }
+
+                let myTeamAmount = calculateTeamPurchases(teamAmount, userId, teamPurchaesArray);
                 coins = 0;
 
-                totalPayout += amount
+                totalPayout += amount + myTeamAmount;
 
                 if (income != 0) {
                     const queryAddPayout = `INSERT INTO payout (user_id,amount) VALUES (?,?)`;
@@ -530,13 +541,12 @@ export const getWalletTransactions = async (req, res) => {
 
                 }
                 if (pfamount != 0) {
-                    const queryAddPfAmount = `INSERT INTO pf_amoZunt  (pfAmount,user_id,withdraw_status) VALUES (?,?,?)`;
-                    const dataAddPfAmount = await queryPromise(queryAddPfAmount, [pfamount, userId, true]);
-
+                    const queryAddPfAmount = `INSERT INTO pf_amount  (pfAmount,user_id,withdraw_status) VALUES (?,?,?)`;
+                    const dataAddPfAmount = await queryPromise(queryAddPfAmount, [pfamount, userId, "pending"]);
                 }
             }
 
-            const QueryUpdateMLMPay = `UPDATE mlm_duration SET coinValue=?,payOut=?,startDate=?,endDate=? WHERE userId=?`
+            const QueryUpdateMLMPay = `UPDATE mlm_duration SET coinValue=?,payOut=payOut+?,startDate=?,endDate=? WHERE userId=?`
             endDate = currentDate + 30;
             await queryPromise(QueryUpdateMLMPay, [coins, totalPayout, currentDate, endDate, userId]);
         }
@@ -567,6 +577,36 @@ export const getWalletTransactions = async (req, res) => {
 // function TransitionWallet(){
 
 // }
+
+async function calculateTeamPurchases(amount, userId, teamPurchased) {
+    const queryTeamId = `SELECT team FROM tbl_users WHERE id=?`
+    const value = [userId]
+
+    const dataTeamId = await queryPromise(queryTeamId, value);
+    const teamId = JSON.parse(dataTeamId[0].team);
+    console.log(teamId)
+    for (let i = 0; i < teamId.length && i < 14; i++) {
+        const queryTeam = `SELECT user_id FROM team_referral WHERE id=?`
+        console.log("team id is ", teamId[i]);
+        const dataTeam = await queryPromise(queryTeam, [teamId[i]]);
+
+        const teamUserId = dataTeam[0].user_id
+        console.log("team user id ----> ", amount, " ", teamPurchased[i + 2]);
+        const percentageAmount = (amount * teamPurchased[i + 2]) / 100;
+        console.log("team user id ----> ", percentageAmount);
+        const queryAddPayout = `INSERT INTO payout (user_id,amount) VALUES (?,?)`;
+        const dataAddPayout = await queryPromise(queryAddPayout, [teamUserId, percentageAmount]);
+        const QueryUpsertMLMPay = `
+    INSERT INTO mlm_duration (userId, payOut) 
+    VALUES (?, ?) 
+    ON DUPLICATE KEY UPDATE payOut = payOut + VALUES(payOut)
+`;
+        await queryPromise(QueryUpsertMLMPay, [teamUserId, percentageAmount]);
+
+    }
+    console.log(teamId);
+    return (amount * teamPurchased[1]) / 100;
+}
 
 const queryPromise = async (query, value = []) => {
     return new Promise((resolve, reject) => {

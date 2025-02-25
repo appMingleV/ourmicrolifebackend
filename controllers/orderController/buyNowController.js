@@ -213,3 +213,17 @@ const queryPromis = (query, value = []) => {
         })
     })
 }
+
+
+export const getAllOrders=(req,res)=>{
+    try{
+    const queryAllOrders=`SELECT * FROM orders_cart`;
+
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:"Operation failed",
+            error:err.message
+        })
+    }
+}
