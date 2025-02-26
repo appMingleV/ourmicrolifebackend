@@ -45,6 +45,7 @@ export const userProfileUpdate = (req, res) => {
 }
 
 export const signupController = async (req, res) => {
+    try {
     const { first_name, last_name, email, mobile_number, referralCode } = req.body;
 
     if (!first_name || !last_name || !email || !mobile_number) {
@@ -53,22 +54,22 @@ export const signupController = async (req, res) => {
     const queryCheckUserExist=`SELECT  email,mobile_number FROM  tbl_users WHERE email=? AND mobile_number=?`
     const valueCheckUserExist=[email,mobile_number]
     const checkUserExist=await queryPromise(queryCheckUserExist,valueCheckUserExist)
-    console.log(checkUserExist)
     if(checkUserExist.length==0){
+        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+        otpStorage[mobile_number] = { first_name, last_name, email, otp }; // Store OTP temporarily
+    
+        // Send OTP via email (use an actual email service in production)
+        const otpData = await otpImplementation(otp, mobile_number)
         const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number) VALUES (?,?,?,?)`
         const value = [first_name, last_name,email, mobile_number];
         const userSet = await queryPromise(querySignup, value);
-        console.log("check user")
-    }
-    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
-    otpStorage[mobile_number] = { first_name, last_name, email, otp }; // Store OTP temporarily
-
-    // Send OTP via email (use an actual email service in production)
-    const otpData = await otpImplementation(otp, mobile_number)
-
-    try {
-
+      
         res.status(200).json({ message: "OTP sent successfully!", otp, mobile_number });
+    }else
+    {
+        res.status(200).json({message:"user already exists "});
+    }
+
     } catch (error) {
         res.status(500).json({ message: "Error sending OTP", error });
     }

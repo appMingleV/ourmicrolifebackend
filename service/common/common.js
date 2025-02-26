@@ -80,7 +80,7 @@ function sendMail(emailHtml,email){
     var mailOptions = {
         from: 'info@ourmicrolife.com',
         to: email,
-        subject: 'Sending Email ',
+        subject: 'verification OTP',
         html: emailHtml
       };
 
