@@ -340,9 +340,6 @@ export const signupWithReferralCode = async (req, res) => {
         }
 
         const teams = await setTeam(referredUserId, new_user_id);
-        await addCoins(new_user_id, 50); // Add coins for the new user
-        await addCoins(referredUserId, 50); // Add coins for the 
-
         const referralCodeNewUser = generateReferralCode();
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
         const referralLink = `${req.protocol}://${req.headers.host}/signup-user?ref=${encryptedData}&iv=${ivHex}`;
@@ -363,8 +360,6 @@ export const signupWithReferralCode = async (req, res) => {
         })
     }
 }
-
-
 
 
 //get Referral users 
