@@ -67,7 +67,7 @@ export const signupController = async (req, res) => {
         res.status(200).json({ message: "OTP sent successfully!", otp, mobile_number });
     }else
     {
-        res.status(200).json({message:"user already exists "});
+        res.status(400).json({message:"user already exists "});
     }
 
     } catch (error) {
