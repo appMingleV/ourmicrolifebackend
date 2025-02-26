@@ -41,7 +41,7 @@ export const refferalCreate = async (refferalCode,userId) => {
     try {
         //get direct referal coin
         const directRefCoin = await directReferralCoin();
-        const coin = directRefCoin.data[0].coin || 0;
+        const coin =  0;
         if (refferalCode) {
             const referralDetails = await checkReferralCode(refferalCode);
             if (!referralDetails) {
@@ -66,7 +66,7 @@ export const refferalCreate = async (refferalCode,userId) => {
 
         } else {
             // Add coins for a new user without referral
-            await addCoins(userId, coin);
+            await addCoins(userId, 0);
 
 
         }
