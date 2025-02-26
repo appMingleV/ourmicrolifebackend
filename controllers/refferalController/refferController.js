@@ -342,8 +342,8 @@ export const signupWithReferralCode = async (req, res) => {
         const teams = await setTeam(referredUserId, new_user_id);
         const referralCodeNewUser = generateReferralCode();
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
-        const referralLink = `${req.protocol}://${req.headers.host}/signup-user?ref=${encryptedData}&iv=${ivHex}`;
-
+        const referralLink = `${req.protocol}://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
+        
         const newReferral = await createReferral(referralLink, referralCodeNewUser, new_user_id);
 
         return res.status(200).json({
