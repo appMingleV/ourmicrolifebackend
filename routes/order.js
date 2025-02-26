@@ -10,6 +10,7 @@ routes.post('/buyOrders',buyOrders)
 routes.get('/buyOrders/:buyId',getBuyOrder)
 .post('/orderItems',orderItems)
 .put('/:orderId',cancelOrder)
+.get('/getAllOrders/:userId',)
 
 
 export default routes

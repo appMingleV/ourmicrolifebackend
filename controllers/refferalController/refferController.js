@@ -194,7 +194,7 @@ const setTeam = async (referredUserId, userId,coinsTeam) => {
         
         // Insert the new user's referral information
         const querySetTeam = `INSERT INTO team_referral (user_id, status, coins, date, teams) VALUES (?, ?, ?, ?, ?)`;
-        const value = [referredUserId, "active", 50, new Date(), JSON.stringify([userId])];
+        const value = [referredUserId, "active", 0, new Date(), JSON.stringify([userId])];
         const teamInsertResult = await queryPromise(querySetTeam, value);
 
         // Retrieve parent team information-
@@ -495,7 +495,7 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
             //directRef--> { referral_to: 27 }
             //direct RefferalUser Profile--->
             
-            const queryUserPorfile = `SELECT first_name,last_name,level,status,profile_picture FROM  tbl_users WHERE id=?`;
+            const queryUserPorfile = `SELECT first_name,last_name,level,status,profile_picture,MLMStatus FROM  tbl_users WHERE id=?`;
             const value = [directRef?.referral_to];
             const profileData = await queryPromise(queryUserPorfile, value);
             // direct refferal user Profile Team--->

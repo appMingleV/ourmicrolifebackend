@@ -218,7 +218,15 @@ const queryPromis = (query, value = []) => {
 
 export const getAllOrders=(req,res)=>{
     try{
-    const queryAllOrders=`SELECT * FROM orders_cart`;
+
+    const {userId}=req.params;
+    const {orderStatus}=req.body;
+    if(orderStatus==="all"){
+    const queryAllOrders=`SELECT * FROM orders_cart WHERE user_id=?`;
+    }else {
+
+    }
+    const value=[userId];
 
     }catch(err){
         return res.status(500).json({
@@ -228,3 +236,4 @@ export const getAllOrders=(req,res)=>{
         })
     }
 }
+
