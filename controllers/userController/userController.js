@@ -50,7 +50,16 @@ export const signupController = async (req, res) => {
     if (!first_name || !last_name || !email || !mobile_number) {
         return res.status(400).json({ message: "All fields except referral code are required." });
     }
-
+    const queryCheckUserExist=`SELECT  email,mobile_number FROM  tbl_users WHERE email=? AND mobile_number=?`
+    const valueCheckUserExist=[email,mobile_number]
+    const checkUserExist=await queryPromise(queryCheckUserExist,valueCheckUserExist)
+    console.log(checkUserExist)
+    if(checkUserExist.length==0){
+        const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number) VALUES (?,?,?,?)`
+        const value = [first_name, last_name,email, mobile_number];
+        const userSet = await queryPromise(querySignup, value);
+        console.log("check user")
+    }
     const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
     otpStorage[mobile_number] = { first_name, last_name, email, otp }; // Store OTP temporarily
 
@@ -70,8 +79,9 @@ export const verifyOTP = async (req, res) => {
     try {
         if (otpStorage[mobile_number] && otpStorage[mobile_number].otp === otp) {
             const token = jwt.sign({ mobile_number }, process.env.JWT_SECRET)
-            const querySignup = `INSERT INTO tbl_users (first_name, last_name, email,mobile_number,api_token) VALUES (?,?,?,?,?)`
-            const value = [otpStorage[mobile_number].first_name, otpStorage[mobile_number].last_name, otpStorage[mobile_number].email, mobile_number, token];
+            const querySignup = `UPDATE tbl_users SET api_token=? WHERE mobile_number=?`;
+
+            const value =  [token,mobile_number];
             const userSet = await queryPromise(querySignup, value);
 
             if (!userSet) {
