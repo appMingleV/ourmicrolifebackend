@@ -81,7 +81,7 @@ export const verifyOTP = async (req, res) => {
         if (otpStorage[mobile_number] && otpStorage[mobile_number].otp === otp) {
             const token = jwt.sign({ mobile_number }, process.env.JWT_SECRET)
             const querySignup = `UPDATE tbl_users SET api_token=? WHERE mobile_number=?`;
-
+               
             const value =  [token,mobile_number];
             const userSet = await queryPromise(querySignup, value);
 
@@ -92,13 +92,16 @@ export const verifyOTP = async (req, res) => {
 
                 })
             }
-
+            const queryGetTeam = `SELECT * FROM tbl_users WHERE mobile_number=?`;
+            const valueGetTeam = [mobile_number];
+            const userDetails=await queryPromise(queryGetTeam, valueGetTeam)
+            console.log(userDetails);
             console.log(token);
-            console.log(userSet)
+    
             await sendMailWelcomeSignup(otpStorage[mobile_number]?.email, otpStorage[mobile_number]?.first_name);
             delete otpStorage[mobile_number];
             // Remove OTP after successful verification
-            return res.status(200).json({ message: "OTP verified successfully!", token, id: userSet.insertId });
+            return res.status(200).json({ message: "OTP verified successfully!", token, id: userDetails[0]?.id });
 
         }
 
@@ -126,7 +129,7 @@ export const login = async (req, res) => {
 
             pool.query(queryCheckEmail, emailValue, async (err, result) => {
                 if (err) {
-                    console.error("Database error:", err);
+         
                     return res.status(500).json({
                         status: "error",
                         message: "Something went wrong while checking the email",
@@ -137,7 +140,7 @@ export const login = async (req, res) => {
                 if (result.length === 0) {
                     return res.status(404).json({
                         status: "error",
-                        message: "Email does not exist in the database",
+                        message: "Email does not exist ",
                     });
                 }
 
@@ -172,7 +175,7 @@ export const login = async (req, res) => {
                 if (result.length === 0) {
                     return res.status(404).json({
                         status: "failed",
-                        message: "Mobile number does not exist in the database",
+                        message: "Mobile number does not exist",
                     })
                 }
 
