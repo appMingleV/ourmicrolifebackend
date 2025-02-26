@@ -427,7 +427,7 @@ function directReferrals(userId) {
 
         const { objTeamData, objUserTeam, objDirectRefferal } = await getUserProfileRefferalUsers(directRefferalUsers);
 
-
+       console.log("check teeam data=====================> ",objUserTeam)
         const successData = [];
         for (let i = 0; i < objTeamData.length; i++) {
 
@@ -437,6 +437,7 @@ function directReferrals(userId) {
             const image= objUserTeam[i][0]?.profile_picture
             const teams = objTeamData[i]?.length;
             const date = directRefferalUsers[i]?.date
+            const MLMStatus=objUserTeam[i][0].MLMStatus
             let totalMembers = 0;
             for (let teamMember of objTeamData[i]) {
                 totalMembers += JSON.parse(teamMember.teams).length;
@@ -451,6 +452,7 @@ function directReferrals(userId) {
                 totalUser,
                 image,
                 date,
+                MLMStatus,
                 directRefMembers
             })
 
