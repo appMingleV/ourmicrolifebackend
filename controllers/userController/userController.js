@@ -516,12 +516,13 @@ export const getWalletTransactions = async (req, res) => {
                 income = dataPositionPaid?.income
                 totalPayout += income
                 if (income != 0) {
-                    const queryAddPayout = `INSERT INTO payout (user_id,amount) VALUES (?,?)`;
-                    const dataAddPayout = await queryPromise(queryAddPayout, [userId, income]);
+                    const heading="profile payout is successful add wallet"
+                    const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
+                    const dataAddPayout = await queryPromise(queryAddPayout, [userId, income,heading,200]);
                     console.log(dataAddPayout);
                 }
             }
-            if (coins >= 200 && endDate<currentDate) {
+            if (coins >= 200) {
                 const dataTentativeCoins = await getTentativeCoin(position);
                 let teamPurchasedPercent = await getTeamPurchased();
 
@@ -530,6 +531,7 @@ export const getWalletTransactions = async (req, res) => {
                 let amount = ((totalIncome) * 80) / 100;
                 let pfamount = totalIncome - amount;
                 let teamAmount = 5 * coins;
+                let payCoin=coins
                 const teamPurchaesArray = [];
                 for (let key in teamPurchasedPercent.data) {
 
@@ -541,11 +543,11 @@ export const getWalletTransactions = async (req, res) => {
                 coins = 0;
 
                 totalPayout += amount + myTeamAmount;
-
+ 
                 if (income != 0) {
-                    const queryAddPayout = `INSERT INTO payout (user_id,amount) VALUES (?,?)`;
-                    const dataAddPayout = await queryPromise(queryAddPayout, [userId, amount]);
-
+                    const heading="The total payout from coin earnings has been paid successfully"
+                    const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
+                    const dataAddPayout = await queryPromise(queryAddPayout, [userId, amount,heading,payCoin]);
                 }
                 if (pfamount != 0) {
                     const queryAddPfAmount = `INSERT INTO pf_amount  (pfAmount,user_id,withdraw_status) VALUES (?,?,?)`;
@@ -560,15 +562,16 @@ export const getWalletTransactions = async (req, res) => {
 
         await queryPromise(`UPDATE coins SET value=? WHERE user_id=?`, [coins, userId]);
 
-
-
+        const queryPayOut=`SELECT * FROM payout WHERE user_id=?`
+        const valuePay=[userId]
+        const dataPayOut = await queryPromise(queryPayOut, valuePay);
         return res.status(200).json({
             status: "success",
             message: "Wallet transactions fetched successfully",
             totalPayout,
             coins,
             data: dataQuery,
-
+            payout:dataPayOut
         })
 
 
