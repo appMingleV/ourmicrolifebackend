@@ -58,7 +58,7 @@ export const refferalCreate = async (refferalCode,userId) => {
             //team fetch coins--->
             const getCoins =await teamReferralCoin();
            
-            const coinsTeam=getCoins.data;
+            const coinsTeam=getCoins.data
            
             const Teams = await setTeam(referredUserId, userId, coinsTeam)
            
@@ -126,7 +126,7 @@ const setDirectReferral = async (referralFrom, referralTo,coin) => {
     const dataCheck = await queryPromise(queryCheck, value);
     if (dataCheck.length != 0) return false;
     const query = `INSERT INTO direct_referrals (referral_from, referral_to, date, status, coin, coins_transfer) VALUES (?, ?, ?, ?, ?, ?)`;
-    const values = [referralFrom, referralTo, new Date(), "active", coin, true];
+    const values = [referralFrom, referralTo, new Date(), "active", 0, true];
 
     return new Promise((resolve, reject) => {
         pool.query(query, values, (err, result) => {
@@ -258,7 +258,7 @@ const putCoins = async (coinsTeam, teamId) => {
             const valueCoin=[dataUserId[0].user_id];
             const dataCoin=await queryPromise(queryGetCoins,valueCoin);
             
-            const valueUser=coins[i+1]+(Number(dataCoin[0]?.value)||0);
+            const valueUser=0;
             console.log("in value get ",valueUser);
             const queryPutCoins = `UPDATE coins SET value=value+? WHERE user_id=?`;
             const values = [0, dataUserId[0].user_id];
