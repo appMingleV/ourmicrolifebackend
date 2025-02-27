@@ -220,7 +220,7 @@ export const verifyOtpNumber = async (req, res) => {
         : { mobile: "+91" + req.body.mobile_number };
 
     const otp = req.body.otp;
-
+    console.log(authData)
     if ("email" in authData) {
         const { email } = authData;
         const storedOtpDetails = otpStorage[email];
@@ -255,6 +255,7 @@ export const verifyOtpNumber = async (req, res) => {
         }
     } else {
         const { mobile } = authData;
+        console.log(mobile)
         const storedOtpDetails = otpStorage[mobile];
         if (
             storedOtpDetails &&
@@ -264,12 +265,13 @@ export const verifyOtpNumber = async (req, res) => {
             // OTP is valid
             delete otpStorage[mobile]; // Clear OTP after verification
             const token = jwt.sign({ mobile }, process.env.JWT_SECRET);
-            const queryStoreToken = `UPDATE tbl_users SET  api_token=? WHERE mobile=?`;
+            const queryStoreToken = `UPDATE tbl_users SET  api_token=? WHERE mobile_number=?`;
             const values1 = [token, mobile];
             const userData = await queryPromise(queryStoreToken, values1);
-            const queryGetUserId = `SELECT id FROM tbl_users WHERE mobile=?`;
-            const values2 = [mobile]
+            const queryGetUserId = `SELECT id FROM tbl_users WHERE mobile_number=?`;
+            const values2 = [req.body.mobile_number]
             const userId = await queryPromise(queryGetUserId, values2);
+            console.log("user is ",userId);
             return res.status(200).json({
                 status: "success",
                 message: "OTP verified successfully",
