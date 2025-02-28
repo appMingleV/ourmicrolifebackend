@@ -60,9 +60,7 @@ export const signupController = async (req, res) => {
     
         // Send OTP via email (use an actual email service in production)
         const otpData = await otpImplementation(otp, mobile_number)
-        const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number) VALUES (?,?,?,?)`
-        const value = [first_name, last_name,email, mobile_number];
-        const userSet = await queryPromise(querySignup, value);
+   
       
         res.status(200).json({ message: "OTP sent successfully!", otp, mobile_number });
     }else
@@ -78,11 +76,11 @@ export const signupController = async (req, res) => {
 export const verifyOTP = async (req, res) => {
     const { mobile_number, otp } = req.body;
     try {
+        console.log(otpStorage[mobile_number]);
         if (otpStorage[mobile_number] && otpStorage[mobile_number].otp === otp) {
             const token = jwt.sign({ mobile_number }, process.env.JWT_SECRET)
-            const querySignup = `UPDATE tbl_users SET api_token=? WHERE mobile_number=?`;
-               
-            const value =  [token,mobile_number];
+            const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number,api_token) VALUES (?,?,?,?,?)`
+            const value = [otpStorage[mobile_number].first_name, otpStorage[mobile_number].last_name,otpStorage[mobile_number].email, mobile_number,token];
             const userSet = await queryPromise(querySignup, value);
 
             if (!userSet) {
@@ -95,9 +93,7 @@ export const verifyOTP = async (req, res) => {
             const queryGetTeam = `SELECT * FROM tbl_users WHERE mobile_number=?`;
             const valueGetTeam = [mobile_number];
             const userDetails=await queryPromise(queryGetTeam, valueGetTeam)
-            console.log(userDetails);
-            console.log(token);
-    
+          
             await sendMailWelcomeSignup(otpStorage[mobile_number]?.email, otpStorage[mobile_number]?.first_name);
             delete otpStorage[mobile_number];
             // Remove OTP after successful verification
@@ -160,12 +156,12 @@ export const login = async (req, res) => {
         } else {
 
             const { mobile } = authData;
-            console.log("mobile is ", authData)
+       
             const queryCheckMobile = `SELECT * FROM tbl_users WHERE mobile_number=?`;
             const Value = [mobile];
             pool.query(queryCheckMobile, Value, async (err, result) => {
                 if (err) {
-                    console.error("Database error:", err);
+               
                     return res.status(500).json({
                         status: "error",
                         message: "Something went wrong while checking the mobile number",
@@ -205,7 +201,7 @@ export const login = async (req, res) => {
 
         }
     } catch (err) {
-        console.error("Error in login:", err);
+  
         return res.status(500).json({
             status: "failed",
             message: "Something went wrong while trying to send OTP to email",
@@ -220,7 +216,7 @@ export const verifyOtpNumber = async (req, res) => {
         : { mobile: "+91" + req.body.mobile_number };
 
     const otp = req.body.otp;
-    console.log(authData)
+ 
     if ("email" in authData) {
         const { email } = authData;
         const storedOtpDetails = otpStorage[email];
@@ -255,7 +251,7 @@ export const verifyOtpNumber = async (req, res) => {
         }
     } else {
         const { mobile } = authData;
-        console.log(mobile)
+     
         const storedOtpDetails = otpStorage[mobile];
         if (
             storedOtpDetails &&
@@ -271,7 +267,7 @@ export const verifyOtpNumber = async (req, res) => {
             const queryGetUserId = `SELECT id FROM tbl_users WHERE mobile_number=?`;
             const values2 = [req.body.mobile_number]
             const userId = await queryPromise(queryGetUserId, values2);
-            console.log("user is ",userId);
+        
             return res.status(200).json({
                 status: "success",
                 message: "OTP verified successfully",
@@ -333,7 +329,7 @@ function generateOtp() {
 export const singleOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
-        console.log(orderId);
+   
         if (orderId == undefined || orderId == null) return res.status(404).json({
             status: "error",
             message: "Invalid order id",
@@ -348,7 +344,7 @@ export const singleOrder = async (req, res) => {
                 message: "No order items found",
             })
         }
-        console.log(dataOrderItems)
+
         const queryProduct = `SELECT * FROM products WHERE id=?`;
         const valueProduct = [dataOrderItems[0]?.product_id];
         const dataProduct = await queryPromise(queryProduct, valueProduct);
@@ -503,7 +499,7 @@ export const getWalletTransactions = async (req, res) => {
         const currentDate = new Date();
         const positionPaid = dataUser[0].paid_status_;
         const position = dataUser[0].level;
-        console.log(dataUser);
+
         if (coins > 200 && currentDate>=endDate) {
             let income = 0;
             if (!positionPaid) {
@@ -521,7 +517,6 @@ export const getWalletTransactions = async (req, res) => {
                     const heading="profile payout is successful add wallet"
                     const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
                     const dataAddPayout = await queryPromise(queryAddPayout, [userId, income,heading,200]);
-                    console.log(dataAddPayout);
                 }
             }
             if (coins >= 200) {
@@ -536,14 +531,10 @@ export const getWalletTransactions = async (req, res) => {
                 let payCoin=coins
                 const teamPurchaesArray = [];
                 for (let key in teamPurchasedPercent.data) {
-
                     teamPurchaesArray.push(teamPurchasedPercent.data[key]);
-
                 }
-
                 let myTeamAmount = calculateTeamPurchases(teamAmount, userId, teamPurchaesArray);
                 coins = 0;
-
                 totalPayout += amount + myTeamAmount;
  
                 if (income != 0) {
@@ -596,16 +587,16 @@ async function calculateTeamPurchases(amount, userId, teamPurchased) {
 
     const dataTeamId = await queryPromise(queryTeamId, value);
     const teamId = JSON.parse(dataTeamId[0].team);
-    console.log(teamId)
+
     for (let i = 0; i < teamId.length && i < 14; i++) {
         const queryTeam = `SELECT user_id FROM team_referral WHERE id=?`
-        console.log("team id is ", teamId[i]);
+   
         const dataTeam = await queryPromise(queryTeam, [teamId[i]]);
 
         const teamUserId = dataTeam[0].user_id
-        console.log("team user id ----> ", amount, " ", teamPurchased[i + 2]);
+
         const percentageAmount = (amount * teamPurchased[i + 2]) / 100;
-        console.log("team user id ----> ", percentageAmount);
+    
         const queryAddPayout = `INSERT INTO payout (user_id,amount) VALUES (?,?)`;
         const dataAddPayout = await queryPromise(queryAddPayout, [teamUserId, percentageAmount]);
         const QueryUpsertMLMPay = `
@@ -614,9 +605,9 @@ async function calculateTeamPurchases(amount, userId, teamPurchased) {
     ON DUPLICATE KEY UPDATE payOut = payOut + VALUES(payOut)
 `;
         await queryPromise(QueryUpsertMLMPay, [teamUserId, percentageAmount]);
-
     }
-    console.log(teamId);
+
+
     return (amount * teamPurchased[1]) / 100;
 }
 
