@@ -154,7 +154,8 @@ export const orderItems = async (req, res) => {
             total_coins
         } = req.body;
 
-        if ( !total_items || !payment_type || !total_amount || !net_amount || !user_id || !shipping_charges || !shipping_address_id || !order_items ||!total_coins ) {
+        if (total_items==undefined || payment_type==undefined  || total_amount==undefined  || net_amount==undefined  || user_id==undefined  || shipping_charges==undefined  || shipping_address_id==undefined  || order_items==undefined  || total_coins==undefined  ) {
+            console.log(total_coins);
             return res.status(400).json({
                 status: "error",
                 message: "Missing required fields"
@@ -230,14 +231,21 @@ export const getAllOrders = async (req, res) => {
         const queryAllOrders = `SELECT * FROM orders_cart WHERE user_id=?`;
         const values = [userId];
         const allOrders = await queryPromis(queryAllOrders, values);
+       
+        if(allOrders.length===0){
+       
+            return res.status(404).json({
+                status: "error chal",
+                message: "No orders found"
+            })
+        }
         const arrayOrders = [];
         for (let key in allOrders) {
             const queryOrderItems = `SELECT * FROM order_items WHERE order_id=?`
             const valueOrder = [allOrders[key]?.id];
             const orderItems = await queryPromis(queryOrderItems, valueOrder);
-            if (orderItems[0].length != 0) {
+            if (orderItems.length != 0) {
                 const productName=await queryPromis(`SELECT name FROM products WHERE id=?`,[orderItems[0].product_id]);
-             
                 orderItems[0].product_name=productName[0]?.name;
                 arrayOrders.push(orderItems[0])
             }
