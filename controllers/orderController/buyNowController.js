@@ -154,7 +154,7 @@ export const orderItems = async (req, res) => {
             total_coins
         } = req.body;
          console.log(req.file.filename)
-        if (!req?.file && !total_items && !payment_type && !total_amount && !net_amount && !user_id && !shipping_charges && !shipping_address_id && !order_items && !total_coins && !req.file.filename) {
+        if (!req?.file && !total_items && !payment_type && !total_amount && !net_amount && !user_id && !shipping_charges && !shipping_address_id && !order_items && !total_coins && !req?.file?.filename) {
             return res.status(400).json({
                 status: "error",
                 message: "Missing required fields"
@@ -170,7 +170,7 @@ export const orderItems = async (req, res) => {
         })
         for (const item of order_items) {
             const queryAddItems = `INSERT INTO order_items (order_id, product_id, size, color, sales_price, old_price, vendor_id, total_price, quantity,coins,product_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`
-            const valuesAddItems = [addCoinsDone.insertId, item.product_id, item.size, item.color, item.sales_price, item.old_price, item.vendor_id, item.total_price, item.quantity, item.coins,req.file.filename]
+            const valuesAddItems = [addCoinsDone.insertId, item.product_id, item.size, item.color, item.sales_price, item.old_price, item.vendor_id, item.total_price, item.quantity, item.coins,req?.file?.filename]
             await queryPromis(queryAddItems, valuesAddItems);
         }
         const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?)`
