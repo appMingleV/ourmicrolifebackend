@@ -154,7 +154,7 @@ export const orderItems = async (req, res) => {
             total_coins
         } = req.body;
          console.log(req.file.filename)
-        if (!req?.file && !total_items && !payment_type && !total_amount && !net_amount && !user_id && !shipping_charges && !shipping_address_id && !order_items && !total_coins && !req?.file?.filename) {
+        if ( !total_items || !payment_type || !total_amount || !net_amount || !user_id || !shipping_charges || !shipping_address_id || !order_items ||!total_coins || !req?.file?.filename) {
             return res.status(400).json({
                 status: "error",
                 message: "Missing required fields"
