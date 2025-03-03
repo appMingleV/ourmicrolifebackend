@@ -2,7 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 
 import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login, } from '../controllers/vendorAuth/vendorAuthController.js'
-import {getAllOrders} from '../controllers/vendorAuth/shopDetails.js'
+import {getAllOrders,getSingleOrder} from '../controllers/vendorAuth/shopDetails.js'
 import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct} from '../controllers/vendorAuth/product.js'
 import store from './store.js'
 const routes=Router();
@@ -77,6 +77,7 @@ routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPrice
 routes.put('/product')
 .delete('/product/:productId',deleteProduct)
 .get('/order/:vendorId',getAllOrders)
+.get('/orderSingle/:orderId',getSingleOrder)
 
 routes.use('/stores',store);
 //shop details-->

@@ -224,3 +224,49 @@ export const getAllOrders=async(req,res)=>{
         })
     }
 }
+
+
+
+export const getSingleOrder=async(req,res)=>{
+    try{
+      const {orderId}=req.params;
+      console.log("get single order")
+      if(!orderId)return res.status(404).json({
+        status:"failed",
+        message:"Order id not found"
+      })
+      const queryAllOrders=`SELECT * FROM order_items WHERE id=?`;
+      const valueAllOrder=[orderId]
+
+      const allOrders=await queryPromis(queryAllOrders,valueAllOrder);
+      console.log(allOrders)
+      if(allOrders.length===0) return res.status(200).json({
+          status:"failed",
+          message:"No orders found"
+      })
+      const arrayAllOrders=[];
+      for(let key of allOrders){
+          const queryOrderDetails=`SELECT * FROM orders_cart WHERE id=?`;
+          const valueOrder=[key.order_id];
+          const orderDetails=await queryPromis(queryOrderDetails,valueOrder);
+          const queryProductDetails=`SELECT * FROM products WHERE id=?`;
+          const valueProduct=[key.product_id];
+          const productDetails=await queryPromis(queryProductDetails,valueProduct);
+          const queryAddress=`SELECT * FROM shipping_addresses WHERE id=?`
+          const valueAddress=[orderDetails[0].shipping_address_id];
+          const addressDetails=await queryPromis(queryAddress,valueAddress);
+          arrayAllOrders.push({...key,product_name:productDetails[0]?.name||"not found",addressDetails:addressDetails[0]||{}})
+      }
+      return res.status(200).json({
+          status:"success",
+          message:"All orders fetched successfully",
+          data:arrayAllOrders
+      })
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:"Something went wrong while trying to fetch single order",
+            error:err.message
+        })
+    }
+}
