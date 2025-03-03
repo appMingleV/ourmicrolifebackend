@@ -1,8 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
 
-import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login } from '../controllers/vendorAuth/vendorAuthController.js'
-
+import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login, } from '../controllers/vendorAuth/vendorAuthController.js'
+import {getAllOrders} from '../controllers/vendorAuth/shopDetails.js'
 import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct} from '../controllers/vendorAuth/product.js'
 import store from './store.js'
 const routes=Router();
@@ -68,7 +68,7 @@ const thumbnailStorage = multer.diskStorage({
     },
   });
 
-  const uploadThumbnail = multer({ storage: thumbnailStorage });
+const uploadThumbnail = multer({ storage: thumbnailStorage });
 const uploadPricesImages = multer({ storage: pricesImageStorage });
 routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPricesImages.array('pricesImages',10),editProduct);
 
@@ -76,7 +76,7 @@ routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPrice
 //product edit --->
 routes.put('/product')
 .delete('/product/:productId',deleteProduct)
-
+.get('/order/:vendorId',getAllOrders)
 
 routes.use('/stores',store);
 //shop details-->
