@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OTP Verification</title>
+    <title>Position Confirmed</title>
     <style>
       body {
         font-family: Arial, sans-serif;
         display: flex;
         justify-content: center;
-        align-items: center;
-        height: 100vh;
+        align-items: flex-start;
         background-color: #f3f4f6;
         margin: 0;
+        padding-top: 20px;
       }
       .container {
         width: 450px;
@@ -23,6 +23,7 @@
         color: white;
         text-align: left;
         font-size: 18px;
+        margin-top: 20px;
       }
       .title {
         font-size: 24px;
@@ -35,13 +36,17 @@
         margin-bottom: 15px;
         line-height: 1.6;
       }
-      .otp {
-        font-size: 22px;
-        font-weight: bold;
-        color: white;
-        margin: 15px 0;
+      .details {
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #8b46c8;
+        border: 1px solid white;
+        margin-top: 10px;
       }
-      .otp span {
+      .details p {
+        margin: 4px 0; /* Reduced spacing */
+      }
+      .highlight {
         color: #facc15;
         font-weight: bold;
       }
@@ -50,6 +55,10 @@
         margin-top: 20px;
         font-weight: bold;
         text-align: center;
+      }
+      a {
+        color: #facc15;
+        text-decoration: underline;
       }
       @media (min-width: 1024px) {
         .container {
@@ -63,30 +72,34 @@
         .footer {
           font-size: 16px;
         }
-        .otp {
-          font-size: 20px;
-        }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h2 class="title">Verify Your Account</h2>
-      <p class="content">Dear <strong>Aarav</strong>,</p>
+      <h2 class="title">Your MLM Position is Confirmed!</h2>
+      <p class="content">Dear <strong>[User's Name]</strong>,</p>
+      <p class="content"><strong>Welcome to the MLM Family!</strong></p>
       <p class="content">
-        Thank you for signing up on Our MicroLife! To proceed, please verify
-        your email with the OTP below:
+        We are thrilled to inform you that you have officially joined as a
+        <strong class="highlight">Sahyogi</strong> in our MLM program.
       </p>
-      <p class="otp">Your OTP: <span>{{OTP}}</span></p>
+      <h3 class="content"><strong>Your MLM Position Details:</strong></h3>
+      <div class="details">
+        <p><strong>Position: </strong><span class="highlight">Sahyogi</span></p>
+        <p>
+          <strong>Your Referral Link: </strong
+          ><span class="highlight">{{referralLink}}</span>
+        </p>
+      </div>
       <p class="content">
-        This OTP is valid for 10 minutes. Do not share it with anyone for
-        security reasons.
+        Now, start referring and earning rewards. Your success starts today!
       </p>
-      <p class="content">
-        If you didn’t request this, please ignore this email.
-      </p>
+      <p class="content">For any assistance, feel free to contact us at:</p>
+      <p class="content highlight">support@ourmicrolife.com</p>
       <p class="footer">
-        Best regards,<br /><strong>The Our MicroLife Team</strong>
+        Best regards,<br />
+        <strong>The Our MicroLife Team</strong>
       </p>
     </div>
   </body>

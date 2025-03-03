@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import pool from '../../config/db.js'
-import {refferalCreate} from '../../controllers/refferalController/refferController.js'
+import {refferalCreate,} from '../../controllers/refferalController/refferController.js'
+import {sendMailPaymentAprovalMLM,sendMailMLMPosition} from '../../service/common/common.js'
 export const vedorList = (req, res) => {
     try {
         const { query } = req.params;
@@ -272,7 +273,8 @@ export const upateMLMMemberStatus=async(req,res)=>{
             })
         }
         if(status=="accepted"){
-        const queryUpdateMlmStatus=`UPDATE tbl_users  SET MLMStatus=?,level="Sahyogi" WHERE id=?`
+        const queryUpdateMlmStatus=`UPDATE tbl_users SET MLMStatus=?,level="Sahyogi" WHERE id=?`
+        console.log(status);
         const values1=[true,userId];
         const startDate = new Date();
         const endDate = new Date(startDate); // Create a new Date object to avoid modifying startDate
@@ -283,7 +285,17 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const values2=[startDate,endDate,0,0,userId];
         await queryPromises(queryAddMLMDuration,values2);
         await refferalCreate(refferalCode,userId)
-   
+        const queryUser=`SELECT * FROM tbl_users WHERE id=?`;
+        const userDetails=await queryPromises(queryUser,[userId]);
+        const refferalCodeUser=await queryPromises(`SELECT * FROM refferal WHERE user_id=?`,[userId]);
+        const transactionId=await queryPromises(`SELECT * FROM Transition WHERE user_id=?`,[userId]);
+        console.log("user Details",userDetails)
+        const userData=userDetails[0];
+        const refferalData=refferalCodeUser[0];
+        const transactionDetails=transactionId[0];
+         
+         sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
+         
         }
         return res.status(200).json({
             status: "success",

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Pending Approval</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background-color: #f3f4f6;
+        margin: 0;
+        padding-top: 20px;
+      }
+      .container {
+        width: 450px;
+        background-color: #a855f7;
+        padding: 32px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        color: white;
+        text-align: left;
+        font-size: 18px;
+        margin-top: 20px;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .content {
+        text-align: justify;
+        margin-bottom: 15px;
+        line-height: 1.6;
+      }
+      .details {
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #8b46c8;
+        border: 1px solid white;
+        margin-top: 10px;
+      }
+      .details p {
+        margin: 4px 0; /* Reduced spacing */
+      }
+      .highlight {
+        color: #facc15;
+        font-weight: bold;
+      }
+      .footer {
+        font-size: 16px;
+        margin-top: 20px;
+        font-weight: bold;
+        text-align: center;
+      }
+      a {
+        color: #facc15;
+        text-decoration: underline;
+      }
+      @media (min-width: 1024px) {
+        .container {
+          width: 400px;
+          padding: 28px;
+        }
+        .title {
+          font-size: 22px;
+        }
+        .content,
+        .footer {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="title">Payment Pending Approval</h2>
+      <p class="content">Dear <strong>{{name}}</strong>,</p>
+      <p class="content">
+        We have received your payment of <strong class="highlight">₹500</strong>
+        for joining our MLM program. Your payment is under review and will be
+        approved within 24 to 48 hours.
+      </p>
+      <h3 class="content"><strong>Transaction Details:</strong></h3>
+      <div class="details">
+        <p>
+          <strong>Transaction ID: </strong
+          ><span class="highlight">{{transactionId}}</span>
+        </p>
+        <p>
+          <strong>Payment Date: </strong
+          ><span class="highlight">{{paymentDate}}</span>
+        </p>
+        <p><strong>Amount Paid: </strong><span class="highlight">₹500</span></p>
+      </div>
+      <p class="content">
+        Once your payment is verified, you will officially become a part of our
+        MLM network and gain access to your referral system and benefits.
+      </p>
+      <p class="content">For any queries, contact us at:</p>
+      <p class="content highlight">support@ourmicrolife.com</p>
+      <p class="footer">
+        Best regards,<br />
+        <strong>The Our MicroLife Team</strong>
+      </p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLM Payment Approved</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding-top: 20px;
+    }
+    .container {
+      width: 450px;
+      background-color: #a855f7;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      color: white;
+      text-align: left;
+      font-size: 18px;
+      border: 1px solid #e5e7eb;
+      margin-top: 20px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .content {
+      text-align: justify;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    .highlight-yellow {
+      color: #facc15;
+      font-weight: bold;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid white;
+      border-radius: 8px;
+      background-color: #8b46c8;
+      margin-top: 10px;
+    }
+    .box p {
+      margin: 5px 0;
+    }
+    .footer {
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .footer p {
+      margin: 2px 0;
+    }
+    a {
+      color: #facc15;
+      text-decoration: underline;
+    }
+    @media (min-width: 1024px) {
+      .container {
+        width: 400px;
+        padding: 28px;
+      }
+      .title {
+        font-size: 22px;
+      }
+      .content {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="title">Payment Approved</h2>
+    <p class="content">Dear <strong>{{name}}</strong>,</p>
+    <p class="content"><strong>Welcome to the MLM Family!</strong></p>
+    <p class="content">
+      Congratulations! Your payment of <span class="highlight-yellow">₹500</span> has been approved, 
+      and you are now officially a part of our MLM network.
+    </p>
+    <h1 class="content"><strong>Your Details:</strong></h1>
+    <div class="box">
+      <p><strong>Referral ID: </strong> <span class="highlight-yellow">{{referralCode}}</span></p>
+      <p><strong>Transaction ID: </strong> <span class="highlight-yellow">{{transactionId}}</span></p>
+      <p><strong>Payment Date: </strong> <span class="highlight-yellow">{{PaymentDate}}</span></p>
+    </div>
+    <p class="content">
+      You can now start referring others and earning rewards. Get ready for an exciting journey!
+    </p>
+    <p class="content">If you have any issues, feel free to contact us at:</p>
+    
+    <div class="footer">
+      <p class="highlight-yellow">support@ourmicrolife.com</p>
+      <p>Best regards,</p>
+      <p>The MLM Team</p>
+    </div>
+  </div>
+</body>
+</html>

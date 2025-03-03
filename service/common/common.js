@@ -30,15 +30,16 @@ export const dateDetails=()=>{
 }
 
 
-export const sendMailForOTP=(email,otp)=>{
+export const sendMailForOTP=(email,otp,subject)=>{
     try{
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
   
         const htmlFilePath = path.join(__dirname, 'index.html');
         let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
-        emailHtml = emailHtml.replace('{{OTP}}', otp);
-        sendMail(emailHtml,email);
+        emailHtml = emailHtml.replace('{{OTP}}', otp)
+        
+        sendMail(emailHtml,email,subject);
         return {
             status:"success",
             message:"Welcome email sent successfully"
@@ -48,14 +49,31 @@ export const sendMailForOTP=(email,otp)=>{
 }
 }
 
-export const sendMailWelcomeSignup=(email,name)=>{
+export const sendMailPaymentAprovalMLM=async (email,name,subject,referralCode,transactionId,PaymentDate,referral_link)=>{
+     try{
+        const __filename = fileURLToPath(import.meta.url);
+          const __dirname = dirname(__filename); 
+        const htmlFilePath = path.join(__dirname, 'paymentApproval.html');
+        let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
+        emailHtml = emailHtml.replace('{{name}}',name)
+        .replace('{{referralCode}}',referralCode).replace('{{transactionId}}',transactionId).replace('{{PaymentDate}}',PaymentDate)
+        sendMail(emailHtml,email,subject);
+        // const htmlFilePath234 = path.join(__dirname, 'mlmPositionConfiremed.html');
+        // htmlFilePath234=htmlFilePath234.replace('{{referralLink}}',referral_link)
+       await sendMailMLMPosition(email,referral_link)
+        //  sendMail(htmlFilePath234,email,"MLM position confirmed")
+     }catch(err){
+         return err
+     }
+}
+export const sendMailWelcomeSignup=(email,name,subject)=>{
             try{
                 const __filename = fileURLToPath(import.meta.url);
                 const __dirname = dirname(__filename); 
                 const htmlFilePath = path.join(__dirname, 'welcome.html');
                 let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
                 emailHtml = emailHtml.replace('{{name}}',name);
-                sendMail(emailHtml,email);
+                sendMail(emailHtml,email,subject);
                 return {
                     status:"success",
                     message:"Welcome email sent successfully"
@@ -66,8 +84,38 @@ export const sendMailWelcomeSignup=(email,name)=>{
 }
 
 
+export const sendMailMLMPosition=(email,referralLink)=>{
+       try{
+        console.log("referral   link: " + referralLink)
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename); 
+        const htmlFilePath = path.join(__dirname, 'mlmPositionConfiremed.html');
+        let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
+        emailHtml = emailHtml.replace('{{referralLink}}',referralLink);
+        sendMail(emailHtml,email,"MLM position confirmed");
+        return {
+            status:"success",
+            message:"Welcome email sent successfully"
+        }
+       }catch(err){
+         return err
+    }
+}
 
-function sendMail(emailHtml,email){
+export const adminConfirmationMailtoUser=(email,name,transactionId,paymentDate)=>{
+      try{
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename); 
+        const htmlFilePath = path.join(__dirname, 'awatinApproval.html');
+        let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
+        emailHtml = emailHtml.replace('{{name}}',name)
+       .replace('{{transactionId}}',transactionId).replace('{{paymentDate}}',paymentDate)
+       sendMail(emailHtml,email,"MLM Awating Approval")
+      }catch(err){
+         return err
+      }
+}
+function sendMail(emailHtml,email,subject){
     const transporter = nodemailer.createTransport({
         host: 'smtp.hostinger.com',
         port: 587, // Use port 465 for SSL
@@ -80,7 +128,7 @@ function sendMail(emailHtml,email){
     var mailOptions = {
         from: 'info@ourmicrolife.com',
         to: email,
-        subject: 'verification OTP',
+        subject: subject || "404 Not Found",
         html: emailHtml
       };
 

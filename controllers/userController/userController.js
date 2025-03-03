@@ -2,7 +2,7 @@ import pool from '../../config/db.js';
 import { getMLM } from '../../service/refferralSystem/refferral.js'
 import otpGenerator from 'otp-generator'
 import { updatePosition, getAllPositonAmount, getTentativeCoin } from '../../service/refferralSystem/refferral.js'
-import { sendMailForOTP, sendMailWelcomeSignup } from '../../service/common/common.js';
+import { sendMailForOTP, sendMailWelcomeSignup,adminConfirmationMailtoUser } from '../../service/common/common.js';
 import { getTeamPurchased } from '../../service/refferralSystem/refferral.js'
 import { otpImplementation } from '../../service/OTPSub/otp.js';
 import jwt from 'jsonwebtoken'
@@ -59,8 +59,8 @@ export const signupController = async (req, res) => {
         otpStorage[mobile_number] = { first_name, last_name, email, otp }; // Store OTP temporarily
     
         // Send OTP via email (use an actual email service in production)
-        const otpData = await otpImplementation(otp, mobile_number)
-   
+        const otpData = await otpImplementation(otp, mobile_number,"verification OTP")
+        await sendMailForOTP(email,otp,"verification OTP")
       
         res.status(200).json({ message: "OTP sent successfully!", otp, mobile_number });
     }else
@@ -94,7 +94,7 @@ export const verifyOTP = async (req, res) => {
             const valueGetTeam = [mobile_number];
             const userDetails=await queryPromise(queryGetTeam, valueGetTeam)
           
-            await sendMailWelcomeSignup(otpStorage[mobile_number]?.email, otpStorage[mobile_number]?.first_name);
+            await sendMailWelcomeSignup(otpStorage[mobile_number]?.email, otpStorage[mobile_number]?.first_name,"welcome to Our Microlife");
             delete otpStorage[mobile_number];
             // Remove OTP after successful verification
             return res.status(200).json({ message: "OTP verified successfully!", token, id: userDetails[0]?.id });
@@ -145,7 +145,7 @@ export const login = async (req, res) => {
 
                 otpStorage[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // OTP valid for 5 minutes
 
-                await sendMailForOTP(email, otp);
+                await sendMailForOTP(email, otp,"verification OTP");
                 return res.status(200).json({
                     status: "success",
                     message: "OTP sent to email successfully",
@@ -235,6 +235,7 @@ export const verifyOtpNumber = async (req, res) => {
             const queryGetUserId = `SELECT id FROM tbl_users WHERE email=?`;
             const values2 = [email]
             const userId = await queryPromise(queryGetUserId, values2);
+            
             return res.json({
                 status: "success",
                 message: "OTP verified successfully",
@@ -421,6 +422,10 @@ export const payMLMAmount = async (req, res) => {
                 message: "server error",
             })
         }
+        const queryUser=`SELECT * FROM tbl_users WHERE id=?`;
+        const userDetails=await queryPromise(queryUser,[userId]);
+        const dataUser=userDetails[0];
+        adminConfirmationMailtoUser(dataUser.email,dataUser.first_name,dateTransaction,dateTransaction)
         return res.status(200).json({
             status: "success",
             message: "MLM amount added successfully",
