@@ -472,6 +472,142 @@ export const getProfile = async (req, res) => {
     }
 }
 
+
+export const addBankDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      account_holder_name,
+      account_number,
+      confirm_account_number,
+      bank_name,
+      ifsc_code,
+      nominee_name,
+      nominee_address,
+      nominee_dob,
+    } = req.body;
+
+    // Validate required fields
+    if (!userId || !account_holder_name || !account_number || !confirm_account_number || !bank_name || !ifsc_code) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing required fields",
+      });
+    }
+
+    // Check if account_number and confirm_account_number match
+    if (account_number !== confirm_account_number) {
+      return res.status(400).json({
+        status: "error",
+        message: "Account number and confirm account number do not match",
+      });
+    }
+
+    // Check if bank details already exist
+    const checkBankDetails = `SELECT * FROM bank_nominee_details WHERE user_id = ?`;
+    const values = [userId];
+    const bankDetails = await queryPromise(checkBankDetails, values);
+
+    if (bankDetails.length === 0) {
+      // Insert new bank details if not found
+      const insertQuery = `
+        INSERT INTO bank_nominee_details 
+        (user_id, account_holder_name, account_number, confirm_account_number, bank_name, ifsc_code, nominee_name, nominee_address, nominee_dob) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      
+      const insertValues = [
+        userId,
+        account_holder_name,
+        account_number,
+        confirm_account_number,
+        bank_name,
+        ifsc_code,
+        nominee_name || null,
+        nominee_address || null,
+        nominee_dob || null,
+      ];
+
+      await queryPromise(insertQuery, insertValues);
+
+      return res.status(201).json({
+        status: "success",
+        message: "Bank details added successfully",
+      });
+    } else {
+      // Update existing bank details
+      const updateQuery = `
+        UPDATE bank_nominee_details 
+        SET account_holder_name = ?, account_number = ?, confirm_account_number = ?, bank_name = ?, ifsc_code = ?, nominee_name = ?, nominee_address = ?, nominee_dob = ? 
+        WHERE user_id = ?`;
+
+      const updateValues = [
+        account_holder_name,
+        account_number,
+        confirm_account_number,
+        bank_name,
+        ifsc_code,
+        nominee_name || null,
+        nominee_address || null,
+        nominee_dob || null,
+        userId,
+      ];
+
+      await queryPromise(updateQuery, updateValues);
+
+      return res.status(200).json({
+        status: "success",
+        message: "Bank details updated successfully",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: "Unexpected error occurred",
+      error: err.message,
+    });
+  }
+};
+
+
+export const getBankDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Validate userId
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid user ID",
+      });
+    }
+
+    // Query to get bank details
+    const query = `SELECT * FROM bank_nominee_details WHERE user_id = ?`;
+    const values = [userId];
+    const bankDetails = await queryPromise(query, values);
+
+    if (bankDetails.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "No bank details found for this user",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      data: bankDetails[0], // Returning only the first record (assuming one per user)
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: "Unexpected error occurred",
+      error: err.message,
+    });
+  }
+};
+
+
+
 export const getWalletTransactions = async (req, res) => {
     try {
         const { userId } = req.params;

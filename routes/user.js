@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult} from '../controllers/vendorAuth/product.js'
-import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login} from '../controllers/userController/userController.js'
+import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails} from '../controllers/userController/userController.js'
 import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
 import multer from 'multer';
@@ -50,6 +50,8 @@ routes.get('/profile/:userId',getProfile)
 .post('/mlmMembers/:userId',upload.single('transaction_image'),payMLMAmount)
 .get('/walletTransactions/:userId',getWalletTransactions)
 .get('/order/:orderId',singleOrder)
+.post('/banks/:userId',addBankDetails)
+.get('/banks/:userId',getBankDetails)
 .use('/order',order);
 
 
