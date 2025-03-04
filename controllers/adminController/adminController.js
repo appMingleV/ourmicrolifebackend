@@ -284,12 +284,13 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const queryAddMLMDuration=`INSERT INTO mlm_duration (startDate,endDate,coinValue,payOut,userId) VALUES (?,?,?,?,?)`
         const values2=[startDate,endDate,0,0,userId];
         await queryPromises(queryAddMLMDuration,values2);
+        console.log("referral_code")
         await refferalCreate(refferalCode,userId)
         const queryUser=`SELECT * FROM tbl_users WHERE id=?`;
         const userDetails=await queryPromises(queryUser,[userId]);
         const refferalCodeUser=await queryPromises(`SELECT * FROM refferal WHERE user_id=?`,[userId]);
         const transactionId=await queryPromises(`SELECT * FROM Transition WHERE user_id=?`,[userId]);
-        console.log("user Details",userDetails)
+   
         const userData=userDetails[0];
         const refferalData=refferalCodeUser[0];
         const transactionDetails=transactionId[0];
