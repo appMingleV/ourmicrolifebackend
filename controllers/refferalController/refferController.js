@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import pool from '../../config/db.js';
 
 // Define characters for generating referral code
-const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' + 'microlife';
+const characters = '0123456789';
 
 // AES encryption algorithm details
 const algorithm = 'aes-256-cbc';
@@ -12,7 +12,7 @@ const algorithm = 'aes-256-cbc';
 
 
 // Generate a 10-character referral code
-const generateReferralCode = customAlphabet(characters, 10);
+const generateReferralCode ="OML2025"+customAlphabet(characters, 10);
 
 //get direct referral system-->
 
