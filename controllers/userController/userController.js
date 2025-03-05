@@ -115,7 +115,6 @@ export const login = async (req, res) => {
             ? { email: req.body.email }
             : { mobile: req.body.mobile_number };
 
-
         if ('email' in authData) {
             const { email } = authData;
 

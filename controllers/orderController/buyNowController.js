@@ -153,7 +153,6 @@ export const orderItems = async (req, res) => {
             order_items,
             total_coins
         } = req.body;
-
         if (total_items==undefined || payment_type==undefined  || total_amount==undefined  || net_amount==undefined  || user_id==undefined  || shipping_charges==undefined  || shipping_address_id==undefined  || order_items==undefined  || total_coins==undefined  ) {
             console.log(total_coins);
             return res.status(400).json({
@@ -173,18 +172,11 @@ export const orderItems = async (req, res) => {
             const queryAddItems = `INSERT INTO order_items (order_id, product_id, size, color, sales_price, old_price, vendor_id, total_price, quantity,coins,product_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`
             const valuesAddItems = [addCoinsDone.insertId, item.product_id, item.size, item.color, item.sales_price, item.old_price, item.vendor_id, item.total_price, item.quantity, item.coins,item.product_image]
             await queryPromis(queryAddItems, valuesAddItems);
+            const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?)`
+            const valueCoinHistory = [item?.product_name, new Date(), total_coins, user_id, true, addCoinsDone.insertId || null];
+            await queryPromis(queryCoinHistory, valueCoinHistory);
         }
-        const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?)`
-
-        const valueCoinHistory = ["product A", new Date(), total_coins, user_id, true, addCoinsDone.insertId || null];
-        const queryCoinHistoryAdded = await queryPromis(queryCoinHistory, valueCoinHistory);
-        if (!queryCoinHistoryAdded) {
-            return res.status(400).json({
-                status: "error",
-                message: "Failed to add coins history"
-            })
-        }
-
+      
         const queryAddCoinsUser = `UPDATE coins SET value=value+? WHERE user_id=?`;
         const valueAddcoin = [total_coins, user_id]
         await queryPromis(queryAddCoinsUser, valueAddcoin);
