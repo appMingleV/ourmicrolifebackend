@@ -640,7 +640,7 @@ export const getWalletTransactions = async (req, res) => {
         const positionPaid = dataUser[0].paid_status_;
         const position = dataUser[0].level;
 
-        if (coins > 200 && currentDate>=endDate) {
+        if (coins > 200 ) {
             let income = 0;
             if (!positionPaid) {
                 const queryCheckUser = `UPDATE tbl_users SET paid_status_=? WHERE id=?`
