@@ -93,7 +93,7 @@
   <body>
     <div class="container">
       <h2 class="title">Payment Pending Approval</h2>
-      <p class="content">Dear <strong>[User's Name]</strong>,</p>
+      <p class="content">Dear <strong>{{name}}</strong>,</p>
       <p class="content">
         We have received your payment of <strong class="highlight">₹500</strong>
         for joining our MLM program. Your payment is under review and will be
@@ -103,11 +103,11 @@
       <div class="details">
         <p>
           <strong>Transaction ID: </strong>
-          <span class="highlight">[Transaction ID]</span>
+          <span class="highlight">{{transactionId}}</span>
         </p>
         <p>
           <strong>Payment Date: </strong>
-          <span class="highlight">[Payment Date]</span>
+          <span class="highlight">{{paymentDate}}</span>
         </p>
         <p><strong>Amount Paid: </strong><span class="highlight">₹500</span></p>
       </div>

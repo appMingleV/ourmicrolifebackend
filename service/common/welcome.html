@@ -6,62 +6,68 @@
     <title>Welcome to OurMicroLife</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            /* background: linear-gradient(to bottom right, #a78bfa, #6366f1); */
-            color: white;
-            text-align: center;
-            padding: 20px;
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          background-color: #f3f4f6;
+          margin: 0;
+          padding-top: 20px;
         }
         .container {
-            max-width: 600px;
-            margin: 40px auto;
-            background: #a855f7;
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          width: 450px;
+          background-color: #a855f7;
+          padding: 32px;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          color: white;
+          text-align: left;
+          font-size: 18px;
+          margin-top: 20px;
         }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .header {
-            font-weight: bold;
-            font-size: 1.2rem;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 15px;
-            color: blueviolet;
+        .title {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 20px;
+          text-align: center;
         }
         .content {
-            text-align: justify;
-            font-size: 1rem;
-            color: white;
+          text-align: justify;
+          margin-bottom: 15px;
+          line-height: 1.6;
         }
-        .content h2 {
-            font-size: 1.2rem;
-            font-weight: bold;
+        .welcome-kit {
+          padding: 12px;
+          border-radius: 8px;
+          background-color: #8b46c8;
+          border: 1px solid white;
+          margin-top: 10px;
         }
-        .button {
-            display: inline-block;
-            font-size: 1.2rem;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: 2px solid #4f46e5;
-            border-radius: 8px;
-            color: #4f46e5;
-            background: white;
-            cursor: pointer;
-            margin-top: 15px;
-            text-decoration: none;
+        .welcome-kit p {
+          margin: 4px 0; /* Reduced spacing between items */
         }
-        .button:hover {
-            background: #4f46e5;
-            color: white;
+        .highlight {
+          color: #facc15;
+          font-weight: bold;
         }
-    </style>
+        .footer {
+          font-size: 16px;
+          margin-top: 20px;
+          font-weight: bold;
+          text-align: center;
+        }
+        a {
+          color: #facc15;
+          text-decoration: underline;
+        }
+        @media (min-width: 1024px) {
+          .container {
+            width: 100%;
+            max-width: 800px; /* Ensures readability on large screens */
+            padding: 28px;
+          }
+        }
+      </style>
 </head>
 <body>
     <div class="container">
