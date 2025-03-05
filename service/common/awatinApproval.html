@@ -44,7 +44,7 @@
         margin-top: 10px;
       }
       .details p {
-        margin: 4px 0; /* Reduced spacing */
+        margin: 4px 0;
       }
       .highlight {
         color: #facc15;
@@ -62,15 +62,30 @@
       }
       @media (min-width: 1024px) {
         .container {
-          width: 400px;
-          padding: 28px;
+          width: 100%;
+          max-width: 600px;
+          padding: 36px;
         }
         .title {
-          font-size: 22px;
+          font-size: 26px;
         }
         .content,
         .footer {
-          font-size: 16px;
+          font-size: 18px;
+        }
+      }
+      @media (min-width: 1280px) {
+        .container {
+          width: 100%;
+          max-width: 700px;
+          padding: 40px;
+        }
+        .title {
+          font-size: 28px;
+        }
+        .content,
+        .footer {
+          font-size: 20px;
         }
       }
     </style>
@@ -78,7 +93,7 @@
   <body>
     <div class="container">
       <h2 class="title">Payment Pending Approval</h2>
-      <p class="content">Dear <strong>{{name}}</strong>,</p>
+      <p class="content">Dear <strong>[User's Name]</strong>,</p>
       <p class="content">
         We have received your payment of <strong class="highlight">₹500</strong>
         for joining our MLM program. Your payment is under review and will be
@@ -87,12 +102,12 @@
       <h3 class="content"><strong>Transaction Details:</strong></h3>
       <div class="details">
         <p>
-          <strong>Transaction ID: </strong
-          ><span class="highlight">{{transactionId}}</span>
+          <strong>Transaction ID: </strong>
+          <span class="highlight">[Transaction ID]</span>
         </p>
         <p>
-          <strong>Payment Date: </strong
-          ><span class="highlight">{{paymentDate}}</span>
+          <strong>Payment Date: </strong>
+          <span class="highlight">[Payment Date]</span>
         </p>
         <p><strong>Amount Paid: </strong><span class="highlight">₹500</span></p>
       </div>
