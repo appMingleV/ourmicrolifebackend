@@ -114,6 +114,7 @@ export const login = async (req, res) => {
         const authData = req.body.email
             ? { email: req.body.email }
             : { mobile: req.body.mobile_number };
+      
 
         if ('email' in authData) {
             const { email } = authData;
@@ -640,7 +641,7 @@ export const getWalletTransactions = async (req, res) => {
         const positionPaid = dataUser[0].paid_status_;
         const position = dataUser[0].level;
 
-        if (coins > 200 ) {
+        if (coins > 200 && currentDate>=endDate) {
             let income = 0;
             if (!positionPaid) {
                 const queryCheckUser = `UPDATE tbl_users SET paid_status_=? WHERE id=?`

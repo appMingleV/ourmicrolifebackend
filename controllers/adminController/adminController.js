@@ -407,6 +407,24 @@ export const getnewMLMUser=async(req,res)=>{
     }
 }
 
+export const getBankDetails =async (req, res) =>{
+    try{
+     const dataMLMUser =`SELECT * FROM bank_nominee_details `
+     const dataBanks=await queryPromises(dataMLMUser)
+     return res.status(200).json(
+        {
+            status: "success",
+            message: "Bank details fetched successfully",
+            data: dataBanks,
+        })
+    }catch(err){
+        return res.status(500).json({
+            status: "error",
+            message: "Something went wrong while trying to fetch bank details",
+            error: err.message
+        })
+    }
+}
 const queryPromises = (query, value = []) => {
     return new Promise((resolve, reject) => {
         pool.query(query, value, (err, result) => {
