@@ -412,8 +412,10 @@ export const getRefferalUsers = async (req, res) => {
 function getDirectRefferalUsers(userId) {
     const queryDirectReferral = `SELECT referral_to,date FROM direct_referrals WHERE referral_from=?`;
     const value = [userId];
+    console.log(userId);
     return new Promise((resolve, reject) => {
         pool.query(queryDirectReferral, value, (err, result) => {
+            console.log("heell safafjj  ",result)
             if (err) return reject(err);
             resolve(result);
         })
@@ -427,23 +429,23 @@ function directReferrals(userId) {
 
         const { objTeamData, objUserTeam, objDirectRefferal } = await getUserProfileRefferalUsers(directRefferalUsers);
 
-       console.log("check teeam data=====================> ",objUserTeam)
+       console.log("check teeam data=====================> ",directRefferalUsers)
         const successData = [];
         for (let i = 0; i < objTeamData.length; i++) {
 
-            const userName = objUserTeam[i][0].first_name + " " + objUserTeam[i][0]?.last_name;
+            const userName = objUserTeam[i][0]?.first_name + " " + objUserTeam[i][0]?.last_name;
             const level = objUserTeam[i][0]?.level;
             const status = objUserTeam[i][0]?.status;
             const image= objUserTeam[i][0]?.profile_picture
             const teams = objTeamData[i]?.length;
             const date = directRefferalUsers[i]?.date
-            const MLMStatus=objUserTeam[i][0].MLMStatus
+            const MLMStatus=objUserTeam[i][0]?.MLMStatus
             let totalMembers = 0;
             for (let teamMember of objTeamData[i]) {
-                totalMembers += JSON.parse(teamMember.teams).length;
+                totalMembers += JSON.parse(teamMember?.teams)?.length;
             }
             const totalUser = totalMembers;
-            const directRefMembers = objDirectRefferal[i].length;
+            const directRefMembers = objDirectRefferal[i]?.length;
             successData.push({
                 userName,
                 level,
