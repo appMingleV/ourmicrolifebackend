@@ -63,11 +63,11 @@ export const updatePosition=async(userId)=>{
     const getLevel=[];
     const getProfileLevelCount=new Map();
     for(let i=0;i<dataDirectReferral.length;i++){
-     const referalUserId=dataDirectReferral[i].referral_to;
+     const referalUserId=dataDirectReferral[i]?.referral_to;
      const queryUserLevel=`SELECT level from tbl_users where id=?`
      const valueReferralId=[referalUserId]
      const dataUserLevel=await queryPromise(queryUserLevel,valueReferralId);
-      if(dataUserLevel[0].level!=null) getLevel.push(dataUserLevel[0].level);
+      if(dataUserLevel[0]?.level!=null) getLevel.push(dataUserLevel[0]?.level);
     }
 
     

@@ -461,6 +461,7 @@ export const getProfile = async (req, res) => {
                 message: "User not found",
             })
         }
+    
 
         await updatePosition(userId);
 
