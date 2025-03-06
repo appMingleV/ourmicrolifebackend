@@ -51,7 +51,8 @@ export const signupController = async (req, res) => {
     if (!first_name || !last_name || !email || !mobile_number) {
         return res.status(400).json({ message: "All fields except referral code are required." });
     }
-    const queryCheckUserExist=`SELECT  email,mobile_number FROM  tbl_users WHERE email=? AND mobile_number=?`
+    
+    const queryCheckUserExist=`SELECT  email,mobile_number FROM  tbl_users WHERE email=? OR mobile_number=?`
     const valueCheckUserExist=[email,mobile_number]
     const checkUserExist=await queryPromise(queryCheckUserExist,valueCheckUserExist)
     if(checkUserExist.length==0){
@@ -65,7 +66,12 @@ export const signupController = async (req, res) => {
         res.status(200).json({ message: "OTP sent successfully!", otp, mobile_number });
     }else
     {
-        res.status(400).json({message:"user already exists "});
+      
+        if(checkUserExist[0].email===email){
+            res.status(400).json({message:`email already exists `});
+        }else{
+            res.status(400).json({message:`mobile number already exists `});
+        }
     }
 
     } catch (error) {
