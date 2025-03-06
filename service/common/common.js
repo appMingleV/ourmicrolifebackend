@@ -60,7 +60,7 @@ export const sendMailPaymentAprovalMLM=async (email,name,subject,referralCode,tr
         sendMail(emailHtml,email,subject);
         // const htmlFilePath234 = path.join(__dirname, 'mlmPositionConfiremed.html');
         // htmlFilePath234=htmlFilePath234.replace('{{referralLink}}',referral_link)
-       await sendMailMLMPosition(email,referral_link)
+       await sendMailMLMPosition(email,name,referral_link)
         //  sendMail(htmlFilePath234,email,"MLM position confirmed")
      }catch(err){
          return err
@@ -84,14 +84,14 @@ export const sendMailWelcomeSignup=(email,name,subject)=>{
 }
 
 
-export const sendMailMLMPosition=(email,referralLink)=>{
+export const sendMailMLMPosition=(email,name,referralLink)=>{
        try{
         console.log("referral   link: " + referralLink)
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename); 
         const htmlFilePath = path.join(__dirname, 'mlmPositionConfiremed.html');
         let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
-        emailHtml = emailHtml.replace('{{referralLink}}',referralLink);
+        emailHtml = emailHtml.replace('{{referralLink}}',referralLink).replace("{{name}}",name)
         sendMail(emailHtml,email,"MLM position confirmed");
         return {
             status:"success",
