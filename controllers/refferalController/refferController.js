@@ -4,7 +4,8 @@ import crypto from 'crypto';
 import pool from '../../config/db.js';
 
 // Define characters for generating referral code
-let characters = '0123456789';
+let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
 
 // AES encryption algorithm details
 const algorithm = 'aes-256-cbc';
@@ -12,7 +13,7 @@ const algorithm = 'aes-256-cbc';
 
 
 // Generate a 10-character referral code
-const generateReferralCode = customAlphabet(characters, 3);
+const generateReferralCode = customAlphabet(characters, 10);
 
 //get direct referral system-->
 
@@ -72,7 +73,7 @@ export const refferalCreate = async (refferalCode,userId) => {
         }
 
         // Generate referral code and link
-        const referralCode ="OML2025"+ generateReferralCode();
+        const referralCode = generateReferralCode();
         const { encryptedData, iv: ivHex } = encrypt(referralCode);
         const referralLink = `https://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
 
