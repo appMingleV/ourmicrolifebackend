@@ -245,7 +245,9 @@ export const getAllOrders = async (req, res) => {
             if (orderItems.length != 0) {
                 const productName=await queryPromis(`SELECT name FROM products WHERE id=?`,[orderItems[0].product_id]);
                 orderItems[0].product_name=productName[0]?.name;
-                arrayOrders.push(orderItems[0])
+                for(let order of orderItems){
+                arrayOrders.push(order)
+                }
             }
         }
         if (arrayOrders.length == 0) {
