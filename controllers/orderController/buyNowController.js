@@ -243,9 +243,10 @@ export const getAllOrders = async (req, res) => {
             const valueOrder = [allOrders[key]?.id];
             const orderItems = await queryPromis(queryOrderItems, valueOrder);
             if (orderItems.length != 0) {
-                const productName=await queryPromis(`SELECT name FROM products WHERE id=?`,[orderItems[0].product_id]);
-                orderItems[0].product_name=productName[0]?.name;
+               
                 for(let order of orderItems){
+                    const productName=await queryPromis(`SELECT name FROM products WHERE id=?`,[order.product_id]);
+                    order.product_name=productName[0]?.name;
                 arrayOrders.push(order)
                 }
             }
