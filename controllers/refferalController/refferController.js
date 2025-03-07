@@ -338,6 +338,7 @@ export const signupWithReferralCode = async (req, res) => {
 
         const teams = await setTeam(referredUserId, new_user_id);
         const referralCodeNewUser = generateReferralCode();
+        addCoins(referredUserId,50)
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
         const referralLink = `${req.protocol}://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
         
