@@ -340,7 +340,7 @@ export const signupWithReferralCode = async (req, res) => {
         const referralCodeNewUser = generateReferralCode();
         const getDirectReferral=await directReferralCoin();
         console.log("get direct referral system=======================================>        ",getDirectReferral);
-        addCoins(referredUserId,50);
+        addCoins(referredUserId,getDirectReferral?.data[0]?.coin);
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
         const referralLink = `${req.protocol}://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
         
