@@ -58,7 +58,7 @@ export const refferalCreate = async (refferalCode,userId) => {
             }
             //team fetch coins--->
             const getCoins =await teamReferralCoin();
-           
+            
             const coinsTeam=getCoins.data
            
             const Teams = await setTeam(referredUserId, userId, coinsTeam)
@@ -338,12 +338,12 @@ export const signupWithReferralCode = async (req, res) => {
 
         const teams = await setTeam(referredUserId, new_user_id);
         const referralCodeNewUser = generateReferralCode();
-        addCoins(referredUserId,50)
+        const getDirectReferral=await directReferralCoin();
+        addCoins(referredUserId,getDirectReferral[0].coin);
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
         const referralLink = `${req.protocol}://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
         
         const newReferral = await createReferral(referralLink, referralCodeNewUser, new_user_id);
-
         return res.status(200).json({
             status: "success",
             message: "Referral successfully created",
