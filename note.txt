@@ -12,3 +12,8 @@
     level12: 0.5,
     level13: 0.5,
     level14: 0.25
+
+    //table --------->
+    1.mlm_duration,
+    2.payout,
+    3.coin_history

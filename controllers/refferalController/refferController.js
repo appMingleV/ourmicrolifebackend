@@ -1,5 +1,5 @@
 import { customAlphabet } from 'nanoid';
-import { directReferralCoin,teamReferralCoin } from '../../service/refferralSystem/refferral.js'
+import { directReferralCoin,teamReferralCoin,teamDistrubutionPayOut,addTransactions,currencyValues } from '../../service/refferralSystem/refferral.js'
 import crypto from 'crypto';
 import pool from '../../config/db.js';
 
@@ -59,8 +59,8 @@ export const refferalCreate = async (refferalCode,userId) => {
             //team fetch coins--->
             const getCoins =await teamReferralCoin();
             
-            const coinsTeam=getCoins.data
-           
+            const coinsTeam=getCoins.data        
+             
             const Teams = await setTeam(referredUserId, userId, coinsTeam)
             addCoins(referredUserId,50)
         } else {
@@ -240,6 +240,7 @@ const setTeam = async (referredUserId, userId,coinsTeam) => {
 //    17, 18, 20
 //  ]
 const putCoins = async (coinsTeam, teamId) => {
+    console.log("coinsTeam=======>     ",coinsTeam)
     const coins = Object.values(coinsTeam);
     console.log("coins -->", coins);
     console.log("teamId -->", teamId);
@@ -316,8 +317,10 @@ export const getCheckRefferalCode = (req, res) => {
 
 export const signupWithReferralCode = async (req, res) => {
     try {
+       
         const { referral_code, new_user_id } = req.body;
         const referralDetails = await checkReferralCode(referral_code);
+     
         if (!referralDetails) {
             return res.status(404).json({
                 status: "failed",
@@ -327,7 +330,7 @@ export const signupWithReferralCode = async (req, res) => {
         }
         const referredUserId = referralDetails.user_id;
         const directReferral = await setDirectReferral(referredUserId, new_user_id);
-
+       
         if (!directReferral) {
             return res.status(500).json({
                 status: "failed",
@@ -335,12 +338,18 @@ export const signupWithReferralCode = async (req, res) => {
                 error: "Failed to set direct referral",
             })
         }
-
-        const teams = await setTeam(referredUserId, new_user_id);
+        const getCoins =await teamReferralCoin();
+        const coinsTeam=getCoins.data      
+        const teams = await setTeam(referredUserId, new_user_id,coinsTeam);
         const referralCodeNewUser = generateReferralCode();
         const getDirectReferral=await directReferralCoin();
-        console.log("get direct referral system=======================================>        ",getDirectReferral);
-        addCoins(referredUserId,getDirectReferral?.data[0]?.coin);
+        console.log("get direct referral system=======================================>",getDirectReferral);
+        const directRefCoin=getDirectReferral?.data[0]?.coin
+        addCoins(referredUserId,directRefCoin);
+       const currency=await currencyValues()
+        await teamDistrubutionPayOut(referredUserId,directRefCoin*currency,directRefCoin,"referral","team referral payout");
+        // await addTransactions("referral coin",directRefCoin,referredUserId,directReferral.insertId,"referral")
+        
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
         const referralLink = `${req.protocol}://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
         
