@@ -30,15 +30,14 @@ export const dateDetails=()=>{
 }
 
 
-export const sendMailForOTP=(email,otp,subject)=>{
+export const sendMailForOTP=(email,name,otp,subject)=>{
     try{
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
-  
+        console.log("send email to ")
         const htmlFilePath = path.join(__dirname, 'index.html');
         let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
-        emailHtml = emailHtml.replace('{{OTP}}', otp)
-        
+        emailHtml = emailHtml.replace('{{OTP}}', otp).replace("{{name}}",name)        
         sendMail(emailHtml,email,subject);
         return {
             status:"success",
@@ -122,7 +121,7 @@ function sendMail(emailHtml,email,subject){
         secure: false,
         auth: {
             user: 'info@ourmicrolife.com',
-            pass: 'i@2L~6W$UeM4'
+            pass: 'Info#OurMicro@Life599'
         }
     });
     var mailOptions = {

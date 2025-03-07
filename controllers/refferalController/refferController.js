@@ -51,7 +51,7 @@ export const refferalCreate = async (refferalCode,userId) => {
 
             const referredUserId = referralDetails.user_id;
 
-            const directReferral = await setDirectReferral(referredUserId, userId,0);
+            const directReferral = await setDirectReferral(referredUserId, userId,50);
 
             if (!directReferral) {
                 return false
@@ -62,12 +62,10 @@ export const refferalCreate = async (refferalCode,userId) => {
             const coinsTeam=getCoins.data
            
             const Teams = await setTeam(referredUserId, userId, coinsTeam)
-           
-
-
+            addCoins(referredUserId,50)
         } else {
             // Add coins for a new user without referral
-            await addCoins(userId, 0);
+            await addCoins(userId,0);
 
 
         }
@@ -127,7 +125,7 @@ const setDirectReferral = async (referralFrom, referralTo,coin) => {
     const dataCheck = await queryPromise(queryCheck, value);
     if (dataCheck.length != 0) return false;
     const query = `INSERT INTO direct_referrals (referral_from, referral_to, date, status, coin, coins_transfer) VALUES (?, ?, ?, ?, ?, ?)`;
-    const values = [referralFrom, referralTo, new Date(), "active", 0, true];
+    const values = [referralFrom, referralTo, new Date(), "active", 50, true];
 
     return new Promise((resolve, reject) => {
         pool.query(query, values, (err, result) => {
@@ -152,9 +150,7 @@ const addCoins = (userId, value) => {
                 const insertQuery = `INSERT INTO coins (user_id, value) VALUES (?,?)`;
                 const insertValues = [userId, value];
                 pool.query(insertQuery, insertValues, (err, insertResult) => {
-
                     if (err) return reject(err);
-
                     resolve(insertResult);
                 });
             } else {
@@ -432,7 +428,7 @@ function directReferrals(userId) {
 
        console.log("check teeam data=====================> ",directRefferalUsers)
         const successData = [];
-        for (let i = 0; i < objTeamData.length; i++) {
+        for (let i = 0; i < objTeamData?.length; i++) {
 
             const userName = objUserTeam[i][0]?.first_name + " " + objUserTeam[i][0]?.last_name;
             const level = objUserTeam[i][0]?.level;
