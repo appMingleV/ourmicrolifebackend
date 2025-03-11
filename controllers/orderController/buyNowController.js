@@ -175,12 +175,13 @@ export const orderItems = async (req, res) => {
             const queryAddItems = `INSERT INTO order_items (order_id, product_id, size, color, sales_price, old_price, vendor_id, total_price, quantity,coins,product_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`
             
             const valuesAddItems = [addCoinsDone?.insertId, item?.product_id, item?.size, item?.color, item?.sales_price, item?.old_price, item?.vendor_id, item?.total_price, item?.quantity, item?.coins,item?.product_image]
-      
+             
             await queryPromis(queryAddItems, valuesAddItems);
-            console.log("items addded ===========================================================> ")
-            const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?1)`
-            const valueCoinHistory = [item?.product_name, new Date(), total_coins, user_id, true, addCoinsDone.insertId || null];
+            
+            const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?)`
+            const valueCoinHistory = [item?.product_name, new Date(),item?.coins , user_id, true, addCoinsDone.insertId || null];
             await queryPromis(queryCoinHistory, valueCoinHistory);
+            
         }
       
         const queryAddCoinsUser = `UPDATE coins SET value=value+? WHERE user_id=?`;
