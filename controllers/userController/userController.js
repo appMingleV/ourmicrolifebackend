@@ -634,8 +634,6 @@ export const getWalletTransactions = async (req, res) => {
         let coins = 0;
         const dataQuery = await queryPromise(queryGetTransactions, value);
        
-
-
         const queryCoinUser = `SELECT * FROM  coins WHERE user_id=?`;
         const getUserCoin = await queryPromise(queryCoinUser, [userId]);
 

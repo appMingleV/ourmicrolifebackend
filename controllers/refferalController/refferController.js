@@ -346,7 +346,10 @@ export const signupWithReferralCode = async (req, res) => {
         console.log("get direct referral system=======================================>",getDirectReferral);
         const directRefCoin=getDirectReferral?.data[0]?.coin
         addCoins(referredUserId,directRefCoin);
-       const currency=await currencyValues()
+        const currency=await currencyValues()
+      
+        await selfPurchased(userId,currency*directRefCoin,directRefCoin,"referral","referral Earning")
+  
         await teamDistrubutionPayOut(referredUserId,directRefCoin*currency,directRefCoin,"referral","team referral payout");
         // await addTransactions("referral coin",directRefCoin,referredUserId,directReferral.insertId,"referral")
         

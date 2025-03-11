@@ -1,5 +1,6 @@
 import axios from "axios"
 import pool from "../../config/db.js";
+import { request } from "express";
 
 export const directReferralCoin= async()=>{
     try{
@@ -57,6 +58,16 @@ export const getMLM=async()=>{
     }
 }
 
+export const selfPurchased=async(userId,value,coin,earningType,heading)=>{
+    try{
+      const selfPurchasedResponse=await axios.get(`https://api.ourmicrolife.com/api/admin/referral/directPurchased`);
+      console.log(selfPurchasedResponse);
+      return "";
+    }catch(err){
+        return err;
+    }
+}
+
 export const teamDistrubutionPayOut=async(userId,value,coin,earningType,heading)=>{
     try{
         const queryTeamPurchases=await axios.get('https://api.ourmicrolife.com/api/admin/referral/teamPurchased');
@@ -84,7 +95,7 @@ export const teamDistrubutionPayOut=async(userId,value,coin,earningType,heading)
             console.log("amount=========================>    ",amount)
             const queryAddPayout=`INSERT INTO payout (user_id,amount,heading,coins,earning_type) VALUES (?,?,?,?,?)`
             const valuePayout=[userIdRef,amount,heading,coin,earningType];
-            console.log("done =========================>    ")
+            console.log("done =========================> ")
             await queryPromise(queryAddPayout,valuePayout);
         }
         return ;

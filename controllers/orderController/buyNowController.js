@@ -177,11 +177,11 @@ export const orderItems = async (req, res) => {
             const valuesAddItems = [addCoinsDone?.insertId, item?.product_id, item?.size, item?.color, item?.sales_price, item?.old_price, item?.vendor_id, item?.total_price, item?.quantity, item?.coins,item?.product_image]
              
             await queryPromis(queryAddItems, valuesAddItems);
-            
+             
             const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?)`
             const valueCoinHistory = [item?.product_name, new Date(),item?.coins , user_id, true, addCoinsDone.insertId || null];
             await queryPromis(queryCoinHistory, valueCoinHistory);
-            
+             
         }
       
         const queryAddCoinsUser = `UPDATE coins SET value=value+? WHERE user_id=?`;
