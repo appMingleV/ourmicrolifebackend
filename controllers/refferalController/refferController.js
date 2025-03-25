@@ -116,7 +116,8 @@ const checkReferralCode = async(referralCode) => {
    const query = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
     const referralCodUser=await queryPromise(query,[referralCode]);
     
-    resultObj.user_id=referralCodUser.user_id || undefined;
+    resultObj.user_id=referralCodUser[0]?.user_id;
+    console.log("hello is putting ------------>           ",referralCodUser)
     if(referralCodUser.length===0){
         const queryCheck=`SELECT * FROM tbl_users WHERE mobile_number = ? AND MLMStatus = ?`;
         const value = [referralCode , true];
@@ -328,7 +329,7 @@ export const getCheckRefferalCode = (req, res) => {
 
 export const signupWithReferralCode = async (req, res) => {
     try {
-       
+        console.log("hello is in the process of being signed")
         const { referral_code, new_user_id } = req.body;
         const referralDetails = await checkReferralCode(referral_code);
          console.log("referral details ========>  ",referralDetails)
@@ -360,7 +361,7 @@ export const signupWithReferralCode = async (req, res) => {
         addCoins(referredUserId,directRefCoin);
         const currency=await currencyValues()
       
-        await selfPurchased(userId,currency*directRefCoin,directRefCoin,"referral","referral Earning")
+        // await selfPurchased(referredUserId,currency*directRefCoin,directRefCoin,"referral","referral Earning")
   
         await teamDistrubutionPayOut(referredUserId,directRefCoin*currency,directRefCoin,"referral","team referral payout");
         // await addTransactions("referral coin",directRefCoin,referredUserId,directReferral.insertId,"referral")

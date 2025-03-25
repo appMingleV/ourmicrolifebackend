@@ -7,7 +7,7 @@ import {decryptRefferal} from '../middleware/index.js';
 import admin from './admin.js'
 import vendor from './vendor.js'
 const route=Router();
-route.get('/',(req,res)=>{
+route.get('/',(req,res)=>{ 
     return  res.status(200).json({
         status:"success",
         message:"API is up and running"
