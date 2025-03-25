@@ -154,14 +154,12 @@ export const orderItems = async (req, res) => {
             total_coins
         } = req.body;
         if (total_items==undefined || payment_type==undefined  || total_amount==undefined  || net_amount==undefined  || user_id==undefined  || shipping_charges==undefined  || shipping_address_id==undefined  || order_items==undefined  || total_coins==undefined  ) {
-            console.log(total_coins);
+        
             return res.status(400).json({
                 status: "error",
                 message: "Missing required fields"
             })
         }
-
-       
 
         const queryAddCoins = `INSERT INTO orders_cart (total_items,payment_type,total_amount,net_amount,user_id,shipping_charges,shipping_address_id,total_coins)  VALUES (?, ?, ?, ?, ?, ?, ?,?)`
         const valuesAddCoins = [total_items, payment_type, total_amount, net_amount, user_id, shipping_charges, shipping_address_id, total_coins]
@@ -187,12 +185,11 @@ export const orderItems = async (req, res) => {
         const queryAddCoinsUser = `UPDATE coins SET value=value+? WHERE user_id=?`;
         const valueAddcoin = [total_coins, user_id]
         await queryPromis(queryAddCoinsUser, valueAddcoin);
-
+         
         return res.status(200).json({
             status: "success",
             message: "order items add successfully"
         })
-
 
     } catch (err) {
         return res.status(500).json({

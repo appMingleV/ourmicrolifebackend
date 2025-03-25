@@ -104,8 +104,71 @@ export const dimensionsProduct= async (req,res)=>{
     }
 }
 
+export const addProduct=async(req,res)=>{
+  try
+  {
+    const { vendorId } = req.params;
+    const {
+      productName,
+      description,
+      quantity,
+      coin,
+      status,
+      categoryId,
+      subCategoryId,
+      brandName,
+      prices,
+    } = req.body;
+    const queryAddProduct = `INSERT INTO products (vendor_id, name, featured_image,description, quantity, coin, status, category_id, sub_category_id, brand_name)
+      VALUES (?,?,?,?,?,?,?,?,?)
+    `;
+    const values = [vendorId, productName,description, quantity,coin, status, categoryId, subCategoryId, brandName];
+    const productSet = await queryPromis(queryAddProduct, values);
+    const productId=productSet.innrows
+    for(let price of prices){
+      const queryAddProduct=`INSERT INTO product_prices  (color_name,config1,product_id) VALUES (?,?,?)`
+      const values = [price.color_name,price.config1,productId];
+      const dataAddProducts=await queryPromis(queryAddProduct, values);
+      const queryAddProductPriceConfig=`INSERT INTO product_price_images (product_price_id, image_path) VALUES (?,?)`
+      const valuesImagesConfig = [dataAddProducts.innrows, req.files];
+      const dataAddImagesConfig=await queryPromis(queryAddProductPriceConfig, valuesImagesConfig);
+      for (const config of price.configurations) {
+        const updatedDataConfig= await addConfigurations(config,productId);
+       }
+    }
 
 
+  }catch(err){
+    return res.status(500).json({
+        status:"error",
+        message:"Something went wrong while trying to add product",
+        error:err.message
+    })
+  }
+}
+ const addConfigurations=async(config,productId)=>{
+  const configId = config.id;
+  const size = config.size;
+  const mrp = config.old_price;
+  const sellPrice =config.sale_price;
+  const quantity = config.stock;
+
+  const updateConfigQuery = `
+    INSERT INTO product_configurations 
+     (products,size, old_price, sale_price, stock,config2) 
+    VALUES (?,?,?,?,?,?,?)
+  `;
+  const updateConfigValues = [productId,size, mrp, sellPrice, quantity, configId];
+
+  const updatedConfig = await queryPromis(updateConfigQuery, updateConfigValues);
+
+  if (!updatedConfig) {
+    throw new Error("Configuration update failed");
+  }
+  
+
+  return updatedConfig;
+ }
 
 export const editProduct=async(req,res)=>{
     try {
@@ -153,7 +216,6 @@ export const editProduct=async(req,res)=>{
         // Update prices and configurations
         
         for (const price of prices) {
-    
           await updatePriceAndImages(price);
         }
          
@@ -178,7 +240,7 @@ const updatePriceAndImages = async (price) => {
     const color = price.color_name;
    
      // Update price details
-    const updatePriceQuery = `UPDATE product_prices SET color_name = ? WHERE id = ?`;
+    const updatePriceQuery = `UPDATE product_prices SET color_name=?,config1=? WHERE id = ?`;
     const updatePriceValues = [color, priceId];
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
    
@@ -207,7 +269,7 @@ const updatePriceAndImages = async (price) => {
   
     const updateConfigQuery = `
       UPDATE product_configurations 
-      SET size = ?, old_price = ?, sale_price = ?, stock = ? 
+      SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=? 
       WHERE id = ?
     `;
     const updateConfigValues = [size, mrp, sellPrice, quantity, configId];

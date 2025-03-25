@@ -108,14 +108,11 @@ export const getPositionRewards=async (req,res)=>{
     }
 }
 // Check referral code validity
-const checkReferralCode = (referralCode) => {
+const checkReferralCode = async(referralCode) => {
     const query = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
-    return new Promise((resolve, reject) => {
-        pool.query(query, [referralCode], (err, results) => {
-            if (err) return reject(err);
-            resolve(results.length > 0 ? results[0] : null);
-        });
-    });
+    const referralCodUser=await queryPromise(query,[referralCode]);
+    
+    return referralCodUser;
 };
 
 // Set direct referral
@@ -509,7 +506,6 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
         for (let directRef of directRefferalUsers) {
             //directRef--> { referral_to: 27 }
             //direct RefferalUser Profile--->
-            
             const queryUserPorfile = `SELECT first_name,last_name,level,status,profile_picture,MLMStatus FROM  tbl_users WHERE id=?`;
             const value = [directRef?.referral_to];
             const profileData = await queryPromise(queryUserPorfile, value);
@@ -527,7 +523,6 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
             objTeamData.push(teamData);
             objDirectRefferal.push(queryDirectReferal);
         }
-
         resolve({ objTeamData, objUserTeam, objDirectRefferal });
     })
 

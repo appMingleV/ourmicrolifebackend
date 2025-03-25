@@ -57,7 +57,7 @@ export const getMLM=async()=>{
         return err;
     }
 }
-
+ 
 export const selfPurchased=async(userId,value,coin,earningType,heading)=>{
     try{
       const selfPurchasedResponse=await axios.get(`https://api.ourmicrolife.com/api/admin/referral/directPurchased`);
@@ -73,9 +73,9 @@ export const teamDistrubutionPayOut=async(userId,value,coin,earningType,heading)
         const queryTeamPurchases=await axios.get('https://api.ourmicrolife.com/api/admin/referral/teamPurchased');
         const coinsTeam=queryTeamPurchases.data.data  
         const coins = Object.values(coinsTeam);
-         console.log("============================>  ",value)
+ 
         const teamCoins=coins.splice(0,1);
-        console.log("teams coins ===============> ",coins)
+      
    
         const queryTeam='SELECT team FROM tbl_users WHERE id=?'
         const values=[userId]
@@ -92,10 +92,10 @@ export const teamDistrubutionPayOut=async(userId,value,coin,earningType,heading)
             const userIdRef=dataUserId[0].user_id;
        
             const amount=+((value*coins[i+1])/100);
-            console.log("amount=========================>    ",amount)
+           
             const queryAddPayout=`INSERT INTO payout (user_id,amount,heading,coins,earning_type) VALUES (?,?,?,?,?)`
             const valuePayout=[userIdRef,amount,heading,coin,earningType];
-            console.log("done =========================> ")
+    
             await queryPromise(queryAddPayout,valuePayout);
         }
         return ;
