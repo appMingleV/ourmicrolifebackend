@@ -1,10 +1,10 @@
 import { customAlphabet } from 'nanoid';
-import { directReferralCoin,teamReferralCoin,teamDistrubutionPayOut,addTransactions,currencyValues } from '../../service/refferralSystem/refferral.js'
+import { directReferralCoin,teamReferralCoin,teamDistrubutionPayOut,addTransactions,currencyValues,selfPurchased } from '../../service/refferralSystem/refferral.js'
 import crypto from 'crypto';
 import pool from '../../config/db.js';
 
 // Define characters for generating referral code
-let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+let characters = '0123456789';
 
 
 // AES encryption algorithm details
@@ -13,7 +13,7 @@ const algorithm = 'aes-256-cbc';
 
 
 // Generate a 10-character referral code
-const generateReferralCode = customAlphabet(characters, 10);
+const generateReferralCode =customAlphabet(characters, 6);
 
 //get direct referral system-->
 
@@ -44,11 +44,12 @@ export const refferalCreate = async (refferalCode,userId) => {
         const directRefCoin = await directReferralCoin();
         const coin =  0;
         if (refferalCode) {
+            console.log("referral uses details =================>  ",re);
             const referralDetails = await checkReferralCode(refferalCode);
-            if (!referralDetails) {
+            if (!referralDetails?.user_id) {
                 return false
             }
-
+             console.log("referral uses details =================>  ", referralDetails);
             const referredUserId = referralDetails.user_id;
 
             const directReferral = await setDirectReferral(referredUserId, userId,50);
@@ -71,7 +72,9 @@ export const refferalCreate = async (refferalCode,userId) => {
         }
 
         // Generate referral code and link
-        const referralCode = generateReferralCode();
+        let referralCode = generateReferralCode();
+      
+        referralCode="OML"+referralCode;
         const { encryptedData, iv: ivHex } = encrypt(referralCode);
         const referralLink = `https://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
 
@@ -109,10 +112,21 @@ export const getPositionRewards=async (req,res)=>{
 }
 // Check referral code validity
 const checkReferralCode = async(referralCode) => {
-    const query = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
+    const resultObj={};
+   const query = `SELECT * FROM refferal WHERE referral_code = ? AND referral_status = 'active'`;
     const referralCodUser=await queryPromise(query,[referralCode]);
     
-    return referralCodUser;
+    resultObj.user_id=referralCodUser.user_id || undefined;
+    if(referralCodUser.length===0){
+        const queryCheck=`SELECT * FROM tbl_users WHERE mobile_number = ? AND MLMStatus = ?`;
+        const value = [referralCode , true];
+        const checkReferralWithNumber= await queryPromise(queryCheck,value);
+     
+        resultObj.user_id=checkReferralWithNumber[0]?.id || undefined;
+      
+    }
+    console.log("user id is ",resultObj)
+    return resultObj;
 };
 
 // Set direct referral
@@ -317,15 +331,16 @@ export const signupWithReferralCode = async (req, res) => {
        
         const { referral_code, new_user_id } = req.body;
         const referralDetails = await checkReferralCode(referral_code);
-     
-        if (!referralDetails) {
+         console.log("referral details ========>  ",referralDetails)
+        if (!referralDetails?.user_id) {
             return res.status(404).json({
                 status: "failed",
                 message: "Invalid referral code",
                 error: "Referral code not found",
             })
         }
-        const referredUserId = referralDetails.user_id;
+        
+        const referredUserId = referralDetails?.user_id ;
         const directReferral = await setDirectReferral(referredUserId, new_user_id);
        
         if (!directReferral) {
