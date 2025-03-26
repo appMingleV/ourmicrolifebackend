@@ -339,8 +339,7 @@ export const signupWithReferralCode = async (req, res) => {
                 message: "Invalid referral code",
                 error: "Referral code not found",
             })
-        }
-        
+        }       
         const referredUserId = referralDetails?.user_id ;
         const directReferral = await setDirectReferral(referredUserId, new_user_id);
        
@@ -354,7 +353,8 @@ export const signupWithReferralCode = async (req, res) => {
         const getCoins =await teamReferralCoin();
         const coinsTeam=getCoins.data      
         const teams = await setTeam(referredUserId, new_user_id,coinsTeam);
-        const referralCodeNewUser = generateReferralCode();
+        let  referralCodeNewUser = generateReferralCode();
+        referralCodeNewUser="OML"+referralCodeNewUser;
         const getDirectReferral=await directReferralCoin();
         console.log("get direct referral system=======================================>",getDirectReferral);
         const directRefCoin=getDirectReferral?.data[0]?.coin

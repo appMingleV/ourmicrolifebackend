@@ -160,7 +160,15 @@ export const orderItems = async (req, res) => {
                 message: "Missing required fields"
             })
         }
-
+        const qeuryUser=`SELECT * FROM  tbl_users WHERE id=?`
+        const valuesUser = [user_id];
+        const userData = await queryPromis(qeuryUser, valuesUser);
+        if (userData.length==0) return res.status(404).json({
+            status: "error",
+            message: "User not found"
+        })
+        const userLevel=userData[0]?.level;
+       
         const queryAddCoins = `INSERT INTO orders_cart (total_items,payment_type,total_amount,net_amount,user_id,shipping_charges,shipping_address_id,total_coins)  VALUES (?, ?, ?, ?, ?, ?, ?,?)`
         const valuesAddCoins = [total_items, payment_type, total_amount, net_amount, user_id, shipping_charges, shipping_address_id, total_coins]
         const addCoinsDone = await queryPromis(queryAddCoins, valuesAddCoins);
@@ -176,8 +184,8 @@ export const orderItems = async (req, res) => {
              
             await queryPromis(queryAddItems, valuesAddItems);
              
-            const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId) VALUES (?,?,?,?,?,?)`
-            const valueCoinHistory = [item?.product_name, new Date(),item?.coins , user_id, true, addCoinsDone.insertId || null];
+            const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId,level_profile,earning_type) VALUES (?,?,?,?,?,?,?,?)`
+            const valueCoinHistory = [item?.product_name, new Date(),item?.coins , user_id, true, addCoinsDone.insertId || null,userLevel,"self"];
             await queryPromis(queryCoinHistory, valueCoinHistory);
              
         }
