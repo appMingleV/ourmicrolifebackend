@@ -279,7 +279,6 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const values1=[true,userId];
         const startDate = new Date();
         const endDate = new Date(startDate); // Create a new Date object to avoid modifying startDate
-        
         endDate.setDate(startDate.getDate() + 30);
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
         const queryAddMLMDuration=`INSERT INTO mlm_duration (startDate,endDate,coinValue,payOut,userId) VALUES (?,?,?,?,?)`
@@ -291,13 +290,12 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const userDetails=await queryPromises(queryUser,[userId]);
         const refferalCodeUser=await queryPromises(`SELECT * FROM refferal WHERE user_id=?`,[userId]);
         const transactionId=await queryPromises(`SELECT * FROM Transition WHERE user_id=?`,[userId]);
-   
         const userData=userDetails[0];
         const refferalData=refferalCodeUser[0];
         const transactionDetails=transactionId[0];
          
          sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
-         
+         await setMLMWallet(userId);
         }
         return res.status(200).json({
             status: "success",
@@ -313,7 +311,15 @@ export const upateMLMMemberStatus=async(req,res)=>{
         })
     }
 }
-
+async function setMLMWallet(userId){
+         const queryAddMLMUser=`INSERT INTO wallets (userId,earning_type,coins,payout,created) VALUES (?,?,?,?,?)`
+         const value=[userId,"self",0,0,new Date().toISOString()];
+         const value1=[userId,"group",0,0,new Date().toISOString()];
+         const value2=[userId,"referral",0,0,new Date().toISOString()];
+         await queryPromises(queryAddMLMUser,value);
+         await queryPromises(queryAddMLMUser,value1);
+         await queryPromises(queryAddMLMUser,value2);
+}
 const checkUserExists = (query,userId)=>{
         
 }

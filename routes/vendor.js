@@ -1,9 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
 
-import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login, } from '../controllers/vendorAuth/vendorAuthController.js'
+import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login} from '../controllers/vendorAuth/vendorAuthController.js'
 import {getAllOrders,getSingleOrder} from '../controllers/vendorAuth/shopDetails.js'
-import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct} from '../controllers/vendorAuth/product.js'
+import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct,addProduct} from '../controllers/vendorAuth/product.js'
 import store from './store.js'
 const routes=Router();
 
@@ -52,9 +52,12 @@ routes.get('/dimension/product/:product',getDimensionProduct)
 
 const thumbnailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
+      console.log(file)
       cb(null, "uploads/product/"); // Directory for thumbnail
     },
+  
     filename: (req, file, cb) => {
+      console.log("file is ================= ",file);
       cb(null, Date.now() + "-" + file.originalname); // Unique name for thumbnail
     },
   });
@@ -70,7 +73,16 @@ const thumbnailStorage = multer.diskStorage({
 
 const uploadThumbnail = multer({ storage: thumbnailStorage });
 const uploadPricesImages = multer({ storage: pricesImageStorage });
+
 routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPricesImages.array('pricesImages',10),editProduct);
+//add product -->
+
+routes.post("/product/:vendorId",
+  uploadThumbnail.fields([
+    {name:'images',maxCount:10},
+    {name:'featured_image',maxCount:1}
+  ])
+  ,addProduct);
 
 
 //product edit --->

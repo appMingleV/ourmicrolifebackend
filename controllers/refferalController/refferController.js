@@ -1,5 +1,5 @@
 import { customAlphabet } from 'nanoid';
-import { directReferralCoin,teamReferralCoin,teamDistrubutionPayOut,addTransactions,currencyValues,selfPurchased } from '../../service/refferralSystem/refferral.js'
+import { directReferralCoin,referralPayout,teamReferralCoin,teamDistrubutionPayOut,addTransactions,currencyValues,selfPurchased } from '../../service/refferralSystem/refferral.js'
 import crypto from 'crypto';
 import pool from '../../config/db.js';
 
@@ -342,7 +342,7 @@ export const signupWithReferralCode = async (req, res) => {
         }       
         const referredUserId = referralDetails?.user_id ;
         const directReferral = await setDirectReferral(referredUserId, new_user_id);
-       
+
         if (!directReferral) {
             return res.status(500).json({
                 status: "failed",
@@ -356,20 +356,23 @@ export const signupWithReferralCode = async (req, res) => {
         let  referralCodeNewUser = generateReferralCode();
         referralCodeNewUser="OML"+referralCodeNewUser;
         const getDirectReferral=await directReferralCoin();
-        console.log("get direct referral system=======================================>",getDirectReferral);
+        console.log("get direct referral system=======================================>  ",getDirectReferral);
         const directRefCoin=getDirectReferral?.data[0]?.coin
         addCoins(referredUserId,directRefCoin);
         const currency=await currencyValues()
       
         // await selfPurchased(referredUserId,currency*directRefCoin,directRefCoin,"referral","referral Earning")
   
-        await teamDistrubutionPayOut(referredUserId,directRefCoin*currency,directRefCoin,"referral","team referral payout");
+        // await teamDistrubutionPayOut(referredUserId,directRefCoin*currency,directRefCoin,"referral","team referral payout");
         // await addTransactions("referral coin",directRefCoin,referredUserId,directReferral.insertId,"referral")
         
         const { encryptedData, iv: ivHex } = encrypt(referralCodeNewUser);
         const referralLink = `${req.protocol}://ourmicrolife.com/signup-user?ref=${encryptedData}&iv=${ivHex}`;
         
         const newReferral = await createReferral(referralLink, referralCodeNewUser, new_user_id);
+        
+        await referralPayout(referredUserId)
+        
         return res.status(200).json({
             status: "success",
             message: "Referral successfully created",

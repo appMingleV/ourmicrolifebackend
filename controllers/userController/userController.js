@@ -1,7 +1,7 @@
 import pool from '../../config/db.js';
 import { getMLM } from '../../service/refferralSystem/refferral.js'
 import otpGenerator from 'otp-generator'
-import { updatePosition, getAllPositonAmount, getTentativeCoin } from '../../service/refferralSystem/refferral.js'
+import { updatePosition, getAllPositonAmount, getTentativeCoin,getProfileCoins } from '../../service/refferralSystem/refferral.js'
 import { sendMailForOTP, sendMailWelcomeSignup,adminConfirmationMailtoUser } from '../../service/common/common.js';
 import { getTeamPurchased } from '../../service/refferralSystem/refferral.js'
 import { otpImplementation } from '../../service/OTPSub/otp.js';
@@ -630,8 +630,7 @@ export const getWalletTransactions = async (req, res) => {
         //history of coin_history---> 
         const queryGetTransactions = `SELECT * FROM coins_history WHERE user_id=?`;
         const value = [userId];
-        let totalPayout = mlmDataQuery[0].payOut;
-        let coins = 0;
+       
         const dataQuery = await queryPromise(queryGetTransactions, value);
        
         const queryCoinUser = `SELECT * FROM  coins WHERE user_id=?`;
@@ -640,79 +639,75 @@ export const getWalletTransactions = async (req, res) => {
         const queryUser = "SELECT * FROM tbl_users WHERE id=?";
         const dataUser = await queryPromise(queryUser, [userId]);
 
-        coins = getUserCoin[0].value;
-        let endDate = mlmDataQuery[0].endDate;
+        let coins = getUserCoin[0]?.value;
+        let endDate = mlmDataQuery[0]?.endDate;
+        let startDate = mlmDataQuery[0]?.startDate;
+        console.log("start date is ================> ",startDate);
+        console.log("end date is ==================>  ",endDate)
         const currentDate = new Date();
         const positionPaid = dataUser[0].paid_status_;
         const position = dataUser[0].level;
-
-        if (coins > 200) {
-            let income = 0;
-            if (!positionPaid) {
-                const queryCheckUser = `UPDATE tbl_users SET paid_status_=? WHERE id=?`
-                const dataCheckUser = await queryPromise(queryCheckUser, [true, userId]);
-                if (!dataCheckUser) return res.status(500).json({
-                    status: "error",
-                    message: "server error",
-                })
-                coins -= 200;
-                const dataPositionPaid = await getAllPositonAmount(position);
-                income = dataPositionPaid?.income
-                totalPayout += income
-                if (income != 0) {
-                    const heading="profile payout is successful add wallet"
-                    const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
-                    const dataAddPayout = await queryPromise(queryAddPayout, [userId, income,heading,200]);
-                }
-            }
-            if (coins >= 200) {
-                const dataTentativeCoins = await getTentativeCoin(position);
-                let teamPurchasedPercent = await getTeamPurchased();
-
-                const tentativeCoins = dataTentativeCoins.coinValue
-                let totalIncome = (coins * tentativeCoins)
-                let amount = ((totalIncome) * 80) / 100;
-                let pfamount = totalIncome - amount;
-                let teamAmount = 5 * coins;
-                let payCoin=coins
-                const teamPurchaesArray = [];
-                for (let key in teamPurchasedPercent.data) {
-                    teamPurchaesArray.push(teamPurchasedPercent.data[key]);
-                }
-                let myTeamAmount = calculateTeamPurchases(teamAmount, userId, teamPurchaesArray);
-                coins = 0;
-                totalPayout += amount + myTeamAmount;
- 
-                if (income != 0) {
-                    const heading="The total payout from coin earnings has been paid successfully"
-                    const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
-                    const dataAddPayout = await queryPromise(queryAddPayout, [userId, amount,heading,payCoin]);
-                }
-                if (pfamount != 0) {
-                    const queryAddPfAmount = `INSERT INTO pf_amount  (pfAmount,user_id,withdraw_status) VALUES (?,?,?)`;
-                    const dataAddPfAmount = await queryPromise(queryAddPfAmount, [pfamount, userId, "pending"]);
-                }
-            }
-
-            const QueryUpdateMLMPay = `UPDATE mlm_duration SET coinValue=?,payOut=payOut+?,startDate=?,endDate=? WHERE userId=?`
-            endDate = (currentDate + 30);
-            await queryPromise(QueryUpdateMLMPay, [coins, totalPayout, currentDate, endDate, userId]);
+        console.log("=====================>  ",dataQuery)
+        const selfPurchasedCoin=dataQuery.filter((element)=>{
+            const date=new Date(element?.coin_add_at.split(" ")[0]);
+           
+          if(element.earning_type=="self" && startDate<=date && endDate>=date ){
+             console.log(date);
+            return element;
+          }   
+        })
+        console.log("===================>  ",selfPurchasedCoin)
+        let coinsSelf=0;
+  
+        for(let i of selfPurchasedCoin){
+            coinsSelf+=i.coin || 0;
         }
 
-        await queryPromise(`UPDATE coins SET value=? WHERE user_id=?`, [coins, userId]);
+        console.log("===================>  ",coinsSelf)
+        let getCoin=await getProfileCoins(position);
+        let levelEarning=getCoin*(coinsSelf>200?200:coinsSelf);
+        let normanEarning=coinsSelf*5;
+        console.log(levelEarning);
+        console.log(normanEarning)
+        const queryUpdateMLMUser = `UPDATE wallets 
+                                SET coins = ?, 
+                                    payout = ? 
+                                WHERE userId = ? AND earning_type = "self"`;
+    
+       const valueUpdate = [coinsSelf, levelEarning+normanEarning,userId];
+    
+       await queryPromise(queryUpdateMLMUser, valueUpdate);
+       const queryGetGroup=`SELECT * FROM wallets WHERE  userId=? `
+       const dataGroup=await queryPromise(queryGetGroup,[userId]);
+       const groupEaring=dataGroup[0].payout;
+       const referralEaring=dataGroup[1].payout
+       
+         let totalPayout=0;
+         if(endDate<currentDate){
+             totalPayout=levelEarning+normanEarning+referralEaring+groupEaring
+             const queryUpdateWallet=`UPDATE wallets 
+                                SET coins = 0, 
+                                    payout =0,
+                                
+                                WHERE userId = ? AND (earning_type = "self" OR earning_type = "referral" OR earning_type = "group") `
+              await queryPromise(queryUpdateWallet,[userId]);
+              const updatePayout=`UPDATE wallets 
+                                SET coins = 0, 
+                                    payout =0,
+                                
+                                WHERE userId = ? AND (earning_type = "self" OR earning_type = "referral" OR earning_type = "group") `                  
+         }
+        
+      const payOutData=await  queryPromise((`SELECT * FROM payout WHERE user_id=?`),[userId]);
 
-        const queryPayOut=`SELECT * FROM payout WHERE user_id=?`
-        const valuePay=[userId]
-        const dataPayOut = await queryPromise(queryPayOut, valuePay);
-        return res.status(200).json({
+       return res.status(200).json({
             status: "success",
             message: "Wallet transactions fetched successfully",
             totalPayout,
-            coins,
-            data: dataQuery,
-            payout:dataPayOut
+            data: dataGroup,
+            transition:dataQuery,
+            payOutData
         })
-
 
     } catch (err) {
         return res.status(500).json({
@@ -726,6 +721,64 @@ export const getWalletTransactions = async (req, res) => {
 // function TransitionWallet(){
 
 // }
+//  if (coins > 200) {
+//             let income = 0;
+//             if (!positionPaid) {
+//                 const queryCheckUser = `UPDATE tbl_users SET paid_status_=? WHERE id=?`
+//                 const dataCheckUser = await queryPromise(queryCheckUser, [true, userId]);
+//                 if (!dataCheckUser) return res.status(500).json({
+//                     status: "error",
+//                     message: "server error",
+//                 })
+//                 coins -= 200;
+//                 const dataPositionPaid = await getAllPositonAmount(position);
+//                 income = dataPositionPaid?.income
+//                 totalPayout += income
+//                 if (income != 0) {
+//                     const heading="profile payout is successful add wallet"
+//                     const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
+//                     const dataAddPayout = await queryPromise(queryAddPayout, [userId, income,heading,200]);
+//                 }
+//             }
+//             if (coins >= 200) {
+//                 const dataTentativeCoins = await getTentativeCoin(position);
+//                 let teamPurchasedPercent = await getTeamPurchased();
+
+//                 const tentativeCoins = dataTentativeCoins.coinValue
+//                 let totalIncome = (coins * tentativeCoins)
+//                 let amount = ((totalIncome) * 80) / 100;
+//                 let pfamount = totalIncome - amount;
+//                 let teamAmount = 5 * coins;
+//                 let payCoin=coins
+//                 const teamPurchaesArray = [];
+//                 for (let key in teamPurchasedPercent.data) {
+//                     teamPurchaesArray.push(teamPurchasedPercent.data[key]);
+//                 }
+//                 let myTeamAmount = calculateTeamPurchases(teamAmount, userId, teamPurchaesArray);
+//                 coins = 0;
+//                 totalPayout += amount + myTeamAmount;
+ 
+//                 if (income != 0) {
+//                     const heading="The total payout from coin earnings has been paid successfully"
+//                     const queryAddPayout = `INSERT INTO payout (user_id,amount,heading,coins) VALUES (?,?,?,?)`;
+//                     const dataAddPayout = await queryPromise(queryAddPayout, [userId, amount,heading,payCoin]);
+//                 }
+//                 if (pfamount != 0) {
+//                     const queryAddPfAmount = `INSERT INTO pf_amount  (pfAmount,user_id,withdraw_status) VALUES (?,?,?)`;
+//                     const dataAddPfAmount = await queryPromise(queryAddPfAmount, [pfamount, userId, "pending"]);
+//                 }
+//             }
+
+//             const QueryUpdateMLMPay = `UPDATE mlm_duration SET coinValue=?,payOut=payOut+?,startDate=?,endDate=? WHERE userId=?`
+//             endDate = (currentDate + 30);
+//             await queryPromise(QueryUpdateMLMPay, [coins, totalPayout, currentDate, endDate, userId]);
+//         }
+
+//         await queryPromise(`UPDATE coins SET value=? WHERE user_id=?`, [coins, userId]);
+
+//         const queryPayOut=`SELECT * FROM payout WHERE user_id=?`
+//         const valuePay=[userId]
+//         const dataPayOut = await queryPromise(queryPayOut, valuePay);
 
 async function calculateTeamPurchases(amount, userId, teamPurchased) {
     const queryTeamId = `SELECT team FROM tbl_users WHERE id=?`

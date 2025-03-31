@@ -68,6 +68,53 @@ export const selfPurchased=async(userId,value,coin,earningType,heading)=>{
     }
 }
 
+const referralData=[50,20,6,5,4,3,2,1,1,1,1,1,1,1];
+export const referralPayout= async (userId)=>{
+    try{
+      const queryGetTeam=`SELECT team FROM tbl_users WHERE id=?`
+      const valueTeam=[userId];
+      const coins=50;
+      let payout=250;
+      const teamData=await queryPromise(queryGetTeam,valueTeam);
+      const teamMLM=teamData[0]?.team!=null?JSON.parse(teamData[0]?.team):[];
+      const team=[userId,...teamMLM]
+      for(let i=0;i<referralData.length && i<team.length;i++){
+           const queryTeamHead = `SELECT user_id FROM team_referral WHERE id=?`;
+            const valuesTeam = [team[i]];
+            const dataUserId = await queryPromise(queryTeamHead, valuesTeam);
+            console.log(dataUserId);
+            const userIdRef=i==0?team[i]:dataUserId[0]?.user_id;
+          console.log("team is now working========================    ",team.length)
+          const queryCheck=`SELECT * FROM  wallets WHERE  earning_type='referral' AND userId=?`;
+          const dateCheck=await queryPromise(queryCheck,[userIdRef]);
+          console.log("===============================>   ",team[i])
+          const queryAddPayout=`INSERT INTO payout (user_id,amount,heading,coins,earning_type) VALUES (?,?,?,?,?)`
+          const valueAdd=[userIdRef,(payout*referralData[i])/100,"referral earingin",50,"referral"]
+          await queryPromise(queryAddPayout,valueAdd);
+          if(dateCheck.length==0){
+              const queryAddMLMUser=`INSERT INTO wallets (userId,earning_type,coins,payout,created) VALUES (?,?,?,?,?)`
+              const value2=[userIdRef,"referral",50,((payout*referralData[i])/100),new Date().toISOString()];
+              await queryPromise(queryAddMLMUser,value2);
+          }else {
+            const queryUpdateMLMUser = `UPDATE wallets 
+                                    SET coins = coins + ?, 
+                                    payout = payout + ? 
+                                WHERE userId = ? AND earning_type = "referral"`;
+    
+             const valueUpdate = [50, ((payout * referralData[i]) / 100), userIdRef];
+          const doneWallte= await queryPromise(queryUpdateMLMUser, valueUpdate);
+          console.log(doneWallte)
+          }
+      }
+      
+     return {
+        status:"success",
+        message:"successfully done"
+     }
+    }catch(err){
+        return  err;
+    }
+}
 export const teamDistrubutionPayOut=async(userId,value,coin,earningType,heading)=>{
     try{
         const queryTeamPurchases=await axios.get('https://api.ourmicrolife.com/api/admin/referral/teamPurchased');
@@ -75,34 +122,50 @@ export const teamDistrubutionPayOut=async(userId,value,coin,earningType,heading)
         const coins = Object.values(coinsTeam);
  
         const teamCoins=coins.splice(0,1);
-      
    
         const queryTeam='SELECT team FROM tbl_users WHERE id=?'
         const values=[userId]
         const dataTeam=await queryPromise(queryTeam,values);
-        const team=JSON.parse(dataTeam[0].team);
+        const team=JSON.parse(dataTeam[0]?.team);
         console.log("team is  ",team);
-        let teamLength=team.length
+        let teamLength=team?.length || []
         
         for(let i=0;i<teamLength;i++){
+
             const queryTeamHead = `SELECT user_id FROM team_referral WHERE id=?`;
             const valuesTeam = [team[i]];
-           
             const dataUserId = await queryPromise(queryTeamHead, valuesTeam);
-            const userIdRef=dataUserId[0].user_id;
-       
+            console.log(dataUserId);
+            const userIdRef=dataUserId[0]?.user_id;
+        
             const amount=+((value*coins[i+1])/100);
-           
+                
             const queryAddPayout=`INSERT INTO payout (user_id,amount,heading,coins,earning_type) VALUES (?,?,?,?,?)`
             const valuePayout=[userIdRef,amount,heading,coin,earningType];
-    
-            await queryPromise(queryAddPayout,valuePayout);
+            const payDetails= await queryPromise(queryAddPayout,valuePayout);
+             console.log("==============>  ",payDetails);
+            const queryCheck=`SELECT * FROM  wallets WHERE earning_type='group' AND userId=?`;
+            const dateCheck=await queryPromise(queryCheck,[team[i]]);
+            if(dateCheck.length==0){
+              const queryAddMLMUser=`INSERT INTO wallets (userId,earning_type,coins,payout,created) VALUES (?,?,?,?,?)`
+              const value2=[userIdRef,"group",coin,amount,new Date().toISOString()];
+              await queryPromise(queryAddMLMUser,value2);
+          }else {
+               const queryUpdateMLMUser = `UPDATE wallets 
+                                SET coins = coins + ?, 
+                                    payout = payout + ? 
+                                WHERE userId = ? AND earning_type = "group"`;
+               const valueUpdate = [coin,amount,userIdRef];
+               await queryPromise(queryUpdateMLMUser, valueUpdate);
+          }
+           
         }
         return ;
     }catch(err){
         return err;
     }
 }
+
 
 
 export const updatePosition=async(userId)=>{
@@ -124,7 +187,6 @@ export const updatePosition=async(userId)=>{
 
     
     for(let i=0;i<getLevel.length;i++){
-
      if(getProfileLevelCount.has(getLevel[i])){
          getProfileLevelCount.set(getLevel[i],getProfileLevelCount.get(getLevel[i])+1);
      }else{
@@ -157,6 +219,17 @@ const updateUserLevel= async (position,userId)=>{
 
 }
 
+export const  walletTransactions=async(userId,earningType,coins,payout)=>{
+    try{
+        if(earningType=="self"){
+           const queryWalletTransactions=`UPDATE wallets SET coins=?,payout=? WHERE earning_type=? AND userId=?`;
+           const valueQuery=[]
+        }
+    }catch(err){
+        console.log(err);
+        return;
+    }
+}
 export const getAllPositonAmount=async (position)=>{
     try{
         let level=position || null;
@@ -180,6 +253,19 @@ export const getTentativeCoin=async(position)=>{
     }
 }
 
+export const getProfileCoins=async(position)=>{
+    try{
+        const queryCoinAsPosition=`SELECT coinValue FROM Tentative_coins  WHERE award=?`
+        const value=[position];
+        const dataCoinsTentative=await queryPromise(queryCoinAsPosition,value);
+        console.log(dataCoinsTentative);
+        if(dataCoinsTentative.length==0)return null;
+        
+        return dataCoinsTentative[0].coinValue;
+    }catch(err){
+        return err
+    }
+}
 
 const queryPromise=async(query,value=[])=>{
     return new Promise((resolve,reject)=>{

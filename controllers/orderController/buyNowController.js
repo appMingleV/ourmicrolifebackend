@@ -1,5 +1,6 @@
 
 import pool from "../../config/db.js"
+import {getProfileCoins,teamDistrubutionPayOut} from '../../service/refferralSystem/refferral.js'
 
 export const buyOrders = async (req, res) => {
     try {
@@ -186,10 +187,12 @@ export const orderItems = async (req, res) => {
              
             const queryCoinHistory = `INSERT INTO coins_history (heading,coin_add_at,coin,user_id,coinStatus,orderId,level_profile,earning_type) VALUES (?,?,?,?,?,?,?,?)`
             const valueCoinHistory = [item?.product_name, new Date(),item?.coins , user_id, true, addCoinsDone.insertId || null,userLevel,"self"];
+            
             await queryPromis(queryCoinHistory, valueCoinHistory);
-             
+           
         }
-      
+        let valueTotal=5*total_coins
+        await  teamDistrubutionPayOut(user_id,valueTotal,total_coins,"group","group purchase earing")
         const queryAddCoinsUser = `UPDATE coins SET value=value+? WHERE user_id=?`;
         const valueAddcoin = [total_coins, user_id]
         await queryPromis(queryAddCoinsUser, valueAddcoin);
@@ -207,6 +210,7 @@ export const orderItems = async (req, res) => {
         })
     }
 }
+
 
 
 const queryPromis = (query, value = []) => {
@@ -227,6 +231,7 @@ export const getAllOrders = async (req, res) => {
         const { userId } = req.params;
         if (!userId) {
             return res.status(400).json({
+     
                 status: "error",
                 message: "Missing required fields"
             })
