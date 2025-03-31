@@ -1,4 +1,5 @@
 
+import { error } from "console";
 import pool from "../../config/db.js";
 
 
@@ -330,6 +331,43 @@ const updatePriceAndImages = async (price) => {
  
            }
   }
+
+export const getAllProductVendor=async(req,res)=>{
+  try{
+    const {vendorId}=req.params;
+    const queryAllProducts=`SELECT * FROM products WHERE vendor_id=?`
+    const value=[vendorId];
+    const dataProduct=await queryPromis(queryAllProducts,value);
+    return  res.status(200).json({
+      status:"success",
+      message:"All product fetch successfully",
+      data:dataProduct
+    })
+  
+  }catch(err){
+    return res.status(500).json({
+      status:"error",
+      message:"Something went wrong while trying to get all product",
+      error:err.message
+    })
+  }
+}
+// export const getSingleProductVendor=async(req,res)=>{
+//   try{
+//     const {productId,vendorId}=req.params;
+//     const queryProductData=`SELECT * FROM products WHERE vendor_id=? AND id=?`
+//     const value=[vendorId,productId];
+//     const dataProduct=await queryPromis(queryProductData,value);
+    
+
+//   }catch(err){
+//     return res.status(500).json({
+//       status:"error",
+//       message:"Something went wrong while trying to get product",
+//       error:err.message
+//     })
+//   }
+// }
 //promis for all query of sql-->
 const queryPromis=(query,value=[])=>{
     return new Promise((resolve,reject)=>{

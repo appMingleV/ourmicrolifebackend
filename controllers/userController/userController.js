@@ -699,7 +699,7 @@ export const getWalletTransactions = async (req, res) => {
          }
         
       const payOutData=await  queryPromise((`SELECT * FROM payout WHERE user_id=?`),[userId]);
-
+      
        return res.status(200).json({
             status: "success",
             message: "Wallet transactions fetched successfully",

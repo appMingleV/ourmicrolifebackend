@@ -3,8 +3,9 @@ import multer from "multer";
 
 import { otpSend, verifyOtpNumber, verifyOtpSignup,emailOTP, signup,vendorDetails,login} from '../controllers/vendorAuth/vendorAuthController.js'
 import {getAllOrders,getSingleOrder} from '../controllers/vendorAuth/shopDetails.js'
-import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct,addProduct} from '../controllers/vendorAuth/product.js'
+import {dimensionsProduct,getDimensionProduct,editProduct,deleteProduct,addProduct,getAllProductVendor} from '../controllers/vendorAuth/product.js'
 import store from './store.js'
+
 const routes=Router();
 
 const storage = multer.diskStorage({
@@ -90,7 +91,7 @@ routes.put('/product')
 .delete('/product/:productId',deleteProduct)
 .get('/order/:vendorId',getAllOrders)
 .get('/orderSingle/:orderId',getSingleOrder)
-
+.get('/productAll/:vendorId',getAllProductVendor);
 routes.use('/stores',store);
 //shop details-->
 
