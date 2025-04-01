@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import pool from '../../config/db.js'
 import {refferalCreate,} from '../../controllers/refferalController/refferController.js'
 import {sendMailPaymentAprovalMLM,sendMailMLMPosition} from '../../service/common/common.js'
+import jwt from 'jsonwebtoken'
+// const SCRETEKEY=process.env.JWT_SECRET
 export const vedorList = (req, res) => {
     try {
         const { query } = req.params;
@@ -253,7 +255,49 @@ export const getMLMUser=async(req,res)=>{
             })
      }
 }
+export const mlmLogin=async(req,res)=>{
+     try{
+        const {email,password}=req.body;
+        if(!email || !password){
+            return  res.status(404).json({
+                status:"failed",
+                message:"all fields are required"
+            })
+        }
+        const querryMlmUser=`SELECT * FROM  users WHERE email=?`
+        const dataMlmUser=await queryPromises(querryMlmUser,[email]);
+        if(dataMlmUser.length==0){
+            return res.status(404).json({
+                status:"failed",
+                message:"user is not found",
+            })
+        }
 
+        if(password!=dataMlmUser[0].password){
+            return res.status(403).json({
+                status:"failed",
+                message:"password is not matching",
+            })
+        }
+        // console.log(SCRETEKEY);
+      const token=jwt.sign({
+            email,
+            password
+        },"c3f8f4e8c7b47c6f0f2a9d8a6b24e648dfb15c51f83deea98f7b4c92c9e2d47a")
+        return res.status(200).json({
+            status:"sucessfully",
+            message:"login sucessfully",
+            token
+        })
+
+     }catch(err){
+       return res.status(500).json({
+                status: "error",
+                message: "Something went wrong while trying to fetch MLM User",
+                error: err.message
+            })
+     }
+}
 export const upateMLMMemberStatus=async(req,res)=>{
     try{ 
         const {userId}=req.params;
