@@ -148,7 +148,7 @@ export const addProduct=async(req,res)=>{
       }
      
       for (const config of price?.configuration) {
-        const updatedDataConfig= await addConfigurations(config,productId);
+        const updatedDataConfig= await addConfigurations(config,dataAddProducts?.insertId);
        }
     }
     return res.status(201).json({
@@ -331,7 +331,46 @@ const updatePriceAndImages = async (price) => {
  
            }
   }
-
+export const getSingleProduct=async(req,res)=>{
+      try{   
+          const {productId}=req.params;
+          const queryProducts=`SELECT * FROM products WHERE id=?`
+          const dateProduct=await queryPromis(queryProducts,[productId]);
+          
+          const queryProductPrice=`SELECT * FROM product_prices WHERE product_id=?`
+          const dateProductPrice=await queryPromis(queryProductPrice,[productId]);
+         
+          const priceArray=[]
+          let prices={};
+          for(let i=0;i<dateProductPrice.length;i++){
+            const id=dateProductPrice[i]?.id;
+           
+            prices=dateProductPrice[i];
+               
+            const queryProductImage=`SELECT * FROM  product_price_images WHERE product_price_id=?`
+            const dataProductImage=await queryPromis(queryProductImage,[id]);
+         
+            prices.images=dataProductImage;
+            const queryOfConfiguration=`SELECT * FROM product_configurations WHERE products=?`
+            const dataConfiguration=await queryPromis(queryOfConfiguration,[id]);
+            prices.config=dataConfiguration;
+            priceArray.push(prices);
+          }
+         
+          dateProduct[0].prices=priceArray;
+          return res.status(200).json({
+            status:"sucessfully",
+            data:dateProduct,
+          })
+ 
+      }catch(err){
+        return res.status(500).json({
+          status:"error",
+          message:"omething went wrong while trying to single product",
+          error:err.message
+      })
+      }
+}
 export const getAllProductVendor=async(req,res)=>{
   try{
     const {vendorId}=req.params;
