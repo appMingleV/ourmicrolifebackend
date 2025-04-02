@@ -209,13 +209,12 @@ export const editProduct=async(req,res)=>{
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
-          SET name = ?, featured_image = ?, description = ?, quantity = ?, status = ?,  category_id = ?, sub_category_id = ?, 
+          SET name = ?,  description = ?, quantity = ?, status = ?,  category_id = ?, sub_category_id = ?, 
               brand_name = ?, coin = ? 
           WHERE id = ?
         `;
         const updateProductValues = [
           productName,
-          req?.files?.featured_image[0]?.filename,
           description,
           quantity,
           status,
