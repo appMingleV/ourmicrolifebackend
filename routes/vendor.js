@@ -58,7 +58,7 @@ const thumbnailStorage = multer.diskStorage({
     },
   
     filename: (req, file, cb) => {
-      console.log("file is ================= ",file);
+   
       cb(null, Date.now() + "-" + file.originalname); // Unique name for thumbnail
     },
   });

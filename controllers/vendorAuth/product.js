@@ -121,15 +121,16 @@ export const addProduct=async(req,res)=>{
       brandName,
       prices,
     } = req.body;
-   
-
+   const featuredImage=req?.files?.featured_image[0]?.filename || ""
+ console.log(req.files)
     const queryAddProduct = `INSERT INTO products (vendor_id, name,featured_image,description, quantity, coin, status, category_id, sub_category_id, brand_name)
       VALUES (?,?,?,?,?,?,?,?,?,?)
     `;
 
-    const values = [vendorId, name,`${req?.files?.featured_image[0]?.filename}`,description, quantity,coin, status, category_id, sub_category_id, brandName];
+    const values = [vendorId, name,featuredImage,description, quantity,coin, status, category_id, sub_category_id, brandName];
+   
     const productSet = await queryPromis(queryAddProduct, values);
-           console.log("images ======================",req?.files?.featured_image[0]?.filename)
+        
     const productId=productSet?.insertId
    
     prices=JSON.parse(prices)
@@ -142,7 +143,7 @@ export const addProduct=async(req,res)=>{
       const dataAddProducts=await queryPromis(queryAddProduct, values);
       for(let i=0;i<5 && count<imageProduct.length;i++){
       const queryAddProductPriceConfig=`INSERT INTO product_price_images (product_price_id, image_path) VALUES (?,?)`
-      const valuesImagesConfig = [dataAddProducts?.insertId,`https://api.ourmicrolife.com/uploads/product/${imageProduct[count]?.filename}`];
+      const valuesImagesConfig = [dataAddProducts?.insertId,`${imageProduct[count]?.filename}`];
        const dataAddImagesConfig=await queryPromis(queryAddProductPriceConfig, valuesImagesConfig);
       count++;
       }
