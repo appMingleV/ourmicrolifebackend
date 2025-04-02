@@ -142,7 +142,7 @@ export const addProduct=async(req,res)=>{
       const dataAddProducts=await queryPromis(queryAddProduct, values);
       for(let i=0;i<5 && count<imageProduct.length;i++){
       const queryAddProductPriceConfig=`INSERT INTO product_price_images (product_price_id, image_path) VALUES (?,?)`
-      const valuesImagesConfig = [dataAddProducts?.insertId,imageProduct[count]?.filename];
+      const valuesImagesConfig = [dataAddProducts?.insertId,`https://api.ourmicrolife.com/uploads/product/${imageProduct[count]?.filename}`];
        const dataAddImagesConfig=await queryPromis(queryAddProductPriceConfig, valuesImagesConfig);
       count++;
       }
@@ -205,16 +205,17 @@ export const editProduct=async(req,res)=>{
           prices,
         } = req.body;
   
-        console.log("files are  ",req.body.featured_image);
+        console.log("files are  ",req.files);
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
-          SET name = ?, description = ?, quantity = ?, status = ?,  category_id = ?, sub_category_id = ?, 
+          SET name = ?, featured_image = ?, description = ?, quantity = ?, status = ?,  category_id = ?, sub_category_id = ?, 
               brand_name = ?, coin = ? 
           WHERE id = ?
         `;
         const updateProductValues = [
           productName,
+          req?.files?.featured_image[0]?.filename,
           description,
           quantity,
           status,
@@ -263,7 +264,11 @@ const updatePriceAndImages = async (price) => {
     const updatePriceQuery = `UPDATE product_prices SET color_name=?,config1=? WHERE id = ?`;
     const updatePriceValues = [color, priceId];
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
-   
+    for(let i of price.images){
+      console.log("======================price      ",i);
+    const updateImagePrices=`UPDATE product_price_images SET image_path=? WHERE id = ?`
+    const valueImage=[price]
+    }
     if (!updatedPrice) {
       throw new Error("Price update failed");
     }

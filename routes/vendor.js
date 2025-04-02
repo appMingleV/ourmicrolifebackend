@@ -75,7 +75,10 @@ const thumbnailStorage = multer.diskStorage({
 const uploadThumbnail = multer({ storage: thumbnailStorage });
 const uploadPricesImages = multer({ storage: pricesImageStorage });
 
-routes.put('/product/:productId',uploadThumbnail.single('thumbnail'),uploadPricesImages.array('pricesImages',10),editProduct);
+routes.put('/product/:productId',uploadThumbnail.fields([
+    {name:'images',maxCount:10},
+    {name:'featured_image',maxCount:1}
+  ]),editProduct);
 //add product -->
 
 routes.post("/product/:vendorId",
