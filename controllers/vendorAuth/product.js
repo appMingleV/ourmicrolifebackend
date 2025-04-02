@@ -116,8 +116,8 @@ export const addProduct=async(req,res)=>{
       quantity,
       coin,
       status,
-      categoryId,
-      subCategoryId,
+      category_id,
+      sub_category_id,
       brandName,
       prices,
     } = req.body;
@@ -127,7 +127,7 @@ export const addProduct=async(req,res)=>{
       VALUES (?,?,?,?,?,?,?,?,?,?)
     `;
 
-    const values = [vendorId, name,`${req?.files?.featured_image[0]?.filename}`,description, quantity,coin, status, categoryId, subCategoryId, brandName];
+    const values = [vendorId, name,`${req?.files?.featured_image[0]?.filename}`,description, quantity,coin, status, category_id, sub_category_id, brandName];
     const productSet = await queryPromis(queryAddProduct, values);
            console.log("images ======================",req?.files?.featured_image[0]?.filename)
     const productId=productSet?.insertId

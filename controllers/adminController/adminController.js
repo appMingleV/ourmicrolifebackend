@@ -221,7 +221,7 @@ export const vedorChangeStatus = (req, res) => {
 
 export const getMLMUser=async(req,res)=>{
      try{
-       console.log("get mlm user")
+   
        const queryMLMUser = `SELECT * FROM Transition`;
        const MLMUsers = await queryPromises(queryMLMUser)
        if (MLMUsers.length == 0) {
