@@ -136,7 +136,7 @@ export const addProduct=async(req,res)=>{
     prices=JSON.parse(prices)
     let imageProduct= req?.files?.images;
     let count=0;
-    console.log("images done is=====================>     ",imageProduct)
+  
     for(let price of prices){
       const queryAddProduct=`INSERT INTO product_prices  (color_name,config1,product_id) VALUES (?,?,?)`
       const values = [price?.color_name,price?.config1 || "null",productId];
@@ -152,6 +152,7 @@ export const addProduct=async(req,res)=>{
         const updatedDataConfig= await addConfigurations(config,dataAddProducts?.insertId);
        }
     }
+     
     return res.status(201).json({
        status: "success",
             message: "Products  successfully added",
