@@ -230,16 +230,17 @@ export const getMLMUser=async(req,res)=>{
                 message: "No MLM user found"
             })
         }
-        console.log(MLMUsers)
+    
         for(let i=0;i<MLMUsers.length;i++){
             const userId=MLMUsers[i]?.user_Id;
         
-            const queryUserDetail = `SELECT first_name,last_name,mobile_number FROM tbl_users WHERE id=?`
+            const queryUserDetail = `SELECT first_name,last_name,mobile_number,email FROM tbl_users WHERE id=?`
             const value1 = [userId];
             const getUserData=await queryPromises(queryUserDetail,value1);
-       
+            // console.log("======================>     ",getUserData)
             MLMUsers[i].name=getUserData[0]?.first_name+getUserData[0]?.last_name;
             MLMUsers[i].mobile=getUserData[0]?.mobile_number;
+            MLMUsers[i].email=getUserData[0]?.email
         }
         
        return res.status(200).json({
