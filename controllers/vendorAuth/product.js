@@ -234,7 +234,7 @@ export const editProduct=async(req,res)=>{
         }
   
         // Update prices and configurations
-        
+        console.log("hellos ")
         for (const price of prices) {
           await updatePriceAndImages(price);
         }
@@ -261,13 +261,8 @@ const updatePriceAndImages = async (price) => {
    
      // Update price details
     const updatePriceQuery = `UPDATE product_prices SET color_name=?,config1=? WHERE id = ?`;
-    const updatePriceValues = [color, priceId];
+    const updatePriceValues = [color,"", priceId];
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
-    for(let i of price.images){
-      console.log("======================price      ",i);
-    const updateImagePrices=`UPDATE product_price_images SET image_path=? WHERE id = ?`
-    const valueImage=[price]
-    }
     if (!updatedPrice) {
       throw new Error("Price update failed");
     }
@@ -277,7 +272,7 @@ const updatePriceAndImages = async (price) => {
 
   
     // Update configurations for this price
-    for (const config of price.configurations) {
+    for (const config of price?.config) {
      const updatedDataConfig= await updateConfigurations(config);
   
     }
@@ -296,7 +291,7 @@ const updatePriceAndImages = async (price) => {
       SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=? 
       WHERE id = ?
     `;
-    const updateConfigValues = [size, mrp, sellPrice, quantity, configId];
+    const updateConfigValues = [size, mrp, sellPrice, quantity, "",configId,];
   
     const updatedConfig = await queryPromis(updateConfigQuery, updateConfigValues);
   
