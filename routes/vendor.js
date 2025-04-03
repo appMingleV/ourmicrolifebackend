@@ -53,7 +53,6 @@ routes.get('/dimension/product/:product',getDimensionProduct)
 
 const thumbnailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-    
       cb(null, "uploads/product/"); // Directory for thumbnail
     },
   
@@ -63,17 +62,8 @@ const thumbnailStorage = multer.diskStorage({
     },
   });
   
-  const pricesImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/product/"); // Directory for prices-specific images
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + "-" + file.originalname); // Unique name for images
-    },
-  });
-
 const uploadThumbnail = multer({ storage: thumbnailStorage });
-const uploadPricesImages = multer({ storage: pricesImageStorage });
+
 
 routes.put('/product/:productId',uploadThumbnail.fields([
     {name:'images',maxCount:10},

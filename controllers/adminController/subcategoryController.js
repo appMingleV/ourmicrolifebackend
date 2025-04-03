@@ -3,7 +3,7 @@ export const addSubCategory = (req, res) => {
     try {
 
         const { sub_category_name, category_id } = req.body;
-        console.log(sub_category_name, category_id);
+       
       
         if (req.file == undefined) {
             return res.status(200).json({
@@ -35,7 +35,7 @@ export const addSubCategory = (req, res) => {
                     error: err.message
                 })
             }
-            console.log(result);
+     
 
             return res.status(200).json({
                 status: "success",
