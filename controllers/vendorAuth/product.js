@@ -87,7 +87,7 @@ export const dimensionsProduct= async (req,res)=>{
           const queryConfig=`SELECT * FROM product_configurations WHERE products=?`
         
            const dataConfig=await queryPromis(queryConfig,[key.id]);
-           console.log(dataConfig);
+        
            key.config=dataConfig;
         }
         return res.status(200).json({
@@ -105,92 +105,74 @@ export const dimensionsProduct= async (req,res)=>{
     }
 }
 
-export const addProduct=async(req,res)=>{
-  try
-  {
-    console.log("add product is ==================  ")
+export const addProduct = async (req, res) => {
+  try {
     const { vendorId } = req.params;
-    let {
-      name,
-      description,
-      quantity,
-      coin,
-      status,
-      category_id,
-      sub_category_id,
-      brandName,
-      prices,
-    } = req.body;
-   const featuredImage=req?.files?.featured_image[0]?.filename || ""
- console.log(req.files)
-    const queryAddProduct = `INSERT INTO products (vendor_id, name,featured_image,description, quantity, coin, status, category_id, sub_category_id, brand_name)
-      VALUES (?,?,?,?,?,?,?,?,?,?)
-    `;
-
-    const values = [vendorId, name,featuredImage,description, quantity,coin, status, category_id, sub_category_id, brandName];
-   
-    const productSet = await queryPromis(queryAddProduct, values);
-        
-    const productId=productSet?.insertId
-   
-    prices=JSON.parse(prices)
-    let imageProduct= req?.files?.images;
-    let count=0;
-  
-    for(let price of prices){
-      const queryAddProduct=`INSERT INTO product_prices  (color_name,config1,product_id) VALUES (?,?,?)`
-      const values = [price?.color_name,price?.config1 || "null",productId];
-      const dataAddProducts=await queryPromis(queryAddProduct, values);
-      for(let i=0;i<5 && count<imageProduct.length;i++){
-      const queryAddProductPriceConfig=`INSERT INTO product_price_images (product_price_id, image_path) VALUES (?,?)`
-      const valuesImagesConfig = [dataAddProducts?.insertId,`${imageProduct[count]?.filename}`];
-       const dataAddImagesConfig=await queryPromis(queryAddProductPriceConfig, valuesImagesConfig);
-      count++;
+    let { name, description, quantity, coin, status, category_id, sub_category_id, brandName, prices } = req.body;
+    
+    const featuredImage = req?.files?.featured_image?.[0]?.filename || "";
+    const images = req?.files?.images || [];
+    
+    // Insert product details
+    const productQuery = `INSERT INTO products (vendor_id, name, featured_image, description, quantity, coin, status, category_id, sub_category_id, brand_name)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    const productValues = [vendorId, name, featuredImage, description, quantity, coin, status, category_id, sub_category_id, brandName];
+    const productResult = await queryPromis(productQuery, productValues);
+    
+    const productId = productResult?.insertId;
+    if (!productId) throw new Error("Failed to insert product");
+    
+    prices = JSON.parse(prices);
+    
+    for (const price of prices) {
+      const { color_name, config1 = "null", configuration } = price;
+      
+      // Insert product price
+      const priceQuery = `INSERT INTO product_prices (color_name, config1, product_id) VALUES (?, ?, ?)`;
+      const priceValues = [color_name, config1, productId];
+      const priceResult = await queryPromis(priceQuery, priceValues);
+      
+      const priceId = priceResult?.insertId;
+      if (!priceId) throw new Error("Failed to insert product price");
+      
+      // Insert images for each product price
+      for (const image of images) {
+        const imageQuery = `INSERT INTO product_price_images (product_price_id, image_path) VALUES (?, ?)`;
+        const imageValues = [priceId, image.filename];
+        await queryPromis(imageQuery, imageValues);
       }
-     
-      for (const config of price?.configuration) {
-        const updatedDataConfig= await addConfigurations(config,dataAddProducts?.insertId);
-       }
+      
+      // Insert configurations
+      for (const config of configuration || []) {
+        await addConfigurations(config, priceId);
+      }
     }
-     
+    
     return res.status(201).json({
-       status: "success",
-            message: "Products  successfully added",
-            productId: productId,
-    })
-
-
-  }catch(err){
+      status: "success",
+      message: "Product successfully added",
+      productId
+    });
+  } catch (err) {
     return res.status(500).json({
-        status:"error",
-        message:"Something went wrong while trying to add product",
-        error:err.message
-    })
+      status: "error",
+      message: "Something went wrong while adding the product",
+      error: err.message
+    });
   }
-}
- const addConfigurations=async(config,productId)=>{
-  const configId = config.name;
-  const size = config.size;
-  const old_price = config.old_price;
-  const sellPrice =config.sale_price;
-  const quantity = config.stock;
+};
 
-  const updateConfigQuery = `
-    INSERT INTO product_configurations 
-     (products,size, old_price, sale_price, stock,config2) 
-    VALUES (?,?,?,?,?,?)
-  `;
-  const updateConfigValues = [productId,size, old_price, sellPrice, quantity, configId || null];
-
-  const updatedConfig = await queryPromis(updateConfigQuery, updateConfigValues);
-
-  if (!updatedConfig) {
-    throw new Error("Configuration update failed");
-  }
+const addConfigurations = async (config, productId) => {
+  const { name: configId, size, old_price, sale_price, stock } = config;
   
-
-  return updatedConfig;
- }
+  const configQuery = `INSERT INTO product_configurations (products, size, old_price, sale_price, stock, config2) VALUES (?, ?, ?, ?, ?, ?)`;
+  const configValues = [productId, size, old_price, sale_price, stock, configId || null];
+  
+  const result = await queryPromis(configQuery, configValues);
+  if (!result) throw new Error("Configuration insertion failed");
+  return result;
+};
 
 export const editProduct=async(req,res)=>{
     try {
@@ -207,7 +189,7 @@ export const editProduct=async(req,res)=>{
           prices,
         } = req.body;
   
-        console.log("files are  ",req.files);
+       
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
@@ -236,7 +218,7 @@ export const editProduct=async(req,res)=>{
         }
   
         // Update prices and configurations
-        console.log("hellos ")
+  
         for (const price of prices) {
           await updatePriceAndImages(price);
         }

@@ -53,7 +53,7 @@ routes.get('/dimension/product/:product',getDimensionProduct)
 
 const thumbnailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      console.log(file)
+    
       cb(null, "uploads/product/"); // Directory for thumbnail
     },
   
