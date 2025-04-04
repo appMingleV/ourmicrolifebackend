@@ -164,10 +164,10 @@ export const addProduct = async (req, res) => {
 };
 
 const addConfigurations = async (config, productId) => {
-  const { name: configId, size, old_price, sale_price, stock } = config;
+  const { name: configId, size, old_price, sale_price, stock,pices } = config;
   
-  const configQuery = `INSERT INTO product_configurations (products, size, old_price, sale_price, stock, config2) VALUES (?, ?, ?, ?, ?, ?)`;
-  const configValues = [productId, size, old_price, sale_price, stock, configId || null];
+  const configQuery = `INSERT INTO product_configurations (products, size, old_price, sale_price, stock, config2,pices) VALUES (?, ?, ?, ?, ?, ?,?)`;
+  const configValues = [productId, size, old_price, sale_price, stock, configId || null,pices];
   
   const result = await queryPromis(configQuery, configValues);
   if (!result) throw new Error("Configuration insertion failed");

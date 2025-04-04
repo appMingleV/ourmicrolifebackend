@@ -208,7 +208,7 @@ export const getAllOrders=async(req,res)=>{
             const queryAddress=`SELECT * FROM shipping_addresses WHERE id=?`
             const valueAddress=[orderDetails[0].shipping_address_id];
             const addressDetails=await queryPromis(queryAddress,valueAddress);
-            arrayAllOrders.push({...key,product_name:productDetails[0]?.name||"not found",addressDetails:addressDetails[0]||{}})
+            arrayAllOrders.push({...key,paymentStatus:orderDetails[0].payment_status,product_name:productDetails[0]?.name||"not found",addressDetails:addressDetails[0]||{}})
         }
         return res.status(200).json({
             status:"success",
@@ -255,7 +255,8 @@ export const getSingleOrder=async(req,res)=>{
           const queryAddress=`SELECT * FROM shipping_addresses WHERE id=?`
           const valueAddress=[orderDetails[0].shipping_address_id];
           const addressDetails=await queryPromis(queryAddress,valueAddress);
-          arrayAllOrders.push({...key,product_name:productDetails[0]?.name||"not found",addressDetails:addressDetails[0]||{}})
+          console.log("================    ",orderDetails[0].payment_status)
+          arrayAllOrders.push({...key,paymentStatus:orderDetails[0].payment_status,product_name:productDetails[0]?.name||"not found",addressDetails:addressDetails[0]||{}})
       }
       return res.status(200).json({
           status:"success",
