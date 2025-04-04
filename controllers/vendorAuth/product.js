@@ -126,11 +126,11 @@ export const addProduct = async (req, res) => {
     prices = JSON.parse(prices);
     
     for (const price of prices) {
-      const { color_name, config1 = "null", configuration } = price;
+      const {  config1,configValue ,configuration } = price;
       
       // Insert product price
       const priceQuery = `INSERT INTO product_prices (color_name, config1, product_id) VALUES (?, ?, ?)`;
-      const priceValues = [color_name, config1, productId];
+      const priceValues = [configValue, config1, productId];
       const priceResult = await queryPromis(priceQuery, priceValues);
       
       const priceId = priceResult?.insertId;
@@ -164,10 +164,10 @@ export const addProduct = async (req, res) => {
 };
 
 const addConfigurations = async (config, productId) => {
-  const { name: configId, size, old_price, sale_price, stock,pices } = config;
-  
+  const { configId, configIdValue, old_price, sale_price, stock,pices } = config;
+  console.log("======================>   ",configId,configIdValue)
   const configQuery = `INSERT INTO product_configurations (products, size, old_price, sale_price, stock, config2,pices) VALUES (?, ?, ?, ?, ?, ?,?)`;
-  const configValues = [productId, size, old_price, sale_price, stock, configId || null,pices];
+  const configValues = [productId, configIdValue, old_price, sale_price, stock, configId || null,pices];
   
   const result = await queryPromis(configQuery, configValues);
   if (!result) throw new Error("Configuration insertion failed");
@@ -242,19 +242,15 @@ const updatePriceAndImages = async (price) => {
   
     const priceId = price.id;
     const color = price.color_name;
-   
+    const congfig1=price.config1
      // Update price details
     const updatePriceQuery = `UPDATE product_prices SET color_name=?,config1=? WHERE id = ?`;
-    const updatePriceValues = [color,"", priceId];
+    const updatePriceValues = [color,congfig1, priceId];
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
     if (!updatedPrice) {
       throw new Error("Price update failed");
     }
-  
-  
     // Insert images for this priceId
-
-  
     // Update configurations for this price
     for (const config of price?.config) {
      const updatedDataConfig= await updateConfigurations(config);
@@ -270,13 +266,14 @@ const updatePriceAndImages = async (price) => {
     const sellPrice =config.sale_price;
     const quantity = config.stock;
     const pices=config.pices;
-     console.log("",config.pices)
+    const config2=config.config2
+
     const updateConfigQuery = `
       UPDATE product_configurations 
       SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=?,pices=? 
       WHERE id = ?
     `;
-    const updateConfigValues = [size, mrp, sellPrice, quantity, "",pices,configId];
+    const updateConfigValues = [size, mrp, sellPrice, quantity, config2,pices,configId];
   
     const updatedConfig = await queryPromis(updateConfigQuery, updateConfigValues);
   
