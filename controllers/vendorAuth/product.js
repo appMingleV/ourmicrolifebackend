@@ -269,13 +269,14 @@ const updatePriceAndImages = async (price) => {
     const mrp = config.old_price;
     const sellPrice =config.sale_price;
     const quantity = config.stock;
+    const pices=config.pices;
   
     const updateConfigQuery = `
       UPDATE product_configurations 
-      SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=? 
+      SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=?,pices=? 
       WHERE id = ?
     `;
-    const updateConfigValues = [size, mrp, sellPrice, quantity, "",configId,];
+    const updateConfigValues = [size, mrp, sellPrice, quantity, "",configId,pices];
   
     const updatedConfig = await queryPromis(updateConfigQuery, updateConfigValues);
   
