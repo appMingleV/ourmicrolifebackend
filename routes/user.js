@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
-import {searchResult,getSingleProduct} from '../controllers/vendorAuth/product.js'
+import {searchResult,getSingleProduct,getAllProduct} from '../controllers/vendorAuth/product.js'
 import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails} from '../controllers/userController/userController.js'
 import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
@@ -52,6 +52,7 @@ routes.get('/profile/:userId',getProfile)
 .get('/order/:orderId',singleOrder)
 .post('/banks/:userId',addBankDetails)
 .get('/banks/:userId',getBankDetails)
+.get('/allProduct',getAllProduct)
 .get('/singleProduct/:productId',getSingleProduct)
 .use('/order',order);
 

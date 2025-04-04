@@ -164,10 +164,10 @@ export const addProduct = async (req, res) => {
 };
 
 const addConfigurations = async (config, productId) => {
-  const { configId, configIdValue, old_price, sale_price, stock,pices } = config;
+  const { configId, configIdValue, old_price, sale_price, stock,pices,discount } = config;
   console.log("======================>   ",configId,configIdValue)
-  const configQuery = `INSERT INTO product_configurations (products, size, old_price, sale_price, stock, config2,pices) VALUES (?, ?, ?, ?, ?, ?,?)`;
-  const configValues = [productId, configIdValue, old_price, sale_price, stock, configId || null,pices];
+  const configQuery = `INSERT INTO product_configurations (products, size, old_price, sale_price, stock, config2,pices,discount) VALUES (?, ?, ?, ?, ?, ?,?,?)`;
+  const configValues = [productId, configIdValue, old_price, sale_price, stock, configId || null,pices,discount];
   
   const result = await queryPromis(configQuery, configValues);
   if (!result) throw new Error("Configuration insertion failed");
@@ -267,13 +267,14 @@ const updatePriceAndImages = async (price) => {
     const quantity = config.stock;
     const pices=config.pices;
     const config2=config.config2
-
+    const discount=config.discount
+    console.log("discount=====================> ",discount)
     const updateConfigQuery = `
       UPDATE product_configurations 
-      SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=?,pices=? 
+      SET size = ?, old_price = ?, sale_price = ?, stock = ?,config2=?,pices=?,discount=? 
       WHERE id = ?
     `;
-    const updateConfigValues = [size, mrp, sellPrice, quantity, config2,pices,configId];
+    const updateConfigValues = [size, mrp, sellPrice, quantity, config2,pices,discount,configId];
   
     const updatedConfig = await queryPromis(updateConfigQuery, updateConfigValues);
   
@@ -389,6 +390,38 @@ export const getAllProductVendor=async(req,res)=>{
 //   }
 // }
 //promis for all query of sql-->
+export const getAllProduct=async(req,res)=>{
+  try{
+    const queryAllProduct=`SELECT * FROM products`;
+    const dataAllProducts=await queryPromis(queryAllProduct);
+    let result=[]
+    
+    for(let i=0;i<dataAllProducts.length;i++){
+     const queryPrice=`SELECT id,color_name, config1 FROM  product_prices WHERE product_id=?`
+     const dataProductPrice=await queryPromis(queryPrice,[dataAllProducts[i].id])
+     let produtobj=dataAllProducts[i];
+     for(let i of dataProductPrice){
+      console.log(i);
+      
+     const queryConfig=`SELECT * FROM product_configurations WHERE products=?`
+     const dataConfig=await queryPromis(queryConfig,[i?.id]);
+     produtobj["prices"]=i;
+     produtobj["config"]=dataConfig;
+     }
+     result.push(produtobj);
+    }
+    return res.status(200).json({
+      status:"sucessfully",
+      data:result
+    })
+  }catch(err){
+    return res.status(500).json({
+      status:"error",
+      message:"Something went wrong while trying to get all product",
+      error:err.message
+    })
+  }
+}
 const queryPromis=(query,value=[])=>{
     return new Promise((resolve,reject)=>{
         pool.query(query,value,(err,result)=>{
