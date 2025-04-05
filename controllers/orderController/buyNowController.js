@@ -179,9 +179,9 @@ export const orderItems = async (req, res) => {
         })
       
         for (const item of order_items) {
-            const queryAddItems = `INSERT INTO order_items (order_id, product_id, size, color, sales_price, old_price, vendor_id, total_price, quantity,coins,product_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`
+            const queryAddItems = `INSERT INTO order_items (order_id, product_id, size, color, sales_price, old_price, vendor_id, total_price, quantity,coins,product_image,productName) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`
             
-            const valuesAddItems = [addCoinsDone?.insertId, item?.product_id, item?.size, item?.color, item?.sales_price, item?.old_price, item?.vendor_id, item?.total_price, item?.quantity, item?.coins,item?.product_image]
+            const valuesAddItems = [addCoinsDone?.insertId, item?.product_id, item?.size, item?.color, item?.sales_price, item?.old_price, item?.vendor_id, item?.total_price, item?.quantity, item?.coins,item?.product_image,item?.product_name]
              
             await queryPromis(queryAddItems, valuesAddItems);
              
