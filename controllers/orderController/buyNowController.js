@@ -240,7 +240,7 @@ export const getAllOrders = async (req, res) => {
         const queryAllOrders = `SELECT * FROM orders_cart WHERE user_id=?`;
         const values = [userId];
         const allOrders = await queryPromis(queryAllOrders, values);
-       
+    //    console.log("============= all orders ",allOrders)
         if(allOrders.length===0){
        
             return res.status(404).json({
@@ -253,14 +253,13 @@ export const getAllOrders = async (req, res) => {
             const queryOrderItems = `SELECT * FROM order_items WHERE order_id=?`
             const valueOrder = [allOrders[key]?.id];
             const orderItems = await queryPromis(queryOrderItems, valueOrder);
-            if (orderItems.length != 0) {
+            
+       
                
                 for(let order of orderItems){
-                    const productName=await queryPromis(`SELECT name FROM products WHERE id=?`,[order.product_id]);
-                    order.product_name=productName[0]?.name;
                 arrayOrders.push(order)
                 }
-            }
+            
         }
         if (arrayOrders.length == 0) {
             return res.status(404).json({
