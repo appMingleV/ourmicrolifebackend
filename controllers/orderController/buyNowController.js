@@ -231,18 +231,15 @@ export const getAllOrders = async (req, res) => {
         const { userId } = req.params;
         if (!userId) {
             return res.status(400).json({
-     
                 status: "error",
                 message: "Missing required fields"
             })
-
         }
         const queryAllOrders = `SELECT * FROM orders_cart WHERE user_id=?`;
         const values = [userId];
         const allOrders = await queryPromis(queryAllOrders, values);
-    //    console.log("============= all orders ",allOrders)
+                      
         if(allOrders.length===0){
-       
             return res.status(404).json({
                 status: "error chal",
                 message: "No orders found"
@@ -252,14 +249,10 @@ export const getAllOrders = async (req, res) => {
         for (let key in allOrders) {
             const queryOrderItems = `SELECT * FROM order_items WHERE order_id=?`
             const valueOrder = [allOrders[key]?.id];
-            const orderItems = await queryPromis(queryOrderItems, valueOrder);
-            
-       
-               
+            const orderItems = await queryPromis(queryOrderItems, valueOrder);       
                 for(let order of orderItems){
                 arrayOrders.push(order)
                 }
-            
         }
         if (arrayOrders.length == 0) {
             return res.status(404).json({
