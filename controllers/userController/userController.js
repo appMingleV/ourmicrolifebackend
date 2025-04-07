@@ -492,16 +492,20 @@ export const addBankDetails = async (req, res) => {
       nominee_name,
       nominee_address,
       nominee_dob,
+      addharNumber,
+      panNumber
     } = req.body;
 
+
+    // console.log(req.files);
     // Validate required fields
-    if (!userId || !account_holder_name || !account_number || !confirm_account_number || !bank_name || !ifsc_code) {
+    if (!userId || !account_holder_name || !account_number || !confirm_account_number || !bank_name || !ifsc_code || !addharNumber || !panNumber) {
       return res.status(400).json({
         status: "error",
         message: "Missing required fields",
       });
     }
-
+    // console.log(req.files.pan[0].filename);
     // Check if account_number and confirm_account_number match
     if (account_number !== confirm_account_number) {
       return res.status(400).json({
@@ -514,13 +518,13 @@ export const addBankDetails = async (req, res) => {
     const checkBankDetails = `SELECT * FROM bank_nominee_details WHERE user_id = ?`;
     const values = [userId];
     const bankDetails = await queryPromise(checkBankDetails, values);
-
+    
     if (bankDetails.length === 0) {
       // Insert new bank details if not found
       const insertQuery = `
         INSERT INTO bank_nominee_details 
-        (user_id, account_holder_name, account_number, confirm_account_number, bank_name, ifsc_code, nominee_name, nominee_address, nominee_dob) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        (user_id, account_holder_name, account_number, confirm_account_number, bank_name, ifsc_code, nominee_name, nominee_address, nominee_dob,addharNumber,panNumber,addharFront,addharBack,pan) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)`;
       
       const insertValues = [
         userId,
@@ -532,6 +536,11 @@ export const addBankDetails = async (req, res) => {
         nominee_name || null,
         nominee_address || null,
         nominee_dob || null,
+        addharNumber,
+        panNumber,
+        req?.files?.addharFront[0]?.filename,
+        req?.files?.addharBack[0]?.filename,
+        req?.file?.pan[0]?.filename
       ];
 
       await queryPromise(insertQuery, insertValues);
@@ -540,32 +549,11 @@ export const addBankDetails = async (req, res) => {
         status: "success",
         message: "Bank details added successfully",
       });
-    } else {
-      // Update existing bank details
-      const updateQuery = `
-        UPDATE bank_nominee_details 
-        SET account_holder_name = ?, account_number = ?, confirm_account_number = ?, bank_name = ?, ifsc_code = ?, nominee_name = ?, nominee_address = ?, nominee_dob = ? 
-        WHERE user_id = ?`;
-
-      const updateValues = [
-        account_holder_name,
-        account_number,
-        confirm_account_number,
-        bank_name,
-        ifsc_code,
-        nominee_name || null,
-        nominee_address || null,
-        nominee_dob || null,
-        userId,
-      ];
-
-      await queryPromise(updateQuery, updateValues);
-
-      return res.status(200).json({
-        status: "success",
-        message: "Bank details updated successfully",
-      });
-    }
+    } 
+     return res.status(200).json({
+            Status:"success",
+            message:"Bank details already added"
+        })
   } catch (err) {
     return res.status(500).json({
       status: "error",
@@ -575,6 +563,47 @@ export const addBankDetails = async (req, res) => {
   }
 };
 
+
+export const addKYCDocuments=async(req,res)=>{
+        try{
+            const {
+      father_or_husband_name,
+      mother_name,
+      aadhaar_number,
+      pan_number,
+    } = req.body;
+      if(!father_or_husband_name || !mother_name || !aadhaar_number || !pan_number){
+       return res.status(400).json({
+        status: "error",
+        message: "Missing required fields",
+      });
+      }
+      const queryKYCDocument = `
+      INSERT INTO user_KYC 
+      (father_or_husband_name, mother_name, aadhaar_number, addharFront, addharBack,pan_number, pan_card_image)
+      VALUES (?, ?, ?, ?, ?,?, ?)
+    `;
+    const value=[father_or_husband_name,mother_name,aadhaar_number,req.files.addharFront[0].filename,req.files.addharBack[0].filename,pan_number,req.files.pan[0].filename]
+    const dataSubmit=await queryPromise(queryKYCDocument,value);
+    if(!dataSubmit){
+        return res.status(500).json({
+            status:"failed",
+            message:"Internal server Error"
+        }
+        )
+    }
+    return res.status(201).json({
+        status:"sucessfully",
+        message:"KYC details added sucessfuly",
+    })
+        }catch(err){
+            return res.status(500).json({
+                status:"failed",
+                   message: "Unexpected error occurred",
+                error: err.message,
+            })
+        }
+}
 
 export const getBankDetails = async (req, res) => {
   try {
