@@ -518,7 +518,7 @@ export const addBankDetails = async (req, res) => {
     const checkBankDetails = `SELECT * FROM bank_nominee_details WHERE user_id = ?`;
     const values = [userId];
     const bankDetails = await queryPromise(checkBankDetails, values);
-    
+    console.log("all is the ",req.files);
     if (bankDetails.length === 0) {
       // Insert new bank details if not found
       const insertQuery = `
@@ -540,7 +540,7 @@ export const addBankDetails = async (req, res) => {
         panNumber,
         req?.files?.addharFront[0]?.filename,
         req?.files?.addharBack[0]?.filename,
-        req?.file?.pan[0]?.filename
+        req?.files?.pan[0]?.filename
       ];
 
       await queryPromise(insertQuery, insertValues);

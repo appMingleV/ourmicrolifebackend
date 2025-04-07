@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {addCategory,editCategory,deleteCategory,singleCategory,getAllCategories} from '../controllers/adminController/categoryContoller.js'
-import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList,getMLMUser,upateMLMMemberStatus,getnewMLMUser,getBankDetails} from '../controllers/adminController/adminController.js'
+import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList,getMLMUser,upateMLMMemberStatus,getnewMLMUser,getBankDetails,getAllUserDetails} from '../controllers/adminController/adminController.js'
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
 
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
@@ -104,7 +104,7 @@ routes.delete('/sliders/:sliderId',deleteSlider);
 routes.get('/newMLMUser',getMLMUser)
 .put('/statusMLM/:userId',decryptRefferal(),upateMLMMemberStatus)
 .get('/mlmuser/:userId',getnewMLMUser)
-.get('/allUserDetails/')
+.get('/allUserDetails/',getAllUserDetails)
 .get('/banksdetails',getBankDetails)
 routes.use('/referral',referral)
 routes.use('/coupon',coupons)

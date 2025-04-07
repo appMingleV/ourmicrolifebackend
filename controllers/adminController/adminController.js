@@ -258,9 +258,20 @@ export const getMLMUser=async(req,res)=>{
 }
 
 
-export const getAllUserDetailsas=async(req,res)=>{
+export const getAllUserDetails=async(req,res)=>{
     try{
-     const queryGetAll=`SELECT first,`
+     const queryGetAll=`SELECT id,first_name,last_name,email,mobile_number FROM tbl_users`
+     const dataAllUser=await queryPromises(queryGetAll);
+     
+     for(let i of dataAllUser){
+
+        console.log(i);
+     }
+    return res.status(200).json({
+        status:"sucessfully",
+        message:"all users details fetched sucessfully",
+        dataAllUser
+    })
 
     }catch(err){
         return res.status(500).json({
