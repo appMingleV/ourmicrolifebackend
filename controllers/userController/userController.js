@@ -582,7 +582,7 @@ export const addKYCDocuments=async(req,res)=>{
       const queryKYCDocument = `
       INSERT INTO user_KYC 
       (father_or_husband_name, mother_name, aadhaar_number, addharFront, addharBack,pan_number, pan_card_image,userId)
-      VALUES (?, ?, ?, ?, ?,?, ?)
+      VALUES (?, ?, ?, ?, ?,?, ?,?)
     `;
     const value=[father_or_husband_name,mother_name,aadhaar_number,req.files.addharFront[0].filename,req.files.addharBack[0].filename,pan_number,req.files.pan[0].filename,userId]
     const dataSubmit=await queryPromise(queryKYCDocument,value);
