@@ -256,6 +256,19 @@ export const getMLMUser=async(req,res)=>{
             })
      }
 }
+
+
+export const getAllUserDetailsas=async(req,res)=>{
+    try{
+     const queryGetAll=`SELECT first,`
+
+    }catch(err){
+        return res.status(500).json({
+            status:"failed",
+            message:"we have failed to fetch details "
+        })
+    }
+}
 export const mlmLogin=async(req,res)=>{
      try{
         const {email,password}=req.body;

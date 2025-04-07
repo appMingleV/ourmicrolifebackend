@@ -60,7 +60,7 @@ routes.get('/profile/:userId',getProfile)
     name:"pan",
     maxCount:1
 }]),addBankDetails)
-.post('/kycDetails',upload.fields([
+.post('/kycDetails/:userId',upload.fields([
     {
         name:"addharFront",
         maxCount:1

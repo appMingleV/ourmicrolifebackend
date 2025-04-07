@@ -104,6 +104,7 @@ routes.delete('/sliders/:sliderId',deleteSlider);
 routes.get('/newMLMUser',getMLMUser)
 .put('/statusMLM/:userId',decryptRefferal(),upateMLMMemberStatus)
 .get('/mlmuser/:userId',getnewMLMUser)
+.get('/allUserDetails/')
 .get('/banksdetails',getBankDetails)
 routes.use('/referral',referral)
 routes.use('/coupon',coupons)
