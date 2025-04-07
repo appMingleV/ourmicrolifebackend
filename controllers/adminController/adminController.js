@@ -258,28 +258,54 @@ export const getMLMUser=async(req,res)=>{
 }
 
 
-export const getAllUserDetails=async(req,res)=>{
-    try{
-     const queryGetAll=`SELECT id,first_name,last_name,email,mobile_number FROM tbl_users`
-     const dataAllUser=await queryPromises(queryGetAll);
-     
-     for(let i of dataAllUser){
+export const getAllUserDetails = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.mobile_number,
+        r.referral_link,
+        r.referral_code
+      FROM tbl_users u
+      LEFT JOIN refferal r ON u.id = r.user_id
+    `;
 
-        console.log(i);
-     }
+    const rawData = await queryPromises(query);
+
+    const dataAllUser = rawData.map(user => {
+      const {
+        referral_link,
+        referral_code,
+        ...userDetails
+      } = user;
+
+      return {
+        ...userDetails,
+        referral: (referral_link || referral_code) ? {
+          referral_link,
+          referral_code
+        } : null
+      };
+    });
+
     return res.status(200).json({
-        status:"sucessfully",
-        message:"all users details fetched sucessfully",
-        dataAllUser
-    })
+      status: "success",
+      message: "All users details fetched successfully",
+      data: dataAllUser
+    });
 
-    }catch(err){
-        return res.status(500).json({
-            status:"failed",
-            message:"we have failed to fetch details "
-        })
-    }
-}
+  } catch (err) {
+    return res.status(500).json({
+      status: "failed",
+      message: "We have failed to fetch details",
+      error: err.message
+    });
+  }
+};
+
 export const mlmLogin=async(req,res)=>{
      try{
         const {email,password}=req.body;
