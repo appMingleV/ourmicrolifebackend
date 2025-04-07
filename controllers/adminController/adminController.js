@@ -349,6 +349,55 @@ export const mlmLogin=async(req,res)=>{
             })
      }
 }
+
+export const getSingleUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const queryDetailsUser = `
+SELECT 
+  u.*, 
+  r.referral_link,
+  r.referral_code,
+  b.*,
+  s.*
+FROM tbl_users u
+LEFT JOIN refferal r ON u.id = r.user_id
+LEFT JOIN bank_nominee_details b ON u.id = b.user_id
+
+LEFT JOIN shipping_addresses s ON u.id = s.user_id
+WHERE u.id = ?
+
+    `;
+     
+    const dataUserDetails = await queryPromises(queryDetailsUser, [userId]);
+     if(dataUserDetails.length==0){
+        return  res.status(200).json(
+            {
+                status:"sucessfull",
+                message:"data is not found"
+            }
+        )
+     }
+    const queryFindKYC=`SELECT * FROM user_KYC WHERE userId=?`
+    const dataKYC=await queryPromises(queryFindKYC,[userId]);
+   
+     dataUserDetails[0].KYC=dataKYC[0];
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully fetched user details",
+      data: dataUserDetails[0] || {},
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      status: "failed",
+      message: "Error fetching user details",
+      error: err.message
+    });
+  }
+};
+
 export const upateMLMMemberStatus=async(req,res)=>{
     try{ 
         const {userId}=req.params;
