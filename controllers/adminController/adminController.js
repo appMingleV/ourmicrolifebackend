@@ -360,7 +360,7 @@ SELECT
   r.referral_link,
   r.referral_code,
   b.* 
-  
+
 FROM tbl_users u
 LEFT JOIN refferal r ON u.id = r.user_id
 LEFT JOIN bank_nominee_details b ON u.id = b.user_id
@@ -384,6 +384,12 @@ WHERE u.id = ?
 
      dataUserDetails[0].KYC=dataKYC[0];
      dataUserDetails[0].address=dataAddress;
+     const queryReferralName=`SELECT * FROM direct_referrals WHERE referral_to=?`
+     const dataRefferName=await queryPromises(queryReferralName,[userId]);
+     const referralId=dataRefferName[0]?.referral_from || null;
+     const queryUserName=`SELECT * FROM tbl_users WHERE id=?`
+     const dataReferralUserName=await queryPromises(queryUserName,[referralId]);
+     dataUserDetails[0].referralName=dataReferralUserName[0]?.first_name+dataReferralUserName[0]?.last_name
     return res.status(200).json({
       status: "success",
       message: "Successfully fetched user details",
@@ -398,6 +404,20 @@ WHERE u.id = ?
     });
   }
 };
+
+export const addUPI=async(req,res)=>{
+    try{
+         const {userId}=req.params;
+         const {upiId,upiName}=req.body;
+         
+    }catch(err){
+        return res.status(500).json({
+      status: "failed",
+      message: "Error fetching user details",
+      error: err.message
+    });
+    }
+}
 
 export const upateMLMMemberStatus=async(req,res)=>{
     try{ 

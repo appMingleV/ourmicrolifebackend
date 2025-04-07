@@ -75,6 +75,7 @@ routes.get('/profile/:userId',getProfile)
         maxCount:1
     }
 ]),addKYCDocuments)
+.post('/upi',)
 .get('/banks/:userId',getBankDetails)
 .get('/allProduct',getAllProduct)
 .get('/singleProduct/:productId',getSingleProduct)
