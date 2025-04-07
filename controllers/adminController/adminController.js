@@ -359,13 +359,11 @@ SELECT
   u.*, 
   r.referral_link,
   r.referral_code,
-  b.*,
-  s.*
+  b.* 
+  
 FROM tbl_users u
 LEFT JOIN refferal r ON u.id = r.user_id
 LEFT JOIN bank_nominee_details b ON u.id = b.user_id
-
-LEFT JOIN shipping_addresses s ON u.id = s.user_id
 WHERE u.id = ?
 
     `;
@@ -381,8 +379,11 @@ WHERE u.id = ?
      }
     const queryFindKYC=`SELECT * FROM user_KYC WHERE userId=?`
     const dataKYC=await queryPromises(queryFindKYC,[userId]);
-   
+    const queryAddress=`SELECT * FROM shipping_addresses WHERE user_id=?`
+    const dataAddress=await queryPromises(queryAddress,[userId]);
+
      dataUserDetails[0].KYC=dataKYC[0];
+     dataUserDetails[0].address=dataAddress;
     return res.status(200).json({
       status: "success",
       message: "Successfully fetched user details",
