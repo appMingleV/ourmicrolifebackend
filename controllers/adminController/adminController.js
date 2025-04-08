@@ -405,20 +405,20 @@ WHERE u.id = ?
   }
 };
 
-export const KYCDetails=async(req,res)=>{
-    try{
-      const {userId}=req.params;
-      if(!userId)return res.status(200).json({
-
-      })
-    }catch(err){
-         return res.status(500).json({
-      status: "failed",
-      message: "Error fetching user details",
-      error: err.message
-    })
-}
-}
+// export const KYCDetails=async(req,res)=>{
+//     try{
+//       const {userId}=req.params;
+//       if(!userId)return res.status(200).json({
+                 
+//       })
+//     }catch(err){
+//          return res.status(500).json({
+//       status: "failed",
+//       message: "Error fetching user details",
+//       error: err.message
+//     })
+// }
+// }
 
 export const addUPI=async(req,res)=>{
     try{
@@ -501,12 +501,12 @@ async function setMLMWallet(userId){
          await queryPromises(queryAddMLMUser,value1);
          await queryPromises(queryAddMLMUser,value2);
 }
-const checkUserExists = (query,userId)=>{
+// const checkUserExists = (query,userId)=>{
         
-}
+// }
 export const vendorOrderList = async (req, res) => {
     try {
-        console.log("vendor is order list")
+        
         const { vendorId } = req.params;
         const queryVendorOrder = `SELECT * FROM  order_items WHERE vendor_id=?`;
         const values = [vendorId];

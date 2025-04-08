@@ -85,8 +85,8 @@ export const verifyOTP = async (req, res) => {
         console.log(otpStorage[mobile_number]);
         if (otpStorage[mobile_number] && otpStorage[mobile_number].otp === otp) {
             const token = jwt.sign({ mobile_number }, process.env.JWT_SECRET)
-            const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number,api_token) VALUES (?,?,?,?,?)`
-            const value = [otpStorage[mobile_number].first_name, otpStorage[mobile_number].last_name,otpStorage[mobile_number].email, mobile_number,token];
+            const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number,api_token,created_at) VALUES (?,?,?,?,?,?)`
+            const value = [otpStorage[mobile_number].first_name, otpStorage[mobile_number].last_name,otpStorage[mobile_number].email, mobile_number,token,new Date()];
             const userSet = await queryPromise(querySignup, value);
 
             if (!userSet) {
