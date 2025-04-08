@@ -266,11 +266,18 @@ export const getAllUserDetails = async (req, res) => {
         u.first_name,
         u.last_name,
         u.email,
+        u.MLMStatus,
         u.mobile_number,
         r.referral_link,
-        r.referral_code
+        r.referral_code,
+        t.id AS transition_id,
+        b.id AS bank_id,
+        k.id AS kyc_id
       FROM tbl_users u
       LEFT JOIN refferal r ON u.id = r.user_id
+      LEFT JOIN Transition t ON u.id = t.user_id
+      LEFT JOIN bank_nominee_details b ON u.id = b.user_id
+      LEFT JOIN user_KYC k ON u.id = k.userId
     `;
 
     const rawData = await queryPromises(query);
@@ -279,6 +286,9 @@ export const getAllUserDetails = async (req, res) => {
       const {
         referral_link,
         referral_code,
+        transition_id,
+        bank_id,
+        kyc_id,
         ...userDetails
       } = user;
 
@@ -287,7 +297,10 @@ export const getAllUserDetails = async (req, res) => {
         referral: (referral_link || referral_code) ? {
           referral_link,
           referral_code
-        } : null
+        } : null,
+        paymentMLM: !!transition_id,
+        bankDetails: !!bank_id,
+        userKYC: !!kyc_id
       };
     });
 
