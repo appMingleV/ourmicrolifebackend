@@ -517,7 +517,7 @@ export const addBankDetails = async (req, res) => {
 
     // console.log(req.files);
     // Validate required fields
-    if (!userId || !account_holder_name || !account_number || !confirm_account_number || !bank_name || !ifsc_code || !addharNumber || !panNumber) {
+    if (!userId || !account_holder_name || !account_number || !confirm_account_number || !bank_name || !ifsc_code ) {
       return res.status(400).json({
         status: "error",
         message: "Missing required fields",
@@ -536,7 +536,7 @@ export const addBankDetails = async (req, res) => {
     const checkBankDetails = `SELECT * FROM bank_nominee_details WHERE user_id = ?`;
     const values = [userId];
     const bankDetails = await queryPromise(checkBankDetails, values);
-    console.log("all is the ",req.files);
+
     if (bankDetails.length === 0) {
       // Insert new bank details if not found
       const insertQuery = `
