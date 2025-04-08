@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult,getSingleProduct,getAllProduct} from '../controllers/vendorAuth/product.js'
-import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails,addKYCDocuments,getUserKYCDetails,addUPI,getUPI} from '../controllers/userController/userController.js'
+import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails,addKYCDocuments,getUserKYCDetails,addUPI,getUPI,nomineeDetails,getNomineeDetails} from '../controllers/userController/userController.js'
 import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
 import multer from 'multer';
@@ -50,16 +50,7 @@ routes.get('/profile/:userId',getProfile)
 .post('/mlmMembers/:userId',upload.single('transaction_image'),payMLMAmount)
 .get('/walletTransactions/:userId',getWalletTransactions)
 .get('/order/:orderId',singleOrder)
-.post('/banks/:userId',upload.fields([{
-    name:"addharFront",
-    maxCount:1
-},{
-    name:"addharBack",
-    maxCount:1
-},{
-    name:"pan",
-    maxCount:1
-}]),addBankDetails)
+.post('/banks/:userId',addBankDetails)
 .post('/kycDetails/:userId',upload.fields([
     {
         name:"addharFront",
@@ -80,6 +71,17 @@ routes.get('/profile/:userId',getProfile)
 .get('/upiDetails/:userId',getUPI)
 .get('/banks/:userId',getBankDetails)
 .get('/allProduct',getAllProduct)
+.post('/nomineeDetails/:userId',upload.fields([{
+    name:"addharFront",
+    maxCount:1
+},{
+    name:"addharBack",
+    maxCount:1
+},{
+    name:"pan",
+    maxCount:1
+}]),nomineeDetails)
+.get('/nomineeDetails/:userId',getNomineeDetails)
 .get('/singleProduct/:productId',getSingleProduct)
 .use('/order',order);
 

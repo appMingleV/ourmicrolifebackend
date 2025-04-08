@@ -512,11 +512,6 @@ export const addBankDetails = async (req, res) => {
       confirm_account_number,
       bank_name,
       ifsc_code,
-      nominee_name,
-      nominee_address,
-      nominee_dob,
-      addharNumber,
-      panNumber
     } = req.body;
 
 
@@ -546,8 +541,8 @@ export const addBankDetails = async (req, res) => {
       // Insert new bank details if not found
       const insertQuery = `
         INSERT INTO bank_nominee_details 
-        (user_id, account_holder_name, account_number, confirm_account_number, bank_name, ifsc_code, nominee_name, nominee_address, nominee_dob,addharNumber,panNumber,addharFront,addharBack,pan) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)`;
+        (user_id, account_holder_name, account_number, confirm_account_number, bank_name, ifsc_code) 
+        VALUES (?, ?, ?, ?, ?, ?)`;
       
       const insertValues = [
         userId,
@@ -555,15 +550,7 @@ export const addBankDetails = async (req, res) => {
         account_number,
         confirm_account_number,
         bank_name,
-        ifsc_code,
-        nominee_name || null,
-        nominee_address || null,
-        nominee_dob || null,
-        addharNumber,
-        panNumber,
-        req?.files?.addharFront[0]?.filename,
-        req?.files?.addharBack[0]?.filename,
-        req?.files?.pan[0]?.filename
+        ifsc_code
       ];
 
       await queryPromise(insertQuery, insertValues);
@@ -634,6 +621,70 @@ export const getUPI = async (req, res) => {
     }
 }
 
+export const nomineeDetails=async(req,res)=>{
+    try{
+        const {userId}=req.params;
+        const {nomineeName,nomineeAddress,nomineeDob,nomineeAddharNumer,panNumber}=req.body;
+        
+ if (!userId || !nomineeName || !nomineeAddress || !nomineeDob || !nomineeAddharNumer || !panNumber) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing required fields",
+      });
+    }
+    
+    const insertQuery = `
+        UPDATE bank_nominee_details SET
+      nominee_name=?, nominee_address=?, nominee_dob=?,addharNumber=?,panNumber=?,addharFront=?,addharBack=?,pan=? WHERE user_id=?`;
+      const value=[nomineeName,nomineeAddress,nomineeDob,nomineeAddharNumer,panNumber,  req?.files?.addharFront[0]?.filename,  req?.files?.addharBack[0]?.filename,  req?.files?.pan[0]?.filename,userId]
+      const dataNomineeDetails=await queryPromise(insertQuery,value);
+      return res.status(200).json(
+        {
+            status:"suceessfully",
+            message:"nominee details sucessfully added"
+        }
+      )
+    }catch(err){
+          return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message
+        });
+    }
+}
+
+export const getNomineeDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID is required",
+      });
+    }
+    const queryNominee = `SELECT user_id,nominee_name,nominee_address,nominee_dob,addharNumber,panNumber,addharFront,addharBack,pan FROM bank_nominee_details WHERE user_id = ?`;
+    const nomineeDetails = await queryPromise(queryNominee, [userId]);
+
+    if (nomineeDetails.length === 0) {
+      return res.status(404).json({
+        status: "not_found",
+        message: "Nominee details not found for this user",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      data: nomineeDetails[0],
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      status: "failed",
+      message: "Unexpected error occurred",
+      error: err.message,
+    });
+  }
+};
 
 export const addKYCDocuments=async(req,res)=>{
         try{
