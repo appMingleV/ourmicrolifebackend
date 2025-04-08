@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult,getSingleProduct,getAllProduct} from '../controllers/vendorAuth/product.js'
-import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails,addKYCDocuments} from '../controllers/userController/userController.js'
+import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails,addKYCDocuments,getUserKYCDetails,addUPI,getUPI} from '../controllers/userController/userController.js'
 import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
 import multer from 'multer';
@@ -75,7 +75,9 @@ routes.get('/profile/:userId',getProfile)
         maxCount:1
     }
 ]),addKYCDocuments)
-.post('/upi',)
+.post('/upi/:userId',addUPI)
+.get('/KYCDetails/:userId',getUserKYCDetails)
+.get('/upiDetails/:userId',getUPI)
 .get('/banks/:userId',getBankDetails)
 .get('/allProduct',getAllProduct)
 .get('/singleProduct/:productId',getSingleProduct)

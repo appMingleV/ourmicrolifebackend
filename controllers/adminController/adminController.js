@@ -359,13 +359,13 @@ SELECT
   u.*, 
   r.referral_link,
   r.referral_code,
-  b.* 
-
+  b.*, 
+  f.*
 FROM tbl_users u
 LEFT JOIN refferal r ON u.id = r.user_id
 LEFT JOIN bank_nominee_details b ON u.id = b.user_id
+LEFT JOIN upi_user f ON u.id = f.userId
 WHERE u.id = ?
-
     `;
      
     const dataUserDetails = await queryPromises(queryDetailsUser, [userId]);
@@ -405,10 +405,26 @@ WHERE u.id = ?
   }
 };
 
+export const KYCDetails=async(req,res)=>{
+    try{
+      const {userId}=req.params;
+      if(!userId)return res.status(200).json({
+
+      })
+    }catch(err){
+         return res.status(500).json({
+      status: "failed",
+      message: "Error fetching user details",
+      error: err.message
+    })
+}
+}
+
 export const addUPI=async(req,res)=>{
     try{
          const {userId}=req.params;
          const {upiId,upiName}=req.body;
+         const queryAddDetails=``
          
     }catch(err){
         return res.status(500).json({

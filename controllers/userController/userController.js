@@ -291,7 +291,30 @@ export const verifyOtpNumber = async (req, res) => {
     }
 };
 
-
+export const getUserKYCDetails=async(req,res)=>{
+    try{
+         const {userId}=req.params;
+         if(!userId){
+             return res.status(404).json({
+            status: "failed",
+            message: "User id is required",
+        })
+         }
+         const queryDetails=`SELECT * FROM user_KYC WHERE userId=?`
+         const value=[userId]
+         const dataGetUser=await queryPromise(queryDetails,value);
+          return res.status(200).json({
+            status:"sucess",
+            dataGetUser
+          })
+    }catch(err){
+       return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message,
+        })
+    }
+}
 
 export const checkReferralActive = async (req, res) => {
     try {
@@ -563,6 +586,54 @@ export const addBankDetails = async (req, res) => {
   }
 };
 
+export const addUPI=async(req,res)=>{
+    try{
+        const {userId}=req.params;
+        const {upiId,upiName}=req.body
+        const queryAddUPI=`INSERT INTO upi_user (upiId,upiName,userId) VALUE (?,?,?)`;
+        const value=[upiId,upiName,userId]
+        const dataQuery=await queryPromise(queryAddUPI,value);
+        return res.status(201).json({
+            status:"sucessfully",
+            message:"upi details sucessfully added"
+        })
+
+    }catch(err){
+        return res.status(500).json({
+            status:"failed",
+            message:"Unexpected error occurred",
+            error:err.message
+        })
+    }
+}
+export const getUPI = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const queryGetUPI = `SELECT upiId, upiName FROM upi_user WHERE userId = ?`;
+        const data = await queryPromise(queryGetUPI, [userId]);
+
+        if (data.length === 0) {
+            return res.status(404).json({
+                status: "not_found",
+                message: "No UPI details found for this user"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            upiDetails: data
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message
+        });
+    }
+}
+
 
 export const addKYCDocuments=async(req,res)=>{
         try{
@@ -642,6 +713,7 @@ export const getBankDetails = async (req, res) => {
     });
   }
 };
+
 
 
 
