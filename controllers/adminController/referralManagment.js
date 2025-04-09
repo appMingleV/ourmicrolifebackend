@@ -2,7 +2,7 @@
 
 import pool from "../../config/db.js";
 
-
+import {directReferrals} from '../refferalController/refferController.js'
 export const directReferralAddCoins = async (req, res) => {
     try {
         const { coin } = req.body;
@@ -163,17 +163,27 @@ export const getUserTree=async(req,res)=>{
          const value=[userId];
          const dataUserTeam=await queryPromise(queryUserDetails,value);
          const parentTree=[];
-         const team=JSON.parse(dataUserTeam[0]?.team)
+         const team=JSON.parse(dataUserTeam[0]?.team || "[]")
+        
          for(let i of team){
+            const obj={};
             const queryDataUser=`SELECT user_id FROM team_referral WHERE id=?`
-            const DataUserTeam=[i];
-            
-            console.log(i);
+            const DataUserTeam=await queryPromise(queryDataUser,[i]);
+            const userPId=DataUserTeam[0]?.user_id
+            const queryUserDetails=`SELECT first_name,last_name FROM tbl_users WHERE id=?`
+            const valueData=[userPId]
+            const dataUserName=await queryPromise(queryUserDetails,valueData);
+             obj.userId= userPId
+             obj.firstName=dataUserName[0]?.first_name 
+             obj.lastName=dataUserName[0]?.last_name
+             parentTree.push(obj);   
          }
-
+         const  TeamData=await   directReferrals(userId);
          return res.status(200).json({
             status:"succes",
-            message:"get all details"
+            message:"get all details",
+            parentTree,
+            TeamData
          })
     }catch(err){
      return res.status(500).json({

@@ -667,14 +667,15 @@ export const getNomineeDetails = async (req, res) => {
       });
     }
     const queryNominee = `SELECT user_id,nominee_name,nominee_address,nominee_dob,addharNumber,panNumber,addharFront,addharBack,pan FROM bank_nominee_details WHERE user_id = ?`;
-    const nomineeDetails = await queryPromise(queryNominee, [userId]);
 
-    if (nomineeDetails.length === 0) {
-      return res.status(404).json({
+    const nomineeDetails = await queryPromise(queryNominee, [userId]);
+    if((nomineeDetails[0]?.nominee_name==null &&  nomineeDetails[0]?.nominee_address==null &&  nomineeDetails[0]?.nominee_dob==null  &&  nomineeDetails[0]?.addharNumber==null  &&  nomineeDetails[0]?.panNumber==null  &&  nomineeDetails[0]?.addharFront==null &&  nomineeDetails[0]?.addharBack==null  &&  nomineeDetails[0]?.pan==null) || nomineeDetails.length === 0 ){
+        return res.status(404).json({
         status: "not_found",
         message: "Nominee details not found for this user",
-      });
+        })
     }
+    
 
     return res.status(200).json({
       status: "success",

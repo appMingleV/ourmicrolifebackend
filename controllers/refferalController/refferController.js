@@ -449,17 +449,12 @@ function getDirectRefferalUsers(userId) {
     })
 
 }
-function directReferrals(userId) {
+export function directReferrals(userId) {
     return new Promise(async (resolve, reject) => {
         const directRefferalUsers = await getDirectRefferalUsers(userId);
-
-
         const { objTeamData, objUserTeam, objDirectRefferal } = await getUserProfileRefferalUsers(directRefferalUsers);
-
-       console.log("check teeam data=====================> ",directRefferalUsers)
         const successData = [];
         for (let i = 0; i < objTeamData?.length; i++) {
-
             const userName = objUserTeam[i][0]?.first_name + " " + objUserTeam[i][0]?.last_name;
             const level = objUserTeam[i][0]?.level;
             const status = objUserTeam[i][0]?.status;
@@ -493,13 +488,16 @@ function directReferrals(userId) {
 
 
 export function getTeams(userId) {
+ 
     return new Promise(async (resolve, reject) => {
         const teamQuery = `SELECT teams,coins,date FROM team_referral WHERE user_id =?`
         const value = [userId]
         console.log("user Id is ",userId);
         const teamData = await queryPromise(teamQuery, value);
+       
         const objRef = [];
-        console.log(teamData);
+        if(teamData.length==0)return resolve(objRef)
+  
         if(teamData.length===0){
             return 
         }
@@ -529,7 +527,6 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
             const value = [directRef?.referral_to];
             const profileData = await queryPromise(queryUserPorfile, value);
             // direct refferal user Profile Team--->
-            console.log("direct referral ---> ",directRef.referral_to)
             const queryUserTeam = `SELECT teams FROM team_referral  WHERE user_id=?`;
 
             const teamData = await queryPromise(queryUserTeam, value);
