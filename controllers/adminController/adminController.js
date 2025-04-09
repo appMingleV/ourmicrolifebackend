@@ -418,6 +418,30 @@ WHERE u.id = ?
   }
 };
 
+export const getHightestCoin=async(req,res)=>{
+    try{
+          const queryUserCoins=`SELECT 
+          c.*,
+          r.*
+          FROM coins c
+          LEFT JOIN tbl_users r ON c.id = r.id
+          ORDER BY c.value DESC
+          `
+          const dataUserCoins=await queryPromises(queryUserCoins);
+        
+          return res.status(200).json({
+            status:"sucessfully",
+            message:"Get All Details of Users",
+            dataUserCoins
+          })
+    }catch(err){
+        return res.status(500).json({
+      status: "failed",
+      message: "Error fetching user details",
+      error: err.message
+    });
+    }
+}
 // export const KYCDetails=async(req,res)=>{
 //     try{
 //       const {userId}=req.params;

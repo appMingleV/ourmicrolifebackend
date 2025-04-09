@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {addCategory,editCategory,deleteCategory,singleCategory,getAllCategories} from '../controllers/adminController/categoryContoller.js'
-import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList,getMLMUser,upateMLMMemberStatus,getnewMLMUser,getBankDetails,getAllUserDetails,getSingleUser} from '../controllers/adminController/adminController.js'
+import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList,getMLMUser,upateMLMMemberStatus,getnewMLMUser,getBankDetails,getAllUserDetails,getSingleUser,getHightestCoin} from '../controllers/adminController/adminController.js'
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
 
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
@@ -63,6 +63,7 @@ routes.get('/vendorSingle/:vendorId',singleVendor)
 routes.put('/vendorStatus/:vendorId',vedorChangeStatus)
 routes.get('/vendor/:vendorId/order',vendorOrderList)
 .get('/mlmUser/tree/:userId',getUserTree)
+.get('/hightestCoin/mlmUser',getHightestCoin)
 .post('/mlm/login',mlmLogin)
 
 
