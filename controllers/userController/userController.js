@@ -632,6 +632,9 @@ export const nomineeDetails=async(req,res)=>{
         message: "Missing required fields",
       });
     }
+
+    console.log("result ======>  ",req.body)
+    console.log("result ======>  ",req.files)
     
     const insertQuery = `
         UPDATE bank_nominee_details SET
