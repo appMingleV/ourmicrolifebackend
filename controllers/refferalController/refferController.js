@@ -492,7 +492,7 @@ function directReferrals(userId) {
 }
 
 
-function getTeams(userId) {
+export function getTeams(userId) {
     return new Promise(async (resolve, reject) => {
         const teamQuery = `SELECT teams,coins,date FROM team_referral WHERE user_id =?`
         const value = [userId]

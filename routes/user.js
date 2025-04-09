@@ -83,6 +83,7 @@ routes.get('/profile/:userId',getProfile)
 }]),nomineeDetails)
 .get('/nomineeDetails/:userId',getNomineeDetails)
 .get('/singleProduct/:productId',getSingleProduct)
+
 .use('/order',order);
 
 

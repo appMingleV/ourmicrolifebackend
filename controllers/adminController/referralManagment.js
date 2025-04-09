@@ -155,6 +155,35 @@ export const teamReferralManagement = async (req, res) => {
 
 }
 
+
+export const getUserTree=async(req,res)=>{
+    try{
+         const {userId}=req.params;
+         const queryUserDetails=`SELECT team FROM tbl_users WHERE id=?`;
+         const value=[userId];
+         const dataUserTeam=await queryPromise(queryUserDetails,value);
+         const parentTree=[];
+         const team=JSON.parse(dataUserTeam[0]?.team)
+         for(let i of team){
+            const queryDataUser=`SELECT user_id FROM team_referral WHERE id=?`
+            const DataUserTeam=[i];
+            
+            console.log(i);
+         }
+
+         return res.status(200).json({
+            status:"succes",
+            message:"get all details"
+         })
+    }catch(err){
+     return res.status(500).json({
+            status: "failed",
+            message: "An error occurred while trying to fetch team referral coins",
+            error: err.message
+        })
+    }
+} 
+
 export const geTeamReferralCoin = async (req, res) => {
     try {
         const getQueryData = `SELECT * FROM team_referral_coin  `;

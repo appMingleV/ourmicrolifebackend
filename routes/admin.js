@@ -7,6 +7,7 @@ import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAl
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
 import {addSlider,allSlider,deleteSlider} from '../controllers/adminController/sliderController.js'
 import {decryptRefferal} from '../middleware/index.js'
+import {getUserTree} from '../controllers/adminController/referralManagment.js'
 import {mlmLogin} from '../controllers/adminController/adminController.js'
 import referral from './referral.js'
 import coupons from './coupons.js'
@@ -61,6 +62,7 @@ routes.get('/vendor/:query',vedorList)
 routes.get('/vendorSingle/:vendorId',singleVendor)
 routes.put('/vendorStatus/:vendorId',vedorChangeStatus)
 routes.get('/vendor/:vendorId/order',vendorOrderList)
+.get('/mlmUser/tree/:userId',getUserTree)
 .post('/mlm/login',mlmLogin)
 
 
