@@ -623,6 +623,7 @@ export const getUPI = async (req, res) => {
 
 export const nomineeDetails=async(req,res)=>{
     try{
+        console.log("=========> hello is not ")
         const {userId}=req.params;
         const {nomineeName,nomineeAddress,nomineeDob,nomineeAddharNumer,panNumber}=req.body;
         
