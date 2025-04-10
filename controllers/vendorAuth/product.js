@@ -192,7 +192,7 @@ export const editProduct=async(req,res)=>{
     try {
         const { productId } = req.params;
         let {
-          productName,
+          name,
           description,
           quantity,
           coin,
