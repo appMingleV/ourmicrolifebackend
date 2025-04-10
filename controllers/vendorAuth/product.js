@@ -225,7 +225,7 @@ export const editProduct=async(req,res)=>{
           WHERE id = ?
         `;
         const updateProductValues = [
-          productName,
+          name,
           description,
           quantity,
           status,
