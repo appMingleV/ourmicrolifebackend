@@ -422,9 +422,10 @@ export const getHightestCoin=async(req,res)=>{
     try{
           const queryUserCoins=`SELECT 
           c.*,
+          r.id,
           r.*
           FROM coins c
-          LEFT JOIN tbl_users r ON c.id = r.id
+          LEFT JOIN tbl_users r ON c.user_id = r.id
           ORDER BY c.value DESC
           `
           const dataUserCoins=await queryPromises(queryUserCoins);
