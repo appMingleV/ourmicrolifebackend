@@ -111,7 +111,7 @@ export const addProduct = async (req, res) => {
     let { name, description, quantity, coin, status, category_id, sub_category_id, brandName, prices } = req.body;
     
     const featuredImage = req?.files?.[0]?.filename || "";
-    const images=[];
+    let images=[];
   
     for(let i=1;i<req?.files.length;i++){
      
@@ -149,11 +149,13 @@ export const addProduct = async (req, res) => {
       if (!priceId) throw new Error("Failed to insert product price");
       
       // Insert images for each product price
+      if(images[i]){
       for (const image of images[i]) {
         const imageQuery = `INSERT INTO product_price_images (product_price_id, image_path) VALUES (?, ?)`;
         const imageValues = [priceId, image];
         await queryPromis(imageQuery, imageValues);
       }
+    }
       
       // Insert configurations
       for (const config of configuration || []) {
@@ -189,7 +191,7 @@ const addConfigurations = async (config, productId) => {
 export const editProduct=async(req,res)=>{
     try {
         const { productId } = req.params;
-        const {
+        let {
           productName,
           description,
           quantity,
@@ -200,14 +202,26 @@ export const editProduct=async(req,res)=>{
           brandName,
           prices,
         } = req.body;
-      // console.log("price is not",req.files);
-      const featuredImage = req?.files?.[0]?.filename || "";
-       
+      prices = JSON.parse(prices);
+      let index=req?.files?.[0]?.fieldname==="featured_image"?1:0
+      const featuredImage = index-1==0?req?.files?.[0]?.filename:"";
+      let images=new Array(prices.length);
+      
+      
+       for(let i=index;i<req?.files.length;i++){
+        let indexPrice=+req?.files[i]?.fieldname
+         if(!images[indexPrice]){
+           images[indexPrice]=[req.files[i]?.filename]; 
+        }else{
+        images[indexPrice].push(req.files[i]?.filename)
+        }
+        }
+        console.log("image is not =======>      ",images);
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
           SET name = ?,  description = ?, quantity = ?, status = ?,  category_id = ?, sub_category_id = ?, 
-              brand_name = ?, coin = ? 
+              brand_name = ?, coin = ? ,featured_image=?
           WHERE id = ?
         `;
         const updateProductValues = [
@@ -219,6 +233,7 @@ export const editProduct=async(req,res)=>{
           subCategoryId,
           brandName,
           coin,
+          featuredImage,
           productId,
         ];
         const updateProductResult = await queryPromis(updateProductQuery, updateProductValues);
@@ -231,9 +246,9 @@ export const editProduct=async(req,res)=>{
         }
   
         // Update prices and configurations
-        prices = JSON.parse(prices);
-        for (const price of prices) {
-          await updatePriceAndImages(price);
+        
+        for (let i=0;i<prices.length;i++) {
+          await updatePriceAndImages(i,prices[i],images);
         }
          
         return res.status(200).json({
@@ -251,7 +266,7 @@ export const editProduct=async(req,res)=>{
     
 }
 
-const updatePriceAndImages = async (price) => {
+const updatePriceAndImages = async (i,price,images) => {
   
     const priceId = price.id;
     const color = price.color_name;
@@ -259,13 +274,21 @@ const updatePriceAndImages = async (price) => {
      // Update price details
     const updatePriceQuery = `UPDATE product_prices SET color_name=?,config1=? WHERE id = ?`;
     const updatePriceValues = [color,congfig1, priceId];
-    console.log("prices ===========>      ",price);
+  
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
     if (!updatedPrice) {
       throw new Error("Price update failed");
     }
-    // Insert images for this priceId
-    // Update configurations for this price
+    //insert images-->
+
+    if(images[i]){
+     for (const image of images[i]) {
+        const imageQuery = `INSERT INTO product_price_images (product_price_id, image_path) VALUES (?, ?)`;
+        const imageValues = [priceId, image];
+        await queryPromis(imageQuery, imageValues);
+      
+      }
+    }
     for (const config of price?.config) {
      const updatedDataConfig= await updateConfigurations(config);
   
