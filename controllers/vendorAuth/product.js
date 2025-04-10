@@ -200,7 +200,8 @@ export const editProduct=async(req,res)=>{
           brandName,
           prices,
         } = req.body;
-  
+      // console.log("price is not",req.files);
+      const featuredImage = req?.files?.[0]?.filename || "";
        
         // Update the product's basic info
         const updateProductQuery = `
@@ -230,7 +231,7 @@ export const editProduct=async(req,res)=>{
         }
   
         // Update prices and configurations
-  
+        prices = JSON.parse(prices);
         for (const price of prices) {
           await updatePriceAndImages(price);
         }
@@ -258,6 +259,7 @@ const updatePriceAndImages = async (price) => {
      // Update price details
     const updatePriceQuery = `UPDATE product_prices SET color_name=?,config1=? WHERE id = ?`;
     const updatePriceValues = [color,congfig1, priceId];
+    console.log("prices ===========>      ",price);
     const updatedPrice = await queryPromis(updatePriceQuery, updatePriceValues);
     if (!updatedPrice) {
       throw new Error("Price update failed");
@@ -425,6 +427,24 @@ export const getAllProduct=async(req,res)=>{
     return res.status(200).json({
       status:"sucessfully",
       data:result
+    })
+  }catch(err){
+    return res.status(500).json({
+      status:"error",
+      message:"Something went wrong while trying to get all product",
+      error:err.message
+    })
+  }
+}
+
+export const delateImage=async(req,res)=>{
+  try{
+    const {imageId}=req.params;
+    const queryDelete=`DELETE FROM product_price_images WHERE id=?`
+    const dataImage=await queryPromis(queryDelete,[imageId]);
+    return res.status(200).json({
+      status:"sucessfully",
+      message:"delete image sucessfully images"
     })
   }catch(err){
     return res.status(500).json({

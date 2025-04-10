@@ -111,6 +111,7 @@ routes.get('/newMLMUser',getMLMUser)
 .get('/allUserDetails',getAllUserDetails)
 .get('/banksdetails',getBankDetails)
 
+
 routes.use('/referral',referral)
 routes.use('/coupon',coupons)
 
