@@ -142,7 +142,7 @@ export const addProduct = async (req, res) => {
     const productQuery = `INSERT INTO products (vendor_id, name, featured_image, description, quantity, coin, status, category_id, sub_category_id, brand_name)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
-    const productValues = [vendorId, name, featuredImage, description, quantity, coin, status, category_id, sub_category_id, brandName];
+    const productValues = [vendorId, name, featuredImage, description, quantity, coin, status, category_id, sub_category_id, brand_name];
     const productResult = await queryPromis(productQuery, productValues);
     
     const productId = productResult?.insertId;
