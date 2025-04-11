@@ -583,7 +583,80 @@ export const getRefferalUser = (req, res) => {
 }
 
 
-
+export const UsercustomFilter = async (req, res) => {
+    try {
+      const { positions = "", date, from, to } = req.query;
+      const selectedPositions = positions.split(",").filter(Boolean);
+  
+      if (selectedPositions.length === 0) {
+        return res.status(400).json({ status: "failed", message: "No position selected." });
+      }
+  
+      const positionMap = {
+        signup: { status: "signUp_status", date: "created_at" },
+        payment: { status: "paid_status_", date: "Paid_Date" },
+        bankDetail: {
+          status: "filled_bankDetail",
+          date: "filled_bankDetail_Date",
+        },
+        kyc: { status: "kyc_status", date: "kyc_status_Date" },
+        complete: { status: "COMPLETED", date: "DateOfJoin" },
+        mlm: { status: "MLMStatus", date: null },
+      };
+  
+      const whereClauses = [];
+  
+      for (let pos of selectedPositions) {
+        const config = positionMap[pos];
+        if (!config) continue;
+  
+        let clause = `${config.status} = 1`;
+  
+        if (config.date) {
+          if (date) {
+            clause += ` AND DATE(${config.date}) = '${date}'`;
+          } else if (from && to) {
+            clause += ` AND DATE(${config.date}) BETWEEN '${from}' AND '${to}'`;
+          }
+        }
+  
+        whereClauses.push(`(${clause})`);
+      }
+  
+      if (whereClauses.length === 0) {
+        return res.status(400).json({
+          status: "failed",
+          message: "Invalid position or date filters.",
+        });
+      }
+  
+      const finalWhereClause = whereClauses.join(" AND ");
+      const query = `SELECT * FROM tbl_users WHERE ${finalWhereClause}`;
+  
+      pool.query(query, (err, result) => {
+        if (err) {
+          return res.status(500).json({
+            status: "failed",
+            message: "Operation failed",
+            error: err.message,
+          });
+        }
+  
+        return res.status(200).json({
+          status: "success",
+          message: "Operation successful",
+          Data: result,
+        });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "failed",
+        message: "Unexpected error",
+        error: error.message,
+      });
+    }
+  };
+  
 
 
 

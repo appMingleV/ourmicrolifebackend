@@ -492,8 +492,15 @@ export const upateMLMMemberStatus=async(req,res)=>{
                 message: "No MLM Member found with this id"
             })
         }
+        ///////////////////////////////////////////////////////////
         if(status=="accepted"){
-        const queryUpdateMlmStatus=`UPDATE tbl_users SET MLMStatus=?,level="Sahyogi" WHERE id=?`
+            const queryUpdateMlmStatus = `
+            UPDATE tbl_users 
+            SET MLMStatus = ?, 
+                MLMStatus_date = CURDATE(), 
+                level = "Sahyogi" 
+            WHERE id = ?
+          `;
         console.log(status);
         const values1=[true,userId];
         const startDate = new Date();

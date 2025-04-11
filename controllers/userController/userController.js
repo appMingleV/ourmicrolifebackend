@@ -82,11 +82,12 @@ export const signupController = async (req, res) => {
 export const verifyOTP = async (req, res) => {
     const { mobile_number, otp } = req.body;
     try {
+        ////////////////////////////////////////////////////////signup_status
         console.log(otpStorage[mobile_number]);
         if (otpStorage[mobile_number] && otpStorage[mobile_number].otp === otp) {
             const token = jwt.sign({ mobile_number }, process.env.JWT_SECRET)
-            const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number,api_token,created_at) VALUES (?,?,?,?,?,?)`
-            const value = [otpStorage[mobile_number].first_name, otpStorage[mobile_number].last_name,otpStorage[mobile_number].email, mobile_number,token,new Date()];
+            const querySignup = `INSERT INTO tbl_users (first_name,last_name,email,mobile_number,api_token,created_at,signUp_status) VALUES (?,?,?,?,?,?,?)`
+            const value = [otpStorage[mobile_number].first_name, otpStorage[mobile_number].last_name,otpStorage[mobile_number].email, mobile_number,token,new Date(),1];
             const userSet = await queryPromise(querySignup, value);
 
             if (!userSet) {
@@ -451,10 +452,17 @@ export const payMLMAmount = async (req, res) => {
                 message: "server error",
             })
         }
+
         const queryUser=`SELECT * FROM tbl_users WHERE id=?`;
         const userDetails=await queryPromise(queryUser,[userId]);
         const dataUser=userDetails[0];
         adminConfirmationMailtoUser(dataUser.email,dataUser.first_name,dateTransaction,dateTransaction)
+
+        ///////////////////////////////////////////////////////////////////////
+        //updating paid status and paid date
+        const queryUsr = `UPDATE tbl_users SET paid_status_ = 1, Paid_Date = CURDATE() WHERE id = ?`;
+        await queryPromise(queryUsr,[userId]);
+
         return res.status(200).json({
             status: "success",
             message: "MLM amount added successfully",
@@ -554,6 +562,11 @@ export const addBankDetails = async (req, res) => {
       ];
 
       await queryPromise(insertQuery, insertValues);
+
+      ///////////////////////////////////////////////////////////////////////////
+      const updateQuery = `UPDATE tbl_users SET filled_bankDetail=1, filled_bankDetail_Date = CURDATE() WHERE id = ?`;
+
+      await queryPromise(updateQuery, [userId]);
 
       return res.status(201).json({
         status: "success",
@@ -720,6 +733,13 @@ export const addKYCDocuments=async(req,res)=>{
         }
         )
     }
+    ///////////////////////////////////////////////////////////////////////////////
+    const updateUserQuery = `UPDATE tbl_users SET kyc_status = 1, kyc_status_Date = CURDATE() WHERE id = ?`;
+    await queryPromise(updateUserQuery, [userId]);
+////////////both upper down
+    const query = `UPDATE tbl_users SET COMPLETED = 1, DateOfJoin = CURDATE() WHERE id = ? AND MLMStatus = 1 AND filled_bankDetail = 1 AND kyc_status = 1 AND paid_status_ = 1`;
+    await queryPromise(query, [userId]);
+
     return res.status(201).json({
         status:"sucessfully",
         message:"KYC details added sucessfuly",
