@@ -200,13 +200,14 @@ export const editProduct=async(req,res)=>{
           category_id,
           sub_category_id,
           brand_name,
+          featured_image,
           prices,
         } = req.body;
       prices = JSON.parse(prices);
+      console.log(featured_image);
       let index=req?.files?.[0]?.fieldname==="featured_image"?1:0
-      const featuredImage = index-1==0?req?.files?.[0]?.filename:"";
+      const featuredImage = index-1==0?req?.files?.[0]?.filename:featured_image;
       let images=new Array(prices.length);
-      
       
        for(let i=index;i<req?.files.length;i++){
         let indexPrice=+req?.files[i]?.fieldname
@@ -216,7 +217,7 @@ export const editProduct=async(req,res)=>{
         images[indexPrice].push(req.files[i]?.filename)
         }
         }
-        console.log("image is not =======>      ",images);
+        
         // Update the product's basic info
         const updateProductQuery = `
           UPDATE products 
@@ -237,7 +238,7 @@ export const editProduct=async(req,res)=>{
           productId,
         ];
         const updateProductResult = await queryPromis(updateProductQuery, updateProductValues);
-       
+      
         if (!updateProductResult) {
           return res.status(400).json({
             status: "error",
