@@ -34,3 +34,15 @@ export const updateOrder=async(req,res)=>{
     })
    }
 }
+
+export const orderDetails=async(req,res)=>{
+   try{
+      // const {}
+   }catch(err){
+      return res.status(500).json({
+         status:"success",
+         message: "Something went wrong while trying to delete coupon",
+         error: err.message
+      })
+   }
+}

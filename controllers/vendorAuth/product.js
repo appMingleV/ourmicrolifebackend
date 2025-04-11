@@ -261,6 +261,7 @@ export const editProduct=async(req,res)=>{
   
         // Update prices and configurations
         for (let i=0;i<prices.length;i++) {
+          console.log(prices[i]);
           await updatePriceAndImages(i,prices[i],images,productId);
         }
          
@@ -317,7 +318,7 @@ const updatePriceAndImages = async (i,price,images,productId) => {
         console.log("hello new addtion ")
       const {  config1,configValue ,configuration } = price;
       const priceQuery = `INSERT INTO product_prices (color_name, config1, product_id) VALUES (?, ?, ?)`;
-      const priceValues = [configValue, config1, productId ];
+      const priceValues = [color, config1, productId ];
       const priceResult = await queryPromis(priceQuery, priceValues);
       
      priceId = priceResult?.insertId;
@@ -525,6 +526,41 @@ export const getAllProduct=async(req,res)=>{
   }
 }
 
+export const delateConfigProduct=async(req,res)=>{
+  try{
+    const {configId}=req.params;
+    const queryDelete=`DELETE FROM product_configurations WHERE id=?`
+    const dataImage=await queryPromis(queryDelete,[configId]);
+    return res.status(200).json({
+      status:"sucessfully",
+      message:"delete image sucessfully images"
+    })
+  }catch(err){
+    return res.status(500).json({
+      status:"error",
+      message:"Something went wrong while trying to get all product",
+      error:err.message
+    })
+  }
+}
+
+export const delatePriceProduct=async(req,res)=>{
+  try{
+    const {priceId}=req.params;
+    const queryDelete=`DELETE FROM product_prices WHERE id=?`
+    const dataImage=await queryPromis(queryDelete,[priceId]);
+    return res.status(200).json({
+      status:"sucessfully",
+      message:"delete image sucessfully images"
+    })
+  }catch(err){
+    return res.status(500).json({
+      status:"error",
+      message:"Something went wrong while trying to get all product",
+      error:err.message
+    })
+  }
+}
 export const delateImage=async(req,res)=>{
   try{
     const {imageId}=req.params;
