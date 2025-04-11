@@ -456,6 +456,8 @@ export function directReferrals(userId) {
         const successData = [];
         for (let i = 0; i < objTeamData?.length; i++) {
             const userName = objUserTeam[i][0]?.first_name + " " + objUserTeam[i][0]?.last_name;
+            const id=objUserTeam[i][0]?.id
+            console.log("=======",id)
             const level = objUserTeam[i][0]?.level;
             const status = objUserTeam[i][0]?.status;
             const image= objUserTeam[i][0]?.profile_picture
@@ -477,7 +479,8 @@ export function directReferrals(userId) {
                 image,
                 date,
                 MLMStatus,
-                directRefMembers
+                directRefMembers,
+                id
             })
 
         }
@@ -523,7 +526,7 @@ function getUserProfileRefferalUsers(directRefferalUsers) {
         for (let directRef of directRefferalUsers) {
             //directRef--> { referral_to: 27 }
             //direct RefferalUser Profile--->
-            const queryUserPorfile = `SELECT first_name,last_name,level,status,profile_picture,MLMStatus FROM  tbl_users WHERE id=?`;
+            const queryUserPorfile = `SELECT first_name,last_name,level,status,profile_picture,MLMStatus,id FROM  tbl_users WHERE id=?`;
             const value = [directRef?.referral_to];
             const profileData = await queryPromise(queryUserPorfile, value);
             // direct refferal user Profile Team--->
