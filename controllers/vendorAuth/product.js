@@ -83,12 +83,25 @@ export const dimensionsProduct= async (req,res)=>{
             status: "failed",
             message: "No products found matching the search term",
         })
-        for(let key of searchData) {
-          const queryConfig=`SELECT * FROM product_configurations WHERE products=?`
+         for(let key of searchData) {
+           
+           const queryProductPrice=`SELECT * FROM  product_prices WHERE product_id=?`
+           const dataPrice=await queryPromis(queryProductPrice,[key?.id]);
+           const prices=[];
         
-           const dataConfig=await queryPromis(queryConfig,[key.id]);
-        
-           key.config=dataConfig;
+          
+           for(let i of dataPrice){
+              i.config=[]
+              const queryConfig=`SELECT * FROM product_configurations WHERE products=?`
+              
+           const dataConfig=await queryPromis(queryConfig,[i.id]);
+          //  console.log("==============>      ",dataConfig)
+           i.config.push(dataConfig);
+           prices.push(i);
+           }
+          
+           key.price=prices
+          //  key.config=dataConfig;
         }
         return res.status(200).json({
             status: "success",
