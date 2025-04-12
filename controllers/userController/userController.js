@@ -296,8 +296,6 @@ export const withdrawRequest=async(req,res)=>{
     try{
       const {userId}=req.params;
       const {amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus,finalAmount}=req.body;
-      console.log("user id is ",userId)
-      console.log("body ",req.body)
       if(!userId || !amount || !pensionCharge || !TDS || !serviceCharge  || !paymentType || !paymentTypeId || !paymentStatus || !finalAmount){
           return res.status(404).json({
             status:"failed",

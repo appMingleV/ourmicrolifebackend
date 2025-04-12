@@ -268,6 +268,7 @@ export const getAllUserDetails = async (req, res) => {
         u.email,
         u.MLMStatus,
         u.mobile_number,
+        u.level,
         r.referral_link,
         r.referral_code,
         t.id AS transition_id,
@@ -649,6 +650,27 @@ export const getBankDetails =async (req, res) =>{
             message: "Bank details fetched successfully",
             data: dataBanks,
         })
+    }catch(err){
+        return res.status(500).json({
+            status: "error",
+            message: "Something went wrong while trying to fetch bank details",
+            error: err.message
+        })
+    }
+}
+
+export const withdrawUser=async(req,res)=>{
+    try{
+     const queryAllUser=`SELECT * FROM Withdraw`;
+     const dataAllUser=await queryPromises(queryAllUser);
+
+     if(dataAllUser.length==0){
+        return res.status(404).json({
+          status:"success",
+          message:""
+        })
+     }
+
     }catch(err){
         return res.status(500).json({
             status: "error",
