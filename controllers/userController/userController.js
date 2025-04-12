@@ -292,6 +292,61 @@ export const verifyOtpNumber = async (req, res) => {
     }
 };
 
+export const withdrawRequest=async(req,res)=>{
+    try{
+      const {userId}=req.params;
+      const {amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus,finalAmount}=req.body;
+      console.log("user id is ",userId)
+      console.log("body ",req.body)
+      if(!userId || !amount || !pensionCharge || !TDS || !serviceCharge  || !paymentType || !paymentTypeId || !paymentStatus || !finalAmount){
+          return res.status(404).json({
+            status:"failed",
+            message:"All fields are required"
+          })
+      }
+      const queryWithdrawReq=`INSERT INTO Withdraw (userId,amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus,finalAmount) VALUES (?,?,?,?,?,?,?,?,?)`
+      const values=[userId,amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus || "inprogress",finalAmount];
+      const dataWithdraw=await queryPromise(queryWithdrawReq,values);
+      return res.status(201).json({
+        status:"success",
+        message:"request successfully submitted"
+      })
+    }catch(err){
+        return res.status(500).json(
+            {
+            status: "failed",
+            message: "Unexpected error occurred",
+            error: err.message,
+        })
+    }
+}
+
+
+export const getAllTrasaction=async(req,res)=>{
+    try{
+        const {userId}=req.params;
+        const queryGetAllWithdraw=`SELECT * FROM Withdraw userId=?`
+        const dataWithdraw=await queryPromise(queryGetAllWithdraw,[userId]);
+        if(dataWithdraw.length==0){
+            return res.status(200).json({
+                status:"success",
+                message:"user withdraw history is not found"
+            })
+        }
+        return res.status(200).json({
+            status:"success",
+            message:"all withdraw details fetch successfully",
+            data:dataWithdraw
+        })
+
+    }catch(err){
+        return res.status(500).json({
+            status:"failed",
+            message: "Unexpected error occurred",
+            error: err.message, 
+        })
+    }
+}
 export const getUserKYCDetails=async(req,res)=>{
     try{
          const {userId}=req.params;

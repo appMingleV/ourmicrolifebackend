@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {getALLTotalCouponsTotalAmount,applyCouponsTotalAmount,getALLCategoryCoupons,applyCategoryCoupon,getALLSubCategoryCoupons,applySubCategoryCoupon} from '../controllers/adminController/couponsController.js'
 import {searchResult,getSingleProduct,getAllProduct} from '../controllers/vendorAuth/product.js'
-import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails,addKYCDocuments,getUserKYCDetails,addUPI,getUPI,nomineeDetails,getNomineeDetails} from '../controllers/userController/userController.js'
+import {userProfileUpdate,getProfile,checkReferralActive,payMLMAmount,signupController,verifyOTP,verifyOtpNumber,getWalletTransactions,singleOrder,login,addBankDetails,getBankDetails,addKYCDocuments,getUserKYCDetails,addUPI,getUPI,nomineeDetails,getNomineeDetails,withdrawRequest,getAllTrasaction} from '../controllers/userController/userController.js'
 import {refferalCreate} from '../controllers/refferalController/refferController.js'
 import order from './order.js'
 import multer from 'multer';
@@ -83,6 +83,8 @@ routes.get('/profile/:userId',getProfile)
 }]),nomineeDetails)
 .get('/nomineeDetails/:userId',getNomineeDetails)
 .get('/singleProduct/:productId',getSingleProduct)
+.post('/withdraw/:userId',withdrawRequest)
+.get('/allWithdraw/Transaction/:userId',getAllTrasaction)
 
 .use('/order',order);
 
