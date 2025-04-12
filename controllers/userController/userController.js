@@ -303,9 +303,14 @@ export const withdrawRequest=async(req,res)=>{
             message:"All fields are required"
           })
       }
+    
       const queryWithdrawReq=`INSERT INTO Withdraw (userId,amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus,finalAmount) VALUES (?,?,?,?,?,?,?,?,?)`
       const values=[userId,amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus || "inprogress",finalAmount];
       const dataWithdraw=await queryPromise(queryWithdrawReq,values);
+      const queyUpdatesPayout=`UPDATE mlm_duration SET payOut=? WHERE userId=?`
+      const valueUpdatedPayout=[0,userId];
+      const dataPayout=await queryPromise(queyUpdatesPayout,valueUpdatedPayout);
+      
       return res.status(201).json({
         status:"success",
         message:"request successfully submitted"
@@ -324,8 +329,11 @@ export const withdrawRequest=async(req,res)=>{
 export const getAllTrasaction=async(req,res)=>{
     try{
         const {userId}=req.params;
-        const queryGetAllWithdraw=`SELECT * FROM Withdraw WHERE userId=?`
-        const dataWithdraw=await queryPromise(queryGetAllWithdraw,[userId]);
+   
+       const queryWithdrawHistory=`SELECT * FROM Withdraw WHERE userId=? AND (paymentStatus="success" OR paymentStatus="rejected")`
+       const queryWithdrawpending=`SELECT * FROM Withdraw WHERE userId=? AND (paymentStatus="inprogress" OR paymentStatus="failed")`
+       const dataRequest=await queryPromise(queryWithdrawpending,[userId]);
+       const dataWithdraw=await queryPromise(queryWithdrawHistory,[userId]);
         if(dataWithdraw.length==0){
             return res.status(200).json({
                 status:"success",
@@ -335,7 +343,10 @@ export const getAllTrasaction=async(req,res)=>{
         return res.status(200).json({
             status:"success",
             message:"all withdraw details fetch successfully",
-            data:dataWithdraw
+            data:{
+                history:dataWithdraw,
+                request:dataRequest
+            }
         })
 
     }catch(err){

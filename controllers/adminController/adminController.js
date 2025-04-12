@@ -327,6 +327,60 @@ export const getAllUserDetails = async (req, res) => {
   }
 }
 
+export const widthdrawFunstionality=async(req,res)=>{
+      try{
+       const {userId}=req.params;
+       const queryWithdrawHistory=`SELECT * FROM Withdraw WHERE userId=? AND (paymentStatus="success" OR paymentStatus="rejected")`
+       const queryWithdrawpending=`SELECT * FROM Withdraw WHERE userId=? AND (paymentStatus="inprogress" OR paymentStatus="failed")`
+       const dataRequest=await queryPromises(queryWithdrawpending,[userId]);
+       const dataWithdraw=await queryPromises(queryWithdrawHistory,[userId]);
+       const userDetails=`SELECT * FROM tbl_users WHERE id=?`
+       const dataUserDetails=await queryPromises(userDetails,[userId]);
+       const bankDetails=`SELECT id,account_holder_name,account_number,confirm_account_number,bank_name,ifsc_code FROM bank_nominee_details WHERE user_id=?`
+       const dataBankDetails=await queryPromises(bankDetails,[userId]);
+       const queryUserUPI=`SELECT * FROM upi_user WHERE userId=?`;
+       const dataUserUPI=await queryPromises(queryUserUPI,[userId]);
+       return res.status(200).json({
+        status:"success",
+        message:"all details fetch  successfully",
+        data:{
+            history:dataWithdraw,
+            request:dataRequest,
+            userData:dataUserDetails,
+            paymentMethod:{
+                bank:dataBankDetails,
+                upi:dataUserUPI
+       }}})
+      }catch(err){
+        return res.status(500).json({
+      status: "failed",
+      message: "We have failed to fetch details",
+      error: err.message
+    });
+      }
+}
+
+
+export const withdrawStatus=async(req,res)=>{
+    try{
+       const {userId}=req.params;
+       const {status}=req.body;
+       const queryUpdated=`UPDATE Withdraw SET paymentStatus=? WHERE userId=?`
+       const value=[status,userId];
+       const updateStatus=await queryPromises(queryUpdated,value);
+       return res.status(200).json({
+         status:"success",
+         message:`payment status successfully updated`
+
+       })
+    }catch(err){
+         return res.status(500).json({
+      status: "failed",
+      message: "We have failed to fetch details",
+      error: err.message
+    })
+}
+}
 export const mlmLogin=async(req,res)=>{
      try{
         const {email,password}=req.body;

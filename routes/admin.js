@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {addCategory,editCategory,deleteCategory,singleCategory,getAllCategories} from '../controllers/adminController/categoryContoller.js'
-import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList,getMLMUser,upateMLMMemberStatus,getnewMLMUser,getBankDetails,getAllUserDetails,getSingleUser,getHightestCoin} from '../controllers/adminController/adminController.js'
+import {vedorList,singleVendor,vedorChangeStatus,vendorOrderList,getMLMUser,upateMLMMemberStatus,getnewMLMUser,getBankDetails,getAllUserDetails,getSingleUser,getHightestCoin,widthdrawFunstionality,withdrawStatus} from '../controllers/adminController/adminController.js'
 import {addSubCategory,editSubCategory,deleteSubCategory,singleSubCategory,getAllSubCategories,subCategeriesByCategories} from '../controllers/adminController/subcategoryController.js'
 
 import {compaignAdd,getCampaign,updateCampaign,deleteCampaign} from '../controllers/adminController/campaignController.js'
@@ -110,7 +110,8 @@ routes.get('/newMLMUser',getMLMUser)
 .get('/userDetails/:userId',getSingleUser)
 .get('/allUserDetails',getAllUserDetails)
 .get('/banksdetails',getBankDetails)
-.get('/widthdraw/:',)
+.get('/widthdraw/:userId',widthdrawFunstionality)
+.put('/withdrawStatus/:userId',withdrawStatus)
 
 routes.use('/referral',referral)
 routes.use('/coupon',coupons)
