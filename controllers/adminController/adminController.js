@@ -361,6 +361,32 @@ export const widthdrawFunstionality=async(req,res)=>{
 }
 
 
+
+export const ecomerceOrders=async(req,res)=>{
+    try{
+       const queryAllOrders=`SELECT 
+       *
+       
+       FROM orders_cart o 
+       LEFT JOIN (
+    SELECT user_id, referral_link, referral_code FROM refferal GROUP BY user_id
+  ) 
+       `  
+       const dataAllOrder=await queryPromises(queryAllOrders);
+    
+       return res.status(200).json({
+        status:"succees",
+        message:"fetch all details of orders",
+        data:dataAllOrder
+       })
+    }catch(err){
+        return res.status(500).json({
+      status: "failed",
+      message: "We have failed to fetch details",
+      error: err.message
+    });
+    }
+}
 export const withdrawStatus=async(req,res)=>{
     try{
        const {userId}=req.params;

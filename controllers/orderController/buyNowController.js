@@ -157,8 +157,8 @@ export const orderItems = async (req, res) => {
         } = req.body;
 
         // Validation
-        if (!total_items || !payment_type || !total_amount || 
-            !net_amount || !user_id || !shipping_charges || 
+        if (total_items===undefined || !payment_type || total_amount===undefined || 
+            net_amount===undefined || !user_id || shipping_charges===undefined || 
             !shipping_address_id || !order_items || total_coins === undefined) {
             return res.status(400).json({
                 status: "error",
