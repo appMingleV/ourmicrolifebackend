@@ -110,7 +110,7 @@ routes.get('/newMLMUser',getMLMUser)
 .get('/userDetails/:userId',getSingleUser)
 .get('/allUserDetails',getAllUserDetails)
 .get('/banksdetails',getBankDetails)
-.get('/widthdraw',)
+.get('/widthdraw/:',)
 
 routes.use('/referral',referral)
 routes.use('/coupon',coupons)

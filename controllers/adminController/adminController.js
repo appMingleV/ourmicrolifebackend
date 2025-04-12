@@ -261,26 +261,33 @@ export const getMLMUser=async(req,res)=>{
 export const getAllUserDetails = async (req, res) => {
   try {
     const query = `
-      SELECT 
-        u.id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.MLMStatus,
-        u.mobile_number,
-        u.level,
-        r.referral_link,
-        r.referral_code,
-        t.id AS transition_id,
-        b.id AS bank_id,
-        k.id AS kyc_id
-      FROM tbl_users u
-      LEFT JOIN refferal r ON u.id = r.user_id
-      LEFT JOIN Transition t ON u.id = t.user_id
-      LEFT JOIN bank_nominee_details b ON u.id = b.user_id
-      LEFT JOIN user_KYC k ON u.id = k.userId
-    `;
-
+  SELECT 
+    u.id,
+    u.first_name,
+    u.last_name,
+    u.email,
+    u.MLMStatus,
+    u.mobile_number,
+    u.level,
+    r.referral_link,
+    r.referral_code,
+    t.transition_id,
+    b.bank_id,
+    k.kyc_id
+  FROM tbl_users u
+  LEFT JOIN (
+    SELECT user_id, referral_link, referral_code FROM refferal GROUP BY user_id
+  ) r ON u.id = r.user_id
+  LEFT JOIN (
+    SELECT user_id, MAX(id) as transition_id FROM Transition GROUP BY user_id
+  ) t ON u.id = t.user_id
+  LEFT JOIN (
+    SELECT user_id, MAX(id) as bank_id FROM bank_nominee_details GROUP BY user_id
+  ) b ON u.id = b.user_id
+  LEFT JOIN (
+    SELECT userId, MAX(id) as kyc_id FROM user_KYC GROUP BY userId
+  ) k ON u.id = k.userId
+`;
     const rawData = await queryPromises(query);
 
     const dataAllUser = rawData.map(user => {
@@ -318,7 +325,7 @@ export const getAllUserDetails = async (req, res) => {
       error: err.message
     });
   }
-};
+}
 
 export const mlmLogin=async(req,res)=>{
      try{
