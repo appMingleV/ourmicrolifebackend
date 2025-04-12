@@ -84,7 +84,7 @@ routes.get('/profile/:userId',getProfile)
 .get('/nomineeDetails/:userId',getNomineeDetails)
 .get('/singleProduct/:productId',getSingleProduct)
 .post('/withdraw/:userId',withdrawRequest)
-.get('/allWithdraw/Transaction/:userId',getAllTrasaction)
+.get('/allWithdraw/transaction/:userId',getAllTrasaction)
 
 .use('/order',order);
 

@@ -325,7 +325,7 @@ export const withdrawRequest=async(req,res)=>{
 export const getAllTrasaction=async(req,res)=>{
     try{
         const {userId}=req.params;
-        const queryGetAllWithdraw=`SELECT * FROM Withdraw userId=?`
+        const queryGetAllWithdraw=`SELECT * FROM Withdraw WHERE userId=?`
         const dataWithdraw=await queryPromise(queryGetAllWithdraw,[userId]);
         if(dataWithdraw.length==0){
             return res.status(200).json({
