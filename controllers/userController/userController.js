@@ -6,6 +6,7 @@ import { sendMailForOTP, sendMailWelcomeSignup,adminConfirmationMailtoUser } fro
 import { getTeamPurchased } from '../../service/refferralSystem/refferral.js'
 import { otpImplementation } from '../../service/OTPSub/otp.js';
 import jwt from 'jsonwebtoken'
+import { paymentNotification } from "../../socket/socket.js";
 const otpStorage = {};
 export const userProfileUpdate = (req, res) => {
     try {
@@ -515,6 +516,8 @@ export const payMLMAmount = async (req, res) => {
         //updating paid status and paid date
         const queryUsr = `UPDATE tbl_users SET paid_status_ = 1, Paid_Date = CURDATE() WHERE id = ?`;
         await queryPromise(queryUsr,[userId]);
+
+        paymentNotification(userId, dataUser.first_name);
 
         return res.status(200).json({
             status: "success",
