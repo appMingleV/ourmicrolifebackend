@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
 
     if (role === "user") {
       userSockets.set(userId, socket);
-      console.log(object);
+      // console.log(object);
     } else if (role === "vendor") vendorSockets.set(userId, socket);
     else if (role === "ecommerceAdmin") ecommerceAdminSocket = socket;
     else if (role === "mlmAdmin") mlmAdminSocket = socket;
