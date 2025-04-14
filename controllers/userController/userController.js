@@ -2,7 +2,7 @@ import pool from '../../config/db.js';
 import { getMLM } from '../../service/refferralSystem/refferral.js'
 import otpGenerator from 'otp-generator'
 import { updatePosition, getAllPositonAmount, getTentativeCoin,getProfileCoins } from '../../service/refferralSystem/refferral.js'
-import { sendMailForOTP, sendMailWelcomeSignup,adminConfirmationMailtoUser } from '../../service/common/common.js';
+import { sendMailForOTP, sendMailWelcomeSignup,adminConfirmationMailtoUser, dateDetails } from '../../service/common/common.js';
 import { getTeamPurchased } from '../../service/refferralSystem/refferral.js'
 import { otpImplementation } from '../../service/OTPSub/otp.js';
 import jwt from 'jsonwebtoken'
@@ -820,6 +820,48 @@ export const addKYCDocuments=async(req,res)=>{
         }
 }
 
+export const getPaymentMethods=async(req,res)=>{
+    try{
+       const {userId}=req.params;
+       const queryUPI=`SELECT * FROM upi_user WHERE userId=?`
+       const dataUPI=await queryPromise(queryUPI,[userId]);
+       const queryBankDetails = `SELECT id,account_holder_name,account_number,confirm_account_number,bank_name,ifsc_code FROM bank_nominee_details WHERE user_id = ?`;
+       const values = [userId];
+       const bankDetails = await queryPromise(queryBankDetails, values);
+       return res.status(200).json({
+        status:"success",
+        message:"payments details fetched successsfully",
+        data:{
+            UPI:dataUPI,
+            bank:bankDetails
+        }
+       })
+    }catch(err){
+        return res.status(500).json({
+                status:"failed",
+                   message: "Unexpected error occurred",
+                error: err.message,
+            })
+    }
+}
+export const getUPIdDetails=async (req,res)=>{
+    try{
+      const {userId}=req.params;
+      const queryUPI=`SELECT * FROM upi_user WHERE userId=?`
+      const dataUPI=await queryPromise(queryUPI,[userId]);
+      return res.status(200).json({
+        status:"success",
+        message:"upi details successfully fetched",
+        data:dataUPI
+      })
+    }catch(err){
+          return res.status(500).json({
+                status:"failed",
+                   message: "Unexpected error occurred",
+                error: err.message,
+            })
+    }
+}
 export const getBankDetails = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -833,7 +875,7 @@ export const getBankDetails = async (req, res) => {
     }
 
     // Query to get bank details
-    const query = `SELECT * FROM bank_nominee_details WHERE user_id = ?`;
+    const query = `SELECT id,account_holder_name,account_number,confirm_account_number,bank_name,ifsc_code FROM bank_nominee_details WHERE user_id = ?`;
     const values = [userId];
     const bankDetails = await queryPromise(query, values);
 
