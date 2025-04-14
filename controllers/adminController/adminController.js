@@ -639,8 +639,8 @@ export const upateMLMMemberStatus=async(req,res)=>{
             message: "Missing required field"
         })
     
-        const quueryUpdateStatus=`UPDATE Transition SET  MLMStatus=? WHERE user_id=?`
-        const values=[status,userId];
+        const quueryUpdateStatus=`UPDATE Transition SET  MLMStatus=?,adminStatus=? WHERE user_id=?`
+        const values=[status,true,userId];
         const updateUser=await queryPromises(quueryUpdateStatus,values);
         if (!updateUser){
             return res.status(400).json({
