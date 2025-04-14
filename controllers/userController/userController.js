@@ -297,7 +297,7 @@ export const withdrawRequest=async(req,res)=>{
     try{
       const {userId}=req.params;
       const {amount,pensionCharge,TDS,serviceCharge,paymentType,paymentTypeId,paymentStatus,finalAmount}=req.body;
-      if(!userId || !amount || !pensionCharge || !TDS || !serviceCharge  || !paymentType || !paymentTypeId || !paymentStatus || !finalAmount){
+      if(userId==undefined || amount==undefined || pensionCharge==undefined || TDS==undefined || serviceCharge==undefined  || paymentType==undefined || paymentTypeId==undefined || paymentStatus==undefined || finalAmount==undefined){
           return res.status(404).json({
             status:"failed",
             message:"All fields are required"

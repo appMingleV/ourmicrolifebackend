@@ -396,6 +396,35 @@ export const loginEcommerce=async(req,res)=>{
     }
 }
 
+
+export const orderItemsByOrder=async(req,res)=>{
+    try{
+        const {orderId}=req.params;
+        const queryAllOrders=`SELECT * FROM orders_cart WHERE id=?`  
+        const dataAllOrder=await queryPromises(queryAllOrders,[orderId]);
+        const addressId=dataAllOrder[0].shipping_address_id
+        const queryAddres=`SELECT * FROM  shipping_addresses WHERE id=?`
+        const dataAddressDetail=await queryPromises(queryAddres,[addressId]);
+        const queryOrderItems=`SELECT * FROM order_items WHERE order_id=?`;
+        const dataOrderItems=await queryPromises(queryOrderItems,[orderId])
+         return res.status(200).json({
+            status:"success",
+            message:"Order Items succesfully fetched",
+            data:{
+               addressDetails:dataAddressDetail,
+               orderItems:dataOrderItems,
+               orderPayment:dataAllOrder
+            }
+         })
+    }catch(err){
+         return res.status(500).json({
+      status: "failed",
+      message: "We have failed to fetch details",
+      error: err.message
+    });
+    }
+}
+
 export const ecomerceOrders=async(req,res)=>{
     try{
        const queryAllOrders=`SELECT * FROM orders_cart`  
