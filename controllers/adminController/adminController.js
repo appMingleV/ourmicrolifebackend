@@ -360,20 +360,58 @@ export const widthdrawFunstionality=async(req,res)=>{
       }
 }
 
-
+export const loginEcommerce=async(req,res)=>{
+    try{
+    const {email,password}=req.body;
+     const queryCheckUser=`SELECT * FROM users WHERE email=?`
+     const dataUsers=await queryPromises(queryCheckUser,[email])
+     if(dataUsers.length==0){
+        return res.status(404).json({
+            status:"failed",
+            message:"user is not found"
+        })
+     }
+     if(dataUsers[0].password!=password){
+        return res.status(403).json({
+            status:"failed",
+            message:"password is not matching"
+        })
+     }
+        const token=jwt.sign({
+            email,
+            password
+        },"c3f8f4e8c7b47c6f0f2a9d8a6b24e648dfb15c51f83deea98f7b4c92c9e2d47a")
+        return res.status(200).json({
+            status:"sucessfully",
+            message:"login sucessfully",
+            token
+        })
+    }catch(err){
+       return res.status(500).json({
+      status: "failed",
+      message: "We have failed to fetch details",
+      error: err.message
+    });
+    }
+}
 
 export const ecomerceOrders=async(req,res)=>{
     try{
-       const queryAllOrders=`SELECT 
-       *
-       
-       FROM orders_cart o 
-       LEFT JOIN (
-    SELECT user_id, referral_link, referral_code FROM refferal GROUP BY user_id
-  ) 
-       `  
+       const queryAllOrders=`SELECT * FROM orders_cart`  
        const dataAllOrder=await queryPromises(queryAllOrders);
-    
+       
+       for(let e of dataAllOrder){
+         const orderId=e?.id;
+         const queryOrderItems=`SELECT * FROM order_items WHERE order_id=?`;
+         const dataOrderItems=await queryPromises(queryOrderItems,[orderId])
+         e.ordersItems=dataOrderItems
+         for(let  t of dataOrderItems){
+            const vendorId=t.vendor_id
+            const queryVendorName=`SELECT ownerName FROM Vendor WHERE id=?`
+            const dataVendorName=await queryPromises(queryVendorName,[vendorId]);
+            t.vendorName=dataVendorName[0]?.ownerName;
+         }
+       }
        return res.status(200).json({
         status:"succees",
         message:"fetch all details of orders",
