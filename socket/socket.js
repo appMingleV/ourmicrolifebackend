@@ -43,8 +43,10 @@ io.on("connection", (socket) => {
     if (role === "user") {
       userSockets.set(userId, socket);
       // console.log(object);
-    } else if (role === "vendor") vendorSockets.set(userId, socket);
-    else if (role === "ecommerceAdmin") ecommerceAdminSocket = socket;
+    } else if (role === "vendor") {
+      vendorSockets.set(userId, socket.id);
+      console.log(vendorSockets);
+    } else if (role === "ecommerceAdmin") ecommerceAdminSocket = socket;
     else if (role === "mlmAdmin") mlmAdminSocket = socket;
 
     console.log(`Registered ${role} with ID: ${userId}`);
@@ -79,7 +81,7 @@ io.on("connection", (socket) => {
 });
 
 // Notify MLM Admin (if connected)
-const paymentNotification =async (userId, name) => {
+const paymentNotification = async (userId, name) => {
   if (mlmAdminSocket) {
     console.log(`Socket id -> ${mlmAdminSocket.userId}`);
     mlmAdminSocket.emit("notify", name); // ✅ Use socket directly
@@ -89,13 +91,16 @@ const paymentNotification =async (userId, name) => {
   }
 };
 // Notify vendor and ecommerce admin (if connected)
-const OrderNotification = async(userId, vendorId) => {
-  console.log("userId", userId, "vendorId", vendorId);
-  const vendorSocket = vendorSockets.get(vendorId);
-  console.log("vendorSocket", vendorSocket?.id); // To confirm it's defined
+const OrderNotification = async (userId, vendorId) => {
+  console.log("userId", userId, "vendorId", typeof vendorId);
+  const key = vendorId.toString();
+  const vendorSocket = vendorSockets.get(key); // ✅ Ensure vendorId is a string
+  console.log(vendorSocket, "frm here");
+
+  console.log("vendorSocket", vendorSocket); // To confirm it's defined
 
   if (vendorSocket) {
-    vendorSocket.emit("order-recieve", userId); // ✅ Corrected here
+    io.to(vendorSocket).emit("order-recieve", userId); // ✅ Corrected here
     console.log(`Order notification sent to vendor: ${vendorId}`);
   } else {
     console.log(`Vendor ${vendorId} not connected`);
