@@ -371,7 +371,8 @@ export const loginEcommerce=async(req,res)=>{
             message:"user is not found"
         })
      }
-     if(dataUsers[0].password!=password){
+
+     if(dataUsers[0]?.password!=password){
         return res.status(403).json({
             status:"failed",
             message:"password is not matching"
