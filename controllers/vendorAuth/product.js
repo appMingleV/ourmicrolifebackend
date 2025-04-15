@@ -421,6 +421,9 @@ export const getSingleProduct=async(req,res)=>{
           const {productId}=req.params;
           const queryProducts=`SELECT * FROM products WHERE id=?`
           const dateProduct=await queryPromis(queryProducts,[productId]);
+          const categoryId=dateProduct[0].category_id
+          const queryCategory=`SELECT * FROM  categories WHERE id=?`
+          const dataCategory=await queryPromis(queryCategory,[categoryId]);
           
           const queryProductPrice=`SELECT * FROM product_prices WHERE product_id=?`
           const dateProductPrice=await queryPromis(queryProductPrice,[productId]);
@@ -443,6 +446,7 @@ export const getSingleProduct=async(req,res)=>{
           }
          
           dateProduct[0].prices=priceArray;
+          dateProduct[0].categoryDetail=dataCategory;
           return res.status(200).json({
             status:"sucessfully",
             data:dateProduct,
