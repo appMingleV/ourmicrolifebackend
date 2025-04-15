@@ -58,7 +58,7 @@ export const editSubCategory = (req, res) => {
         const { subCategoryId } = req.params;
         const { sub_category_name, category_id } = req.body;
         const queryCheckcategroie = `SELECT * FROM sub_categories WHERE id=?`
-
+        console.log(sub_category_name,'  ',category_id)
         pool.query(queryCheckcategroie, [subCategoryId], (err, result) => {
             if (err) {
                 return res.status(500).json({
