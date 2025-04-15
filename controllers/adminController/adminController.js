@@ -659,14 +659,21 @@ export const upateMLMMemberStatus=async(req,res)=>{
           `;
         console.log(status);
         const values1=[true,userId];
+        const queryCheckUser=`SELECT * FROM mlm_duration WHERE userId=?`
+        const value=[userId]
+        const dataCheckUser=await queryPromises(queryCheckUser,value);
+        console.log("data checker =====> ",dataCheckUser);
+        if(dataCheckUser?.length===0){
         const startDate = new Date();
         const endDate = new Date(startDate); // Create a new Date object to avoid modifying startDate
         endDate.setDate(startDate.getDate() + 30);
+         console.log("referral_code");
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
+        
         const queryAddMLMDuration=`INSERT INTO mlm_duration (startDate,endDate,coinValue,payOut,userId) VALUES (?,?,?,?,?)`
         const values2=[startDate,endDate,0,0,userId];
         await queryPromises(queryAddMLMDuration,values2);
-        console.log("referral_code");
+       
         await refferalCreate(refferalCode,userId)
         const queryUser=`SELECT * FROM tbl_users WHERE id=?`;
         const userDetails=await queryPromises(queryUser,[userId]);
@@ -675,16 +682,15 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const userData=userDetails[0];
         const refferalData=refferalCodeUser[0];
         const transactionDetails=transactionId[0];
-         
-         sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
-         await setMLMWallet(userId);
+        sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
+        await setMLMWallet(userId);
         }
-        return res.status(200).json({
+    }
+      return res.status(200).json({
             status: "success",
             message: "MLM Member status updated successfully",
             user:updateUser
         })
-   
     }catch(err){
         return res.status(500).json({
             status: "error",
