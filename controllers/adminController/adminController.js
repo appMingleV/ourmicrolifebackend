@@ -457,10 +457,11 @@ export const ecomerceOrders=async(req,res)=>{
 }
 export const withdrawStatus=async(req,res)=>{
     try{
-       const {userId}=req.params;
+        console.log("with draw =====>  ")
+       const {id}=req.params;
        const {status}=req.body;
-       const queryUpdated=`UPDATE Withdraw SET paymentStatus=? WHERE userId=?`
-       const value=[status,userId];
+       const queryUpdated=`UPDATE Withdraw SET paymentStatus=? WHERE id=?`
+       const value=[status,id];
        const updateStatus=await queryPromises(queryUpdated,value);
        return res.status(200).json({
          status:"success",
