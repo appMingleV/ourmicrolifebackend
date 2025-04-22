@@ -84,6 +84,7 @@ export const updateUserKYCBank=async(req,res)=>{
        const queryUpdate=`UPDATE tbl_users SET filled_bankDetail=?, kyc_status=? WHERE id=?`
        
        if(status=="completed"){
+      
            const updateUser=await queryPromises(queryUpdate,[status,status,userId]);
            await sendVerification(email,true)
        }else{
