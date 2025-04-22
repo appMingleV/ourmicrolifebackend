@@ -631,7 +631,7 @@ export const addBankDetails = async (req, res) => {
       await queryPromise(insertQuery, insertValues);
 
       ///////////////////////////////////////////////////////////////////////////
-      const updateQuery = `UPDATE tbl_users SET filled_bankDetail=1, filled_bankDetail_Date = CURDATE() WHERE id = ?`;
+      const updateQuery = `UPDATE tbl_users SET filled_bankDetail="inreview", filled_bankDetail_Date = CURDATE() WHERE id = ?`;
 
       await queryPromise(updateQuery, [userId]);
 
@@ -801,10 +801,10 @@ export const addKYCDocuments=async(req,res)=>{
         )
     }
     ///////////////////////////////////////////////////////////////////////////////
-    const updateUserQuery = `UPDATE tbl_users SET kyc_status = 1, kyc_status_Date = CURDATE() WHERE id = ?`;
+    const updateUserQuery = `UPDATE tbl_users SET kyc_status = "inreview", kyc_status_Date = CURDATE() WHERE id = ?`;
     await queryPromise(updateUserQuery, [userId]);
 ////////////both upper down
-    const query = `UPDATE tbl_users SET COMPLETED = 1, DateOfJoin = CURDATE() WHERE id = ? AND MLMStatus = 1 AND filled_bankDetail = 1 AND kyc_status = 1 AND paid_status_ = 1`;
+    const query = `UPDATE tbl_users SET COMPLETED = 1, DateOfJoin = CURDATE() WHERE id = ? AND MLMStatus = 1 AND filled_bankDetail = "inreview" AND kyc_status = "inreview" AND paid_status_ = 1`;
     await queryPromise(query, [userId]);
 
     return res.status(201).json({

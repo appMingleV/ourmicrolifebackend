@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+// import { emailOTP } from '../../controllers/vendorAuth/vendorAuthController';
 export const dateDetails=()=>{
     try{
         const now = new Date();
@@ -110,6 +111,18 @@ export const adminConfirmationMailtoUser=(email,name,transactionId,paymentDate)=
         emailHtml = emailHtml.replace('{{name}}',name)
        .replace('{{transactionId}}',transactionId).replace('{{paymentDate}}',paymentDate)
        sendMail(emailHtml,email,"MLM Awating Approval")
+      }catch(err){
+         return err
+      }
+}
+export const sendVerification=(email,status)=>{
+     try{
+        
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename); 
+        const htmlFilePath = path.join(__dirname,status?'Bank&KYCApproved.html':"Bank&KYCRejected.html");
+        let emailHtml = fs.readFileSync(htmlFilePath, 'utf8');
+       sendMail(emailHtml,email,status?"KYC & Bank detail Approved":"KYC & Bank detail Rejected")
       }catch(err){
          return err
       }

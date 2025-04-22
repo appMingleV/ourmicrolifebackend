@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import pool from '../../config/db.js'
 import {refferalCreate,} from '../../controllers/refferalController/refferController.js'
-import {sendMailPaymentAprovalMLM,sendMailMLMPosition} from '../../service/common/common.js'
+import {sendMailPaymentAprovalMLM,sendMailMLMPosition,sendVerification} from '../../service/common/common.js'
 import jwt from 'jsonwebtoken'
 // const SCRETEKEY=process.env.JWT_SECRET
 export const vedorList = (req, res) => {
@@ -67,6 +67,35 @@ export const vedorList = (req, res) => {
 
 }
 
+
+export const updateUserKYCBank=async(req,res)=>{
+    try{
+       const {userId}=req.params;
+       const {status}=req.body;
+       const queryUserDetail=`SELECT * FROM tbl_users WHERE id=?`
+       const dataUserProfile=await queryPromises(queryUserDetail,[userId]);
+       const email=dataUserProfile[0]?.email;
+       const queryUpdate=`UPDATE tbl_users SET filled_bankDetail=?, kyc_status=? WHERE id=?`
+       
+       if(status=="completed"){
+           const updateUser=await queryPromises(queryUpdate,[status,status,userId]);
+           await sendVerification(email,true)
+       }else{
+            const updateUser=await queryPromises(queryUpdate,[status,status,userId]);
+            await sendVerification(email,false)
+       }
+       return res.status(200).json({
+        status:"success",
+        message:"status successfully updated"
+       })
+    }catch(err){
+        return res.status(500).json({
+             status: "error",
+            message: "Something went wrong while trying to fetch vendor list",
+            error: err.message
+        })
+    }
+}
 
 export const singleVendor = (req, res) => {
     try {
