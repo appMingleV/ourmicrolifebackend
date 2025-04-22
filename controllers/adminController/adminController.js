@@ -72,6 +72,12 @@ export const updateUserKYCBank=async(req,res)=>{
     try{
        const {userId}=req.params;
        const {status}=req.body;
+       if(!status){
+        return res.status(404).json({
+            status:"failed",
+            message:"status is messing field"
+        })
+       }
        const queryUserDetail=`SELECT * FROM tbl_users WHERE id=?`
        const dataUserProfile=await queryPromises(queryUserDetail,[userId]);
        const email=dataUserProfile[0]?.email;
