@@ -68,6 +68,9 @@ export const vedorList = (req, res) => {
 }
 
 
+
+
+
 export const updateUserKYCBank=async(req,res)=>{
     try{
        const {userId}=req.params;
@@ -84,7 +87,6 @@ export const updateUserKYCBank=async(req,res)=>{
        const queryUpdate=`UPDATE tbl_users SET filled_bankDetail=?, kyc_status=? WHERE id=?`
        
        if(status=="completed"){
-      
            const updateUser=await queryPromises(queryUpdate,[status,status,userId]);
            await sendVerification(email,true)
        }else{
@@ -254,7 +256,7 @@ export const vedorChangeStatus = (req, res) => {
         })
     }
 }
-
+ 
 export const getMLMUser=async(req,res)=>{
      try{
    

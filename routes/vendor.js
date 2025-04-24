@@ -49,7 +49,7 @@ routes.get('/:vendorId',vendorDetails)
 
 //dimenesion of product added--->
 routes.post('/dimension/product/:productId',dimensionsProduct)
-routes.get('/dimension/product/:product',getDimensionProduct)
+routes.get('/dimension/product/:productId',getDimensionProduct)
 
 const thumbnailStorage = multer.diskStorage({
     destination: (req, file, cb) => {

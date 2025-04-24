@@ -33,10 +33,13 @@ export const dimensionsProduct= async (req,res)=>{
 
  export const getDimensionProduct=async(req,res)=>{
     try{
+         
         const {productId}=req.params;
+      
         const queryDimension=`SELECT * FROM dimension_of_products WHERE product_id=?`;
         const value=[productId];
         const dimensionSet=await queryPromis(queryDimension,value);      
+      
         if(dimensionSet.length==0){
             return res.status(404).json({
                 status:"error",
