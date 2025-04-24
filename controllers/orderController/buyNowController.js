@@ -2,7 +2,7 @@
 import pool from "../../config/db.js"
 import {getProfileCoins,teamDistrubutionPayOut} from '../../service/refferralSystem/refferral.js'
 import {OrderNotification} from '../../socket/socket.js';
-
+import {createOrder} from '../../service/Delivery/Delivery.js'
 export const buyOrders = async (req, res) => {
     try {
         const { coin, color, products, size, product_configuration_id, old_price, price, quantity, product_name, user_id, image_url, vendor_id } = req.body
@@ -178,7 +178,7 @@ export const orderItems = async (req, res) => {
 
         const userLevel = userData[0]?.level;
         const vendorIds = []; // Array to collect vendor IDs
-
+        const productDetails=[]
         // Create order
         const queryAddCoins = `INSERT INTO orders_cart 
             (total_items, payment_type, total_amount, net_amount, user_id, shipping_charges, shipping_address_id, total_coins) 
@@ -194,7 +194,10 @@ export const orderItems = async (req, res) => {
                 message: "Failed to create order"
             });
         }
-
+            //    const queryDimension=`SELECT * FROM dimension_of_products WHERE product_id=?`;
+            //  const value=[item?.product_id];
+            //  const dataDimension=await queryPromis(queryDimension,value);
+       let productDeleviry=[];
         // Process order items
         for (const item of order_items) {
             if (!item.product_id || !item.vendor_id) {
@@ -213,7 +216,13 @@ export const orderItems = async (req, res) => {
                     item.quantity, item.coins, item.product_image, item.product_name
                 ]
             );
-            
+      
+             const objDelivery= {
+                    "Name":item.product_name || "not available",
+                    "SKU": item.product_id,
+                    "QTY": item.quantity
+                }
+             productDeleviry.push(objDelivery)
             // Collect vendor IDs
             vendorIds.push(item.vendor_id);
 
@@ -223,7 +232,7 @@ export const orderItems = async (req, res) => {
                 (heading, coin_add_at, coin, user_id, coinStatus, orderId, level_profile, earning_type) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    item.product_name, new Date(), item.coins, user_id, 
+                    item.product_name || "hello texting", new Date(), item.coins, user_id, 
                     true, addCoinsDone.insertId, userLevel, "self"
                 ]
             );
@@ -251,7 +260,61 @@ export const orderItems = async (req, res) => {
                 // Continue with other vendors even if one fails
             }
         }
-
+         const ShippingAddress="SELECT * FROM `shipping_addresses` WHERE id=?"
+         const dataAddress=await queryPromis(ShippingAddress,[shipping_address_id]);
+          const objDelivery={
+                "PaymentType": payment_type,
+            "OrderType": "forward",
+            "CustomerName": userData[0]?.first_name,
+            "OrderNumber": addCoinsDone.insertId,
+            "Addresses": {
+                "BilingAddress": {
+                    "AddressLine1": dataAddress[0].full_address,
+                    "AddressLine2": dataAddress[0].near_by_address,
+                    "City":dataAddress[0].city,
+                    "State": dataAddress[0].state,
+                    "Country": "India",
+                    "Pincode":  dataAddress[0].pin_code,
+                    "ContactCode": "91",
+                    "Contact":  dataAddress[0].mobile_number
+                },
+                "ShippingAddress": {
+                    "AddressLine1": dataAddress[0].full_address,
+                    "AddressLine2": dataAddress[0].near_by_address,
+                    "City":dataAddress[0].city,
+                    "State": dataAddress[0].state,
+                    "Country": "India",
+                    "Pincode":  dataAddress[0].pin_code,
+                    "ContactCode": "91",
+                    "Contact":  dataAddress[0].mobile_number
+                },
+                "PickupAddress": {
+                    "WarehouseName": "Kapodra",
+                    "ContactName": "person",
+                    "AddressLine1": "l.h.road surat",
+                    "AddressLine2": "KAPODRA",
+                    "City": "surat",
+                    "State": "Gujrat",
+                    "Country": "India",
+                    "Pincode": "395006",
+                    "ContactCode": "91",
+                    "Contact": "7923464213"
+                }
+            },
+            "Weight": "0.9",
+            "Length": "11",
+            "Breadth": "12",
+            "Height": "13",
+            "ProductDetails": productDeleviry,
+            "InvoiceAmount": total_amount,
+            "EwayBill": null,
+            "ShippingCharge":shipping_charges,
+            "CodCharge": "",
+            "Discount": ""
+             }
+         
+         const deliveryData= await createOrder(objDelivery)
+       
         return res.status(200).json({
             status: "success",
             message: "Order placed successfully",

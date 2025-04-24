@@ -17,3 +17,73 @@
     1.mlm_duration,
     2.payout,
     3.coin_history
+
+
+
+
+     {
+            "PaymentType": "prepaid",
+            "OrderType": "forward",
+            "CustomerName": "Vivek",
+            "OrderNumber": "1025",
+            "Addresses": {
+                "BilingAddress": {
+                    "AddressLine1": "l.h.road surat",
+                    "AddressLine2": "KAPODRA",
+                    "City": "surat",
+                    "State": "Gujrat",
+                    "Country": "India",
+                    "Pincode": "395006",
+                    "ContactCode": "91",
+                    "Contact": "7965464213"
+                },
+                "ShippingAddress": {
+                    "AddressLine1": "l.h.road surat",
+                    "AddressLine2": "KAPODRA",
+                    "City": "surat",
+                    "State": "Gujrat",
+                    "Country": "India",
+                    "Pincode": "395006",
+                    "ContactCode": "91",
+                    "Contact": "7965464213"
+                },
+                "PickupAddress": {
+                    "WarehouseName": "Kapodra",
+                    "ContactName": "person",
+                    "AddressLine1": "l.h.road surat",
+                    "AddressLine2": "KAPODRA",
+                    "City": "surat",
+                    "State": "Gujrat",
+                    "Country": "India",
+                    "Pincode": "395006",
+                    "ContactCode": "91",
+                    "Contact": "7923464213"
+                }
+            },
+            "Weight": "0.9",
+            "Length": "11",
+            "Breadth": "12",
+            "Height": "13",
+            "ProductDetails": [
+                {
+                    "Name": "xyz",
+                    "SKU": "xrv_dr",
+                    "QTY": "12"
+                },
+                {
+                    "Name": "abc",
+                    "SKU": "xrv_sdsdr",
+                    "QTY": "12"
+                },
+                {
+                    "Name": "nbrt",
+                    "SKU": "xrfgbfv_dr",
+                    "QTY": "22"
+                }
+            ],
+            "InvoiceAmount": "1220",
+            "EwayBill": null,
+            "ShippingCharge": "12",
+            "CodCharge": "15",
+            "Discount": "20"
+        }
