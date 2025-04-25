@@ -329,7 +329,7 @@ export const getCheckRefferalCode = (req, res) => {
 
 export const signupWithReferralCode = async (req, res) => {
     try {
-        console.log("hello is in the process of being signed")
+      
         const { referral_code, new_user_id } = req.body;
         const referralDetails = await checkReferralCode(referral_code);
          console.log("referral details ========>  ",referralDetails)
@@ -360,7 +360,7 @@ export const signupWithReferralCode = async (req, res) => {
         const directRefCoin=getDirectReferral?.data[0]?.coin
         addCoins(referredUserId,directRefCoin);
         const currency=await currencyValues()
-      
+        
         // await selfPurchased(referredUserId,currency*directRefCoin,directRefCoin,"referral","referral Earning")
   
         // await teamDistrubutionPayOut(referredUserId,directRefCoin*currency,directRefCoin,"referral","team referral payout");
@@ -371,7 +371,7 @@ export const signupWithReferralCode = async (req, res) => {
         
         const newReferral = await createReferral(referralLink, referralCodeNewUser, new_user_id);
         
-        await referralPayout(referredUserId)
+        // await referralPayout(referredUserId)
         
         return res.status(200).json({
             status: "success",

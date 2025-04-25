@@ -721,6 +721,10 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const userData=userDetails[0];
         const refferalData=refferalCodeUser[0];
         const transactionDetails=transactionId[0];
+        const teamLastMember=JSON.parse(userData?.team)
+        const lastMember=teamLastMember[teamLastMember.length-1];
+        const getMemberId=await queryPromises(`SELECT user_id FROM team_referral WHERE id=?`,[lastMember]);
+        // const addCoin=await queryPromises(`UPDATE `)
         sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
         await setMLMWallet(userId);
         }
