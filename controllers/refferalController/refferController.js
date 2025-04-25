@@ -221,7 +221,7 @@ const setTeam = async (referredUserId, userId,coinsTeam) => {
        
         // Update parent teams and propagate changes
         const updatedTeams = [teamInsertResult.insertId, ...parentTeams];
-        putCoins(coinsTeam,updatedTeams);
+        // putCoins(coinsTeam,updatedTeams);
         // Update the parent user's team with new entries
         const queryUpdateNewUserParent = `UPDATE tbl_users SET team = ? WHERE id = ?`;
         await queryPromise(queryUpdateNewUserParent, [JSON.stringify(updatedTeams), userId]);
@@ -251,7 +251,7 @@ const setTeam = async (referredUserId, userId,coinsTeam) => {
 //     7,  8,  9, 10, 12, 16,
 //    17, 18, 20
 //  ]
-const putCoins = async (coinsTeam, teamId) => {
+export const putCoins = async (coinsTeam, teamId) => {
     console.log("coinsTeam=======>     ",coinsTeam)
     const coins = Object.values(coinsTeam);
     console.log("coins -->", coins);
@@ -358,7 +358,7 @@ export const signupWithReferralCode = async (req, res) => {
         const getDirectReferral=await directReferralCoin();
         console.log("get direct referral system=======================================>  ",getDirectReferral);
         const directRefCoin=getDirectReferral?.data[0]?.coin
-        addCoins(referredUserId,directRefCoin);
+        // addCoins(referredUserId,directRefCoin);
         const currency=await currencyValues()
         
         // await selfPurchased(referredUserId,currency*directRefCoin,directRefCoin,"referral","referral Earning")

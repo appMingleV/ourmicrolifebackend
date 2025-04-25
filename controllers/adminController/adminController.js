@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import pool from '../../config/db.js'
 import {refferalCreate,} from '../../controllers/refferalController/refferController.js'
 import {sendMailPaymentAprovalMLM,sendMailMLMPosition,sendVerification} from '../../service/common/common.js'
+import {directReferralCoin} from '../../service/refferralSystem/refferral.js'
 import jwt from 'jsonwebtoken'
 // const SCRETEKEY=process.env.JWT_SECRET
 export const vedorList = (req, res) => {
@@ -723,8 +724,12 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const transactionDetails=transactionId[0];
         const teamLastMember=JSON.parse(userData?.team)
         const lastMember=teamLastMember[teamLastMember.length-1];
+        const getDirectReferral=await directReferralCoin();
+        const directRefCoin=getDirectReferral?.data[0]?.coin
+        
         const getMemberId=await queryPromises(`SELECT user_id FROM team_referral WHERE id=?`,[lastMember]);
-        // const addCoin=await queryPromises(`UPDATE `)
+        const addCoin=await queryPromises(`UPDATE wallets SET coins=coins+? WHERE userId=? AND earning_type=?`,[50,getMemberId[0]?.user_id,"referral"])
+
         sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
         await setMLMWallet(userId);
         }
