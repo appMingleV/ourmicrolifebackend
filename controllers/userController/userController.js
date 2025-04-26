@@ -971,9 +971,9 @@ export const getWalletTransactions = async (req, res) => {
        const selfDataGroupPur=await queryPromise(queryGetGroupPur,[userId,"group"]);
        const queryDataRef=`SELECT * FROM wallets WHERE  userId=? AND earning_type=?`
        const selfDataRef=await queryPromise(queryDataRef,[userId,"referral"]);
-       walletArray.push(selfDataGroupPur);
-       walletArray.push(selfDataRef)
-       walletArray.push(selfDataGroup)
+       walletArray.push(selfDataGroupPur[0]);
+       walletArray.push(selfDataRef[0])
+       walletArray.push(selfDataGroup[0])
        const groupEaring=selfDataGroupPur[0].payout;
        const referralEaring=selfDataRef[0].payout
        
@@ -992,14 +992,14 @@ export const getWalletTransactions = async (req, res) => {
                                 
                                 WHERE userId = ? AND (earning_type = "self" OR earning_type = "referral" OR earning_type = "group") `                  
          }
-        
+      
       const payOutData=await  queryPromise((`SELECT * FROM payout WHERE user_id=?`),[userId]);
       
        return res.status(200).json({
             status: "success",
             message: "Wallet transactions fetched successfully",
             totalPayout,
-            data: walletArray,
+            data:walletArray,
             transition:dataQuery,
             payOutData
         })
