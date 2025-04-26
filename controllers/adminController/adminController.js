@@ -704,10 +704,11 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const dataCheckUser=await queryPromises(queryCheckUser,value);
         console.log("data checker =====> ",dataCheckUser);
         if(dataCheckUser?.length===0){
+              console.log("referral_code");
         const startDate = new Date();
         const endDate = new Date(startDate); // Create a new Date object to avoid modifying startDate
         endDate.setDate(startDate.getDate() + 30);
-         console.log("referral_code");
+       
         const updateMlmStatus=await queryPromises(queryUpdateMlmStatus,values1);
         
         const queryAddMLMDuration=`INSERT INTO mlm_duration (startDate,endDate,coinValue,payOut,userId) VALUES (?,?,?,?,?)`
@@ -723,15 +724,18 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const refferalData=refferalCodeUser[0];
         const transactionDetails=transactionId[0];
         const teamLastMember=JSON.parse(userData?.team)
-        const lastMember=teamLastMember[teamLastMember.length-1];
+        const lastMember=teamLastMember[0];
         const getDirectReferral=await directReferralCoin();
         const directRefCoin=getDirectReferral?.data[0]?.coin
-        
+        console.log(teamLastMember,  "last member",lastMember)
         const getMemberId=await queryPromises(`SELECT user_id FROM team_referral WHERE id=?`,[lastMember]);
-        const addCoin=await queryPromises(`UPDATE wallets SET coins=coins+? WHERE userId=? AND earning_type=?`,[50,getMemberId[0]?.user_id,"referral"])
-
+      
+          const addCoin=await queryPromises(`UPDATE wallets SET coins=coins+? WHERE userId=? AND earning_type=?`,[50,getMemberId[0]?.user_id,"referral"])
         sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
         await setMLMWallet(userId);
+        }else{
+            console.log("data is ")
+              const addCoin=await queryPromises(`UPDATE wallets SET coins=coins+? WHERE userId=? AND earning_type=?`,[50,getMemberId[0]?.user_id,"referral"])
         }
     }
       return res.status(200).json({

@@ -964,10 +964,18 @@ export const getWalletTransactions = async (req, res) => {
        const valueUpdate = [coinsSelf, levelEarning+normanEarning,userId];
     
        await queryPromise(queryUpdateMLMUser, valueUpdate);
-       const queryGetGroup=`SELECT * FROM wallets WHERE  userId=? `
-       const dataGroup=await queryPromise(queryGetGroup,[userId]);
-       const groupEaring=dataGroup[0].payout;
-       const referralEaring=dataGroup[1].payout
+       const walletArray=[]
+       const queryGetGroup=`SELECT * FROM wallets WHERE  userId=? AND earning_type=?`
+       const selfDataGroup=await queryPromise(queryGetGroup,[userId,"self"]);
+       const queryGetGroupPur=`SELECT * FROM wallets WHERE  userId=? AND earning_type=?`
+       const selfDataGroupPur=await queryPromise(queryGetGroupPur,[userId,"group"]);
+       const queryDataRef=`SELECT * FROM wallets WHERE  userId=? AND earning_type=?`
+       const selfDataRef=await queryPromise(queryDataRef,[userId,"referral"]);
+       walletArray.push(selfDataGroupPur);
+       walletArray.push(selfDataRef)
+       walletArray.push(selfDataGroup)
+       const groupEaring=selfDataGroupPur[0].payout;
+       const referralEaring=selfDataRef[0].payout
        
          let totalPayout=0;
          if(endDate<currentDate){
@@ -991,7 +999,7 @@ export const getWalletTransactions = async (req, res) => {
             status: "success",
             message: "Wallet transactions fetched successfully",
             totalPayout,
-            data: dataGroup,
+            data: walletArray,
             transition:dataQuery,
             payOutData
         })
