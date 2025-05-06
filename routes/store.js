@@ -47,7 +47,7 @@ routes.post('/signup',multipleupload,signup);
 routes.post('/otp/number',otpSend)
 
 routes.post('/signup/verifyOTP',verifyOtpSignup)
-routes.post('/otp/vendor/email', emailOTP)
+routes.post('/otp/email', emailOTP)
 
 
 export default routes;
