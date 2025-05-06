@@ -185,8 +185,8 @@ export const verifyOtpSignup = (req, res) => {
         console.log(newStoreUser);
         const storeUserId=newStoreUser?.insertId
         const queryStoreDetails=`INSERT INTO  storeUser (storeName,storeCategory,storeUserId,userName,storeAddress,BusinessContact,logo,banner) VALUES (?,?,?,?,?,?,?,?)`
-        
         const valueStoreDetails=[storeName,storeCategory,storeUserId,userName,storeAddress,BusinessContact]
+        
         return res.status(201).json({
           status:"sucessfully",
           message:"store user sucessfully registered",
