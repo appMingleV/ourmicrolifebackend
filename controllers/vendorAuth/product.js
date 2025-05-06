@@ -551,6 +551,19 @@ export const delateConfigProduct=async(req,res)=>{
   }
 }
 
+export const dashboardDetails=async(req,res)=>{
+  try{
+      const {vendorId}=req.params;
+      
+  }catch(err){
+  return res.status(500).json({
+      status:"error",
+      message:"Something went wrong while trying to get all product",
+      error:err.message
+    })
+  }
+}
+
 export const delatePriceProduct=async(req,res)=>{
   try{
     const {priceId}=req.params;

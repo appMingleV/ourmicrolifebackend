@@ -727,10 +727,11 @@ export const upateMLMMemberStatus=async(req,res)=>{
         const lastMember=teamLastMember[0];
         const getDirectReferral=await directReferralCoin();
         const directRefCoin=getDirectReferral?.data[0]?.coin
-        console.log(teamLastMember,  "last member",lastMember)
+        console.log("coins===> ",directRefCoin);
+        // console.log(teamLastMember,  "last member",lastMember)
         const getMemberId=await queryPromises(`SELECT user_id FROM team_referral WHERE id=?`,[lastMember]);
-      
-          const addCoin=await queryPromises(`UPDATE wallets SET coins=coins+? WHERE userId=? AND earning_type=?`,[50,getMemberId[0]?.user_id,"referral"])
+        const payout=5*directRefCoin
+        const addCoin=await queryPromises(`UPDATE wallets SET coins=coins+?,payOut=payOut+? WHERE userId=? AND earning_type=?`,[50,payout,getMemberId[0]?.user_id,"referral"])
         sendMailPaymentAprovalMLM(userData?.email,userData?.first_name,"Payment Approval",refferalData.referral_code,transactionDetails.transition_id,transactionDetails.date_transaction,refferalData.referral_link)
         await setMLMWallet(userId);
         }else{

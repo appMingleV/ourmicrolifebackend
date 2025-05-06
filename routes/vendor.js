@@ -83,6 +83,7 @@ routes.put('/product')
 .delete('/productImage/:imageId',delateImage)
 .delete('/productPrice/:priceId',delatePriceProduct)
 .delete('/productConfig/:configId',delateConfigProduct)
+.get('/dashboard/:vendorId',)
 routes.use('/stores',store);
 //shop details-->
 

@@ -432,9 +432,7 @@ export const getRefferalUsers = async (req, res) => {
     }
 }
 
-// function getTeamName(userId){
-//   const teamName=
-// }
+
 
 function getDirectRefferalUsers(userId) {
     const queryDirectReferral = `SELECT referral_to,date FROM direct_referrals WHERE referral_from=?`;

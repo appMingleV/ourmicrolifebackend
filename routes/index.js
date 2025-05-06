@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import coins from './coins.js';
 import {refferalCreate,getRefferalUser,getRefferalUsers,getCheckRefferalCode,signupWithReferralCode,UsercustomFilter} from '../controllers/refferalController/refferController.js'
-
+import store from './store.js'
 import user from './user.js'
 import {decryptRefferal} from '../middleware/index.js';
 import admin from './admin.js'
@@ -35,4 +35,6 @@ route.post('/custom-filter',UsercustomFilter);
 route.use('/admin',admin);
 route.use('/vendor',vendor);
 route.use('/user',user)
+route.use('/store',store)
+
 export default route;
