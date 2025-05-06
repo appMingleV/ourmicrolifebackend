@@ -43,7 +43,7 @@ const upload = multer({ storage:storage });
 const multipleupload = upload.fields([{ name: 'aadharNumberFront',maxCount: 1  }, { name: 'aadharNumberBack',maxCount: 1  }, { name: 'PANDocument',maxCount: 1  }, { name: 'DocumentProof',maxCount: 1  }]);
 
 
-routes.post('/signup',signup);
+routes.post('/signup',multipleupload,signup);
 routes.post('/otp/number',otpSend)
 
 routes.post('/signup/verifyOTP',verifyOtpSignup)

@@ -184,9 +184,13 @@ export const verifyOtpSignup = (req, res) => {
         const newStoreUser=await queryPromises(queryPersonal,values);
         console.log(newStoreUser);
         const storeUserId=newStoreUser?.insertId
-        const queryStoreDetails=`INSERT INTO  storeUser (storeName,storeCategory,storeUserId,userName,storeAddress,BusinessContact,logo,banner) VALUES (?,?,?,?,?,?,?,?)`
+        const queryStoreDetails=`INSERT INTO  storeUserDetails (storeName,storeCategory,storeUserId,userName,storeAddress,BusinessContact,logo,banner) VALUES (?,?,?,?,?,?,?,?)`
         const valueStoreDetails=[storeName,storeCategory,storeUserId,userName,storeAddress,BusinessContact]
-        
+        await queryPromises(queryStoreDetails,valueStoreDetails);
+        const queryDocument=`INSERT INTO  storeUserDocuments  (storeUserId ,aadharNumber ,aadharNumberFront ,aadharNumberBack ,PAN ,PANDocument ,DocumentProof ,documentType ) VALUES (?,?,?,?,?,?,?,?)`
+        const valueDocument=[storeUserId,aadharNumber,aadharNumberFront,aadharNumberBack,PAN,PANDocument,DocumentProof,documentType]
+        const dataDocumnet=await queryPromises(queryDocument,valueDocument);
+        console.log("data Document =====>     ",dataDocumnet);
         return res.status(201).json({
           status:"sucessfully",
           message:"store user sucessfully registered",
