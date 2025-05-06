@@ -980,11 +980,10 @@ export const getWalletTransactions = async (req, res) => {
          let totalPayout=0;
          if(endDate<currentDate){
              totalPayout=levelEarning+normanEarning+referralEaring+groupEaring
-             const queryUpdateWallet=`UPDATE wallets 
-                                SET coins = 0, 
-                                    payout =0,
-                                
-                                WHERE userId = ? AND (earning_type = "self" OR earning_type = "referral" OR earning_type = "group") `
+            const queryUpdateWallet = `UPDATE wallets 
+                            SET coins = 0, 
+                                payout = 0
+                            WHERE userId = ? AND (earning_type = "self" OR earning_type = "referral" OR earning_type = "group")`;
               await queryPromise(queryUpdateWallet,[userId]);
               const updatePayout=`UPDATE wallets 
                                 SET coins = 0, 
